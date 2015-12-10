@@ -14,30 +14,30 @@ import java.util.List;
 
 public class Find
 {
-    public static void Execute(CommandSender sender, String[] args, VirtualShop plugin)
+    public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
     {
         if(!sender.hasPermission("virtualshop.find"))
         {
-            Chatty.NoPermissions(sender);
+            Chatty.noPermissions(sender);
             return;
         }
         if(args.length < 1)
 		{
-			Chatty.SendError(sender, "You need to specify the item.");
+			Chatty.sendError(sender, "You need to specify the item.");
 			return;
 		}
 		ItemStack item = ItemDb.get(args[0], 0);
 		if(item==null)
 		{
-			Chatty.WrongItem(sender, args[0]);
+			Chatty.wrongItem(sender, args[0]);
 			return;
 		}
         int page = 1;
-		List<Offer> offers = DatabaseManager.GetPrices(item);
-        if(args.length>1)  page = Numbers.ParseInteger(args[1]);
+		List<Offer> offers = DatabaseManager.getPrices(item);
+        if(args.length>1)  page = Numbers.parseInteger(args[1]);
 		if(offers.size()==0)
 		{
-			Chatty.SendError(sender, "No one is selling " + args[0]);
+			Chatty.sendError(sender, "No one is selling " + args[0]);
             return;
 		}
 
@@ -55,7 +55,7 @@ public class Find
             if(count==start+9) break;
             if(count >= start)
             {
-                sender.sendMessage(Chatty.FormatOffer(o));
+                sender.sendMessage(Chatty.formatOffer(o));
             }
             count++;
 		}

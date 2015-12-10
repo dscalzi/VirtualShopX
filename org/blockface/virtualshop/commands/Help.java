@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 
 public class Help {
 
-    public static void Execute(CommandSender sender, VirtualShop plugin)
+    public static void execute(CommandSender sender, VirtualShop plugin)
     {
         sender.sendMessage(ChatColor.GRAY + "|-------------" + ChatColor.DARK_GREEN +"VirtualShop" + ChatColor.GRAY + "-------------|");
         sender.sendMessage(ChatColor.RED + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<maxprice>" + ChatColor.WHITE + " - buy items.");

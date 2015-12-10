@@ -12,44 +12,44 @@ import org.bukkit.inventory.ItemStack;
 
 public class Cancel {
 
-    public static void Execute(CommandSender sender, String[] args, VirtualShop plugin)
+    public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
     {
         if(!(sender instanceof Player))
         {
-            Chatty.DenyConsole(sender);
+            Chatty.denyConsole(sender);
             return;
         }
         if(!sender.hasPermission("virtualshop.cancel"))
         {
-            Chatty.NoPermissions(sender);
+            Chatty.noPermissions(sender);
             return;
         }
         if(args.length < 1)
         {
-            Chatty.SendError(sender, "You must specify an item.");
+            Chatty.sendError(sender, "You must specify an item.");
             return;
         }
         ItemStack item = ItemDb.get(args[0], 0);
 		if(item==null)
 		{
-			Chatty.WrongItem(sender, args[0]);
+			Chatty.wrongItem(sender, args[0]);
 			return;
 		}
         Player player = (Player)sender;
         int total = 0;
-        for(Offer o: DatabaseManager.GetSellerOffers(player.getName(),item))
+        for(Offer o: DatabaseManager.getSellerOffers(player.getName(),item))
         {
             total += o.item.getAmount();
         }
 		if(total == 0)
 		{
-			Chatty.SendError(sender,"You do not have any " + args[0] + " for sale.");
+			Chatty.sendError(sender,"You do not have any " + args[0] + " for sale.");
 			return;
 		}
         item.setAmount(total);
         new InventoryManager(player).addItem(item);
-        DatabaseManager.RemoveSellerOffers(player,item);
-        Chatty.SendSuccess(sender, "Removed " + Chatty.FormatAmount(total) + " " + Chatty.FormatItem(args[0]));
+        DatabaseManager.removeSellerOffers(player,item);
+        Chatty.sendSuccess(sender, "Removed " + Chatty.formatAmount(total) + " " + Chatty.formatItem(args[0]));
 
 
     }

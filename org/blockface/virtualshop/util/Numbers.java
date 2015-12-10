@@ -2,7 +2,7 @@ package org.blockface.virtualshop.util;
 
 public class Numbers
 {
-    public static Integer ParseInteger(String s)
+    public static Integer parseInteger(String s)
 	{
 		try
 		{
@@ -17,7 +17,7 @@ public class Numbers
 		return -1;
 	}
 
-	public static Float ParseFloat(String s)
+	public static Float parseFloat(String s)
 	{
 		try
 		{

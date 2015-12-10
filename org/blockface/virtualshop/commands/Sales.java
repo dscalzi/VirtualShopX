@@ -12,24 +12,24 @@ import java.util.List;
 
 public class Sales
 {
-    public static void Execute(CommandSender sender, String[] args, VirtualShop plugin)
+    public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
     {
         if(!sender.hasPermission("virtualshop.sales"))
         {
-            Chatty.NoPermissions(sender);
+            Chatty.noPermissions(sender);
             return;
         }
         int start = 1;
         List<Transaction> transactions;
-        transactions = DatabaseManager.GetTransactions();
-        if(args.length>0)  start = Numbers.ParseInteger(args[0]);
+        transactions = DatabaseManager.getTransactions();
+        if(args.length>0)  start = Numbers.parseInteger(args[0]);
         if(start < 0)
         {
             String search = args[0];
-			if(args.length > 1) start = Numbers.ParseInteger(args[1]);
+			if(args.length > 1) start = Numbers.parseInteger(args[1]);
 			if(start < 0) start = 1;
 			start = (start -1) * 9;
-            transactions = DatabaseManager.GetTransactions(search);
+            transactions = DatabaseManager.getTransactions(search);
         }
         else start = (start-1) * 9;
 
@@ -47,7 +47,7 @@ public class Sales
             if(count==start+9) break;
             if(count >= start)
             {
-                sender.sendMessage(Chatty.FormatTransaction(t));
+                sender.sendMessage(Chatty.formatTransaction(t));
             }
             count++;
         }

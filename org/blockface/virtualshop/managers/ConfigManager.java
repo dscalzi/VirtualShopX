@@ -9,7 +9,7 @@ public class ConfigManager
 {
     private static ConfigurationSection config;
 
-    public static void Initialize(Plugin plugin)
+    public static void initialize(Plugin plugin)
     {
         config = plugin.getConfig();
         plugin.getConfig().options().copyDefaults(true); 
@@ -19,18 +19,18 @@ public class ConfigManager
             e.printStackTrace();
         }
         plugin.reloadConfig();
-        BroadcastOffers();
-        UsingMySQL();
-        MySQLUserName();
-        MySQLHost();
-        MySQLdatabase();
-        MySQLport();
-        MySQLPassword();
+        broadcastOffers();
+        usingMySQL();
+        mySQLUserName();
+        mySQLHost();
+        mySQLdatabase();
+        mySQLport();
+        mySQLPassword();
         getPort();
         plugin.saveConfig();
     }
 
-	public static Boolean BroadcastOffers()
+	public static Boolean broadcastOffers()
 	{
 		return config.getBoolean("broadcast-offers", true);
 	}
@@ -39,32 +39,32 @@ public class ConfigManager
         return config.getInt("MySQL.port",3306);
     }
 
-	public static Boolean UsingMySQL()
+	public static Boolean usingMySQL()
 	{
 		return config.getBoolean("using-MySQL", false);
 	}
 
-	public static String MySQLUserName()
+	public static String mySQLUserName()
 	{
 		return config.getString("MySQL.username", "root");
 	}
 
-	public static String MySQLPassword()
+	public static String mySQLPassword()
 	{
 		return config.getString("MySQL.password", "password");
 	}
 
-	public static String MySQLHost()
+	public static String mySQLHost()
 	{
 		return config.getString("MySQL.host", "localhost");
 	}
 
-	public static String MySQLdatabase()
+	public static String mySQLdatabase()
 	{
 		return config.getString("MySQL.database", "minecraft");
 	}
 
-	public static Integer MySQLport()
+	public static Integer mySQLport()
 	{
 		return config.getInt("MySQL.port", 3306);
 	}

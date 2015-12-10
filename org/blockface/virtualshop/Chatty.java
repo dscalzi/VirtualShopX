@@ -15,37 +15,37 @@ public class Chatty
     private static VirtualShop plugin;
 	private static Logger logger;
 
-    public static void Initialize(VirtualShop p)
+    public static void initialize(VirtualShop p)
     {
 		logger = Logger.getLogger("minecraft");
         plugin = p;
         prefix = "[Shop] " + ChatColor.WHITE;
-        LogInfo(plugin.getDescription().getName() + " is loading.");
+        logInfo(plugin.getDescription().getName() + " is loading.");
     }
 
-	public static void LogInfo(String message)
+	public static void logInfo(String message)
 	{
 		logger.info(message);
 	}
 
-    public static void SendError(CommandSender sender, String message)
+    public static void sendError(CommandSender sender, String message)
     {
         sender.sendMessage(ChatColor.RED + prefix  + message);
     }
 
-    public static void SendSuccess(CommandSender sender, String message)
+    public static void sendSuccess(CommandSender sender, String message)
     {
         sender.sendMessage(ChatColor.DARK_GREEN + prefix  + message);
     }
 
-    public static Boolean SendSuccess(String sender, String message)
+    public static Boolean sendSuccess(String sender, String message)
     {   Player player = plugin.getServer().getPlayer(sender);
 		if(player == null) return false;
-        SendSuccess(player,message);
+        sendSuccess(player,message);
 		return true;
     }
 
-    public static void SendGlobal(String message)
+    public static void sendGlobal(String message)
     {
         plugin.getServer().broadcastMessage(ChatColor.DARK_GREEN + prefix  + message);
     }
@@ -58,64 +58,64 @@ public class Chatty
         return prefix;
     }
 
-    public static void WrongItem(CommandSender sender, String item)
+    public static void wrongItem(CommandSender sender, String item)
 	{
 
-		SendError(sender, "What is " + item + "?");
+		sendError(sender, "What is " + item + "?");
 	}
 
-	public static void DenyConsole(CommandSender sender)
+	public static void denyConsole(CommandSender sender)
 	{
-		SendError(sender, "You must be in-game to do this.");
+		sendError(sender, "You must be in-game to do this.");
 	}
 
-	public static void NumberFormat(CommandSender sender)
+	public static void numberFormat(CommandSender sender)
 	{
-		SendError(sender, "That is not a proper number.");
+		sendError(sender, "That is not a proper number.");
 	}
 
-	public static String FormatSeller(String seller)
+	public static String formatSeller(String seller)
 	{
 		return ChatColor.RED + seller + ChatColor.WHITE;
 	}
 
-	public static String FormatAmount(Integer amount)
+	public static String formatAmount(Integer amount)
 	{
 		return ChatColor.GOLD + amount.toString() + ChatColor.WHITE;
 	}
 
-	public static String FormatItem(String item)
+	public static String formatItem(String item)
 	{
 		return ChatColor.BLUE + item.toLowerCase() + ChatColor.WHITE;
 	}
 
-	public static String FormatPrice(double price)
+	public static String formatPrice(double price)
 	{
 		return ChatColor.YELLOW + VirtualShop.econ.format(price) + ChatColor.WHITE;
 	}
 
-	public static String FormatBuyer(String buyer)
+	public static String formatBuyer(String buyer)
 	{
 		return ChatColor.AQUA + buyer.toString() + ChatColor.WHITE;
 	}
 
-	public static void NoPermissions(CommandSender sender)
+	public static void noPermissions(CommandSender sender)
 	{
-		SendError(sender, "You do not have permission to do this");
+		sendError(sender, "You do not have permission to do this");
 	}
 
-    public static void BroadcastOffer(Offer o) {
-         SendGlobal(FormatOffer(o));
+    public static void broadcastOffer(Offer o) {
+         sendGlobal(formatOffer(o));
     }
 
-    public static String FormatOffer(Offer o)
+    public static String formatOffer(Offer o)
     {
-        return FormatSeller(o.seller) + ": " + FormatAmount(o.item.getAmount()) + " " + FormatItem(ItemDb.reverseLookup(o.item)) + " for " + FormatPrice(o.price) + " each.";
+        return formatSeller(o.seller) + ": " + formatAmount(o.item.getAmount()) + " " + formatItem(ItemDb.reverseLookup(o.item)) + " for " + formatPrice(o.price) + " each.";
     }
 
-    public static String FormatTransaction(Transaction t)
+    public static String formatTransaction(Transaction t)
 	{
-		return FormatSeller(t.seller)+ " --> " + FormatBuyer(t.buyer) + ": " + FormatAmount(t.item.getAmount())+" " + FormatItem(ItemDb.reverseLookup(t.item)) + " for "+ FormatPrice(t.cost);
+		return formatSeller(t.seller)+ " --> " + formatBuyer(t.buyer) + ": " + formatAmount(t.item.getAmount())+" " + formatItem(ItemDb.reverseLookup(t.item)) + " for "+ formatPrice(t.cost);
 
 	}
 

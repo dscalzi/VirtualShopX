@@ -9,6 +9,7 @@ import org.bukkit.material.MaterialData;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public class InventoryManager {
     private final PlayerInventory _inv;
     private final Player _player;

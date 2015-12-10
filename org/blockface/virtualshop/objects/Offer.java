@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class Offer
 {
     public ItemStack item;
@@ -28,7 +29,7 @@ public class Offer
         this.price = price;
     }
 
-    public static List<Offer> ListOffers(ResultSet result)
+    public static List<Offer> listOffers(ResultSet result)
     {
         List<Offer> ret = new ArrayList<Offer>();
         try {

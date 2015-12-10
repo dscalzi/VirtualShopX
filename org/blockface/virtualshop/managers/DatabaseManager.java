@@ -11,104 +11,105 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class DatabaseManager
 {
     private static Database database;
 
-    public static void Initialize()
+    public static void initialize()
     {
-        if(ConfigManager.UsingMySQL()) LoadMySQL();
-        else LoadSQLite();
+        if(ConfigManager.usingMySQL()) loadMySQL();
+        else loadSQLite();
     }
 
-    private static void LoadSQLite() {
+    private static void loadSQLite() {
         database = new SQLiteDB();
         try {
-            database.Load();
+            database.load();
         } catch (Exception e) {
-            Chatty.LogInfo("Fatal error.");
+            Chatty.logInfo("Fatal error.");
         }
     }
 
-    private static void LoadMySQL() {
+    private static void loadMySQL() {
         database = new MySQLDB();
         try {
-            database.Load();
+            database.load();
         } catch (Exception e) {
-            LoadSQLite();
+            loadSQLite();
         }
     }
 
-    public static void Close() {
-        database.Unload();
+    public static void close() {
+        database.unload();
     }
 
-    public static void AddOffer(Offer offer)
+    public static void addOffer(Offer offer)
 	{
 			String query = "insert into stock(seller,item,amount,price,damage) values('" +offer.seller +"',"+ offer.item.getType().getId() + ","+offer.item.getAmount() +","+offer.price+"," + offer.item.getDurability()+")";
-			database.Query(query);
+			database.query(query);
 	}
 
-    public static List<Offer> GetItemOffers(ItemStack item)
+    public static List<Offer> getItemOffers(ItemStack item)
 	{
 		String query = "select * from stock where item=" + item.getTypeId()+ " and damage=" + item.getDurability() + " order by price asc";
-		return Offer.ListOffers(database.Query(query));
+		return Offer.listOffers(database.query(query));
 	}
 
-    public static List<Offer> GetSellerOffers(String player, ItemStack item)
+    public static List<Offer> getSellerOffers(String player, ItemStack item)
 	{
 		String query = "select * from stock where seller = '" + player + "' and item =" + item.getTypeId() + " and damage=" + item.getDurability();
-		return Offer.ListOffers(database.Query(query));
+		return Offer.listOffers(database.query(query));
 	}
 
-    public static void RemoveSellerOffers(Player player, ItemStack item)
+    public static void removeSellerOffers(Player player, ItemStack item)
 	{
 		String query = "delete from stock where seller = '" + player.getName() + "' and item =" + item.getTypeId() + " and damage = " + item.getDurability();
-		database.Query(query);
+		database.query(query);
 	}
 
-    public static void DeleteItem(int id)
+    public static void deleteItem(int id)
 	{
 		String query = "delete from stock where id="+id;
-		database.Query(query);
+		database.query(query);
 	}
 
-    public static void UpdateQuantity(int id, int quantity)
+    public static void updateQuantity(int id, int quantity)
 	{
 		String query = "update stock set amount="+quantity+" where id=" + id;
-		database.Query(query);
+		database.query(query);
 	}
 
-    public static void LogTransaction(Transaction transaction)
+    public static void logTransaction(Transaction transaction)
 	{
 		String query = "insert into transactions(seller,buyer,item,amount,cost,damage) values('" +transaction.seller +"','"+ transaction.buyer + "'," + transaction.item.getTypeId() + ","+ transaction.item.getAmount() +","+transaction.cost+","+transaction.item.getDurability()+")";
-		database.Query(query);
+		database.query(query);
 	}
 
-    public static List<Offer> GetBestPrices()
+    public static List<Offer> getBestPrices()
     {
         String query = "select f.* from (select item,min(price) as minprice from stock group by item) as x inner join stock as f on f.item = x.item and f.price = x.minprice";
-        return Offer.ListOffers(database.Query(query));
+        return Offer.listOffers(database.query(query));
     }
 
-    public static List<Offer> SearchBySeller(String seller)
+    public static List<Offer> searchBySeller(String seller)
     {
-		return Offer.ListOffers(database.Query("select * from stock where seller like '%" + seller +  "%'"));
+		return Offer.listOffers(database.query("select * from stock where seller like '%" + seller +  "%'"));
     }
 
-    public static List<Transaction> GetTransactions()
+    public static List<Transaction> getTransactions()
 	{
-		return Transaction.ListTransactions(database.Query("select * from transactions order by id desc"));
+		return Transaction.listTransactions(database.query("select * from transactions order by id desc"));
 	}
 
-	public static List<Transaction> GetTransactions(String search)
+	public static List<Transaction> getTransactions(String search)
 	{
-		return Transaction.ListTransactions(database.Query("select * from transactions where seller like '%" + search +"%' OR buyer like '%" + search +"%' order by id"));
+		return Transaction.listTransactions(database.query("select * from transactions where seller like '%" + search +"%' OR buyer like '%" + search +"%' order by id"));
 	}
 
-    public static List<Offer> GetPrices(ItemStack item)
+    public static List<Offer> getPrices(ItemStack item)
 	{
 		String query = "select * from stock where item=" + item.getTypeId() + " AND damage=" + item.getDurability() + " order by price asc limit 0,10";
-		return Offer.ListOffers(database.Query(query));
+		return Offer.listOffers(database.query(query));
 	}
 }

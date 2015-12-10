@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class Transaction
 {
     public String seller;
@@ -22,7 +23,7 @@ public class Transaction
         this.cost = cost;
     }
 
-    public static List<Transaction> ListTransactions(ResultSet result)
+    public static List<Transaction> listTransactions(ResultSet result)
     {
         List<Transaction> ret = new ArrayList<Transaction>();
         try {

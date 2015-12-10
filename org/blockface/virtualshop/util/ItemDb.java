@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-
+@SuppressWarnings("deprecation")
 public class ItemDb
 {
 	private final static Logger logger = Logger.getLogger("Minecraft");

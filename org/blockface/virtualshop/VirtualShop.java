@@ -19,12 +19,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@SuppressWarnings("deprecation")
 public class VirtualShop extends JavaPlugin {
     
     public static Economy econ = null;
     
     public void onDisable() {
-        DatabaseManager.Close();
+        DatabaseManager.close();
     }
 
     public void onEnable() {
@@ -34,9 +35,9 @@ public class VirtualShop extends JavaPlugin {
             this.getLogger().severe("Vault not found. Shutting down!");
             this.getServer().getPluginManager().disablePlugin(this);
         }
-		Chatty.Initialize(this);
-        ConfigManager.Initialize(this);
-        DatabaseManager.Initialize();
+		Chatty.initialize(this);
+        ConfigManager.initialize(this);
+        DatabaseManager.initialize();
         try {
             ItemDb.load(this.getDataFolder(),"items.csv");
         } catch (IOException e) {
@@ -69,13 +70,13 @@ public class VirtualShop extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
     {
-        if(label.equalsIgnoreCase("sell")) Sell.Execute(sender, args, this);
-        if(label.equalsIgnoreCase("buy")) Buy.Execute(sender, args, this);
-        if(label.equalsIgnoreCase("cancel")) Cancel.Execute(sender, args, this);
-        if(label.equalsIgnoreCase("stock")) Stock.Execute(sender, args, this);
-        if(label.equalsIgnoreCase("sales")) Sales.Execute(sender, args, this);
-        if(label.equalsIgnoreCase("find")) Find.Execute(sender, args, this);
-        if(label.equalsIgnoreCase("shop")) Help.Execute(sender, this);
+        if(label.equalsIgnoreCase("sell")) Sell.execute(sender, args, this);
+        if(label.equalsIgnoreCase("buy")) Buy.execute(sender, args, this);
+        if(label.equalsIgnoreCase("cancel")) Cancel.execute(sender, args, this);
+        if(label.equalsIgnoreCase("stock")) Stock.execute(sender, args, this);
+        if(label.equalsIgnoreCase("sales")) Sales.execute(sender, args, this);
+        if(label.equalsIgnoreCase("find")) Find.execute(sender, args, this);
+        if(label.equalsIgnoreCase("shop")) Help.execute(sender, this);
         return true;
     }
 }

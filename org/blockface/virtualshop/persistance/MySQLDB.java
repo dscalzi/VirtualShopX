@@ -10,30 +10,30 @@ public class MySQLDB implements Database
 {
     private MySQL db;
 
-    public void Load() throws Exception
+    public void load() throws Exception
     {
-        Chatty.LogInfo("Using MySQL.");
-        db = new MySQL(Chatty.getLogger(), Chatty.getPrefix(), ConfigManager.MySQLHost(), ConfigManager.getPort().toString(), ConfigManager.MySQLdatabase(), ConfigManager.MySQLUserName(), ConfigManager.MySQLPassword());
+        Chatty.logInfo("Using MySQL.");
+        db = new MySQL(Chatty.getLogger(), Chatty.getPrefix(), ConfigManager.mySQLHost(), ConfigManager.getPort().toString(), ConfigManager.mySQLdatabase(), ConfigManager.mySQLUserName(), ConfigManager.mySQLPassword());
         db.open();
         if(db.checkConnection())
         {
-            Chatty.LogInfo("Successfully connected to MySQL Database");
-            CheckTables();
+            Chatty.logInfo("Successfully connected to MySQL Database");
+            checkTables();
             return;
         }
-        Chatty.LogInfo("Could not connect to MySQL Database. Check settings.");
+        Chatty.logInfo("Could not connect to MySQL Database. Check settings.");
     }
 
-    public ResultSet Query(String query) {
+    public ResultSet query(String query) {
         try {
             return db.query(query);
         } catch (Exception e) {
             reconnect();
-            return Query(query);
+            return query(query);
         }
     }
 
-    public void Unload() {
+    public void unload() {
         db.close();
     }
 
@@ -42,24 +42,24 @@ public class MySQLDB implements Database
         try {
             db.open();
         } catch (Exception e) {
-            Chatty.LogInfo("Your database has gone offline, please switch to SQLite for stability.");
+            Chatty.logInfo("Your database has gone offline, please switch to SQLite for stability.");
         }
     }
 
 
-    private void CheckTables() throws Exception
+    private void checkTables() throws Exception
 	{
 		if(!db.checkTable("stock"))
 		{
 			String query = "create table stock(`id` integer primary key auto_increment,`damage` integer,`seller` varchar(80) not null,`item` integer not null, `price` float not null,`amount` integer not null)";
 			db.createTable(query);
-            Chatty.LogInfo("Created stock table.");
+            Chatty.logInfo("Created stock table.");
 		}
 		if(!db.checkTable("transactions"))
 		{
 			String query = "create table transactions(`id` integer primary key auto_increment,`damage` integer not null, `buyer` varchar(20) not null,`seller` varchar(20) not null,`item` integer not null, `cost` float not null,`amount` integer not null)";
 			db.createTable(query);
-			Chatty.LogInfo("Created transaction table.");
+			Chatty.logInfo("Created transaction table.");
 		}
 	}
 

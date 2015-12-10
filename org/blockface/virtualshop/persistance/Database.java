@@ -4,9 +4,9 @@ import java.sql.ResultSet;
 
 public interface Database
 {
-    public void Load() throws Exception;
+    public void load() throws Exception;
 
-    public ResultSet Query(String query);
+    public ResultSet query(String query);
 
-    public void Unload();
+    public void unload();
 }
