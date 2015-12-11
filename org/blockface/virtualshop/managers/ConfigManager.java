@@ -5,12 +5,13 @@ import java.io.IOException;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
+import net.md_5.bungee.api.ChatColor;
+
 public class ConfigManager
 {
     private static ConfigurationSection config;
 
-    public static void initialize(Plugin plugin)
-    {
+    public static void initialize(Plugin plugin){
         config = plugin.getConfig();
         plugin.getConfig().options().copyDefaults(true); 
         try {
@@ -30,42 +31,39 @@ public class ConfigManager
         plugin.saveConfig();
     }
 
-	public static Boolean broadcastOffers()
-	{
+    public static String getPrefix(){
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chatty.prefix"));
+    }
+    
+	public static Boolean broadcastOffers(){
 		return config.getBoolean("broadcast-offers", true);
 	}
 
-    public static Integer getPort() {
+    public static Integer getPort(){
         return config.getInt("MySQL.port",3306);
     }
 
-	public static Boolean usingMySQL()
-	{
+	public static Boolean usingMySQL(){
 		return config.getBoolean("using-MySQL", false);
 	}
 
-	public static String mySQLUserName()
-	{
+	public static String mySQLUserName(){
 		return config.getString("MySQL.username", "root");
 	}
 
-	public static String mySQLPassword()
-	{
+	public static String mySQLPassword(){
 		return config.getString("MySQL.password", "password");
 	}
 
-	public static String mySQLHost()
-	{
+	public static String mySQLHost(){
 		return config.getString("MySQL.host", "localhost");
 	}
 
-	public static String mySQLdatabase()
-	{
+	public static String mySQLdatabase(){
 		return config.getString("MySQL.database", "minecraft");
 	}
 
-	public static Integer mySQLport()
-	{
+	public static Integer mySQLport(){
 		return config.getInt("MySQL.port", 3306);
 	}
 

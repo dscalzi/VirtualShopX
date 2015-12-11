@@ -6,3 +6,5 @@ MySQL:
   password: password
   database: minecraft
 broadcast-offers: true
+chatty:
+  prefix: "&6&l[&f&lA&ftlas&lN&fetwork&6&l] + &f"

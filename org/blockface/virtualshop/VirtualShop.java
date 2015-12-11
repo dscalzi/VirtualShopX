@@ -24,19 +24,19 @@ public class VirtualShop extends JavaPlugin {
     
     public static Economy econ = null;
     
-    public void onDisable() {
+    public void onDisable(){
         DatabaseManager.close();
     }
 
-    public void onEnable() {
+    public void onEnable(){
         if (this.setupEconomy()){
             
         } else {
             this.getLogger().severe("Vault not found. Shutting down!");
             this.getServer().getPluginManager().disablePlugin(this);
         }
-		Chatty.initialize(this);
         ConfigManager.initialize(this);
+		Chatty.initialize(this);
         DatabaseManager.initialize();
         try {
             ItemDb.load(this.getDataFolder(),"items.csv");
@@ -46,7 +46,7 @@ public class VirtualShop extends JavaPlugin {
         }
     }
     
-    public boolean setupEconomy() {
+    public boolean setupEconomy(){
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
         }
@@ -58,7 +58,7 @@ public class VirtualShop extends JavaPlugin {
         return econ != null;
     }
     
-    public boolean hasEnough(String playerName, double money) {
+    public boolean hasEnough(String playerName, double money){
         double balance = econ.getBalance(playerName) - money;
         if (balance > 0){
             return true;
@@ -68,8 +68,7 @@ public class VirtualShop extends JavaPlugin {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-    {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
         if(label.equalsIgnoreCase("sell")) Sell.execute(sender, args, this);
         if(label.equalsIgnoreCase("buy")) Buy.execute(sender, args, this);
         if(label.equalsIgnoreCase("cancel")) Cancel.execute(sender, args, this);
