@@ -2,8 +2,14 @@ package org.blockface.virtualshop.util;
 
 public class Numbers
 {
+	public static final int ALL = 135291444;
+	
     public static Integer parseInteger(String s)
 	{
+    	
+    	if(s.equalsIgnoreCase("all"))
+			return Numbers.ALL;
+    	
 		try
 		{
 			Integer i = Integer.parseInt(s);

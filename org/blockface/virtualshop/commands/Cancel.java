@@ -55,11 +55,11 @@ public class Cancel {
         	try{
         		cancelAmt = Integer.parseInt(args[0]);
         		if(cancelAmt < 1){
-        			Chatty.sendError(sender, "That is not a proper number");
+        			Chatty.numberFormat(sender);
             		return;
         		}
         	} catch (NumberFormatException e){
-        		Chatty.sendError(sender, "That is not a proper number");
+        		Chatty.numberFormat(sender);
         		return;
         	}
 		}

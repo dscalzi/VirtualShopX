@@ -51,6 +51,19 @@ public class Sell
 			return;
 		}
         InventoryManager im = new InventoryManager(player);
+        if(amount == Numbers.ALL){
+        	ItemStack[] inv = player.getInventory().getContents();
+        	int total = 0;
+        	for(int i=0; i<inv.length; ++i){
+        		if(inv[i] == null){
+        			continue;
+        		} else if(inv[i].getType() == item.getType()){
+        			total += inv[i].getAmount();
+        			player.sendMessage("" + total);
+        		}
+        	}
+        	item.setAmount(total);
+        }
 		if(!im.contains(item,true,true))
 		{
 			Chatty.sendError(sender, "You do not have " + Chatty.formatAmount(item.getAmount()) + " " + Chatty.formatItem(args[1]));
