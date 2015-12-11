@@ -51,7 +51,7 @@ public class Sell
 			return;
 		}
         InventoryManager im = new InventoryManager(player);
-        if(amount == Numbers.ALL){
+        if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
         	ItemStack[] inv = player.getInventory().getContents();
         	int total = 0;
         	for(int i=0; i<inv.length; ++i){
@@ -59,14 +59,16 @@ public class Sell
         			continue;
         		} else if(inv[i].getType() == item.getType()){
         			total += inv[i].getAmount();
-        			player.sendMessage("" + total);
         		}
         	}
         	item.setAmount(total);
         }
 		if(!im.contains(item,true,true))
 		{
-			Chatty.sendError(sender, "You do not have " + Chatty.formatAmount(item.getAmount()) + " " + Chatty.formatItem(args[1]));
+			if(item.getAmount() == 0)
+        		Chatty.sendError(sender, "You do not have any " + Chatty.formatItem(args[1]));
+			else
+				Chatty.sendError(sender, "You do not have " + Chatty.formatAmount(item.getAmount()) + " " + Chatty.formatItem(args[1]));
 			return;
 		}
         im.remove(item, true, true);

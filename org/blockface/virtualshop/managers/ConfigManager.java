@@ -1,7 +1,6 @@
 package org.blockface.virtualshop.managers;
 
-import java.io.IOException;
-
+import java.io.File;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
@@ -14,11 +13,11 @@ public class ConfigManager
     public static void initialize(Plugin plugin){
         config = plugin.getConfig();
         plugin.getConfig().options().copyDefaults(true); 
-        try {
-            plugin.getConfig().save("config.yml");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        File file = new File(plugin.getDataFolder(), "config.yml");
+		if (!file.exists())
+		{
+			plugin.saveDefaultConfig();
+		}
         plugin.reloadConfig();
         broadcastOffers();
         usingMySQL();
