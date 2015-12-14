@@ -8,6 +8,7 @@ import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.util.InventoryManager;
 import org.blockface.virtualshop.util.ItemDb;
 import org.blockface.virtualshop.util.Numbers;
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -21,10 +22,15 @@ public class Sell
             Chatty.denyConsole(sender);
             return;
         }
+        Player player = (Player)sender;
         if(!sender.hasPermission("virtualshop.sell"))
         {
             Chatty.noPermissions(sender);
             return;
+        }
+        if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+        	Chatty.invalidGamemode(sender, player.getGameMode());
+        	return;
         }
         if(args.length < 3)
 		{
@@ -38,7 +44,6 @@ public class Sell
 			Chatty.numberFormat(sender);
 			return;
 		}
-        Player player = (Player)sender;
         ItemStack item = ItemDb.get(args[1], amount);
 		if(args[1].equalsIgnoreCase("hand"))
 		{

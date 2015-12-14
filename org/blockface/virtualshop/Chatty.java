@@ -7,12 +7,14 @@ import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.objects.Transaction;
 import org.blockface.virtualshop.util.ItemDb;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Chatty
 {
     private static String prefix;
+    private static String color;
     private static VirtualShop plugin;
 	private static Logger logger;
 
@@ -20,6 +22,7 @@ public class Chatty
 		logger = Logger.getLogger("minecraft");
         plugin = p;
         prefix = ConfigManager.getPrefix();
+        color = ConfigManager.getColor();
         logInfo(plugin.getDescription().getName() + " is loading.");
     }
 
@@ -28,11 +31,11 @@ public class Chatty
 	}
 
     public static void sendError(CommandSender sender, String message){
-        sender.sendMessage(ChatColor.RED + prefix  + message);
+        sender.sendMessage(ChatColor.RED + prefix + " " + message);
     }
 
     public static void sendSuccess(CommandSender sender, String message){
-        sender.sendMessage(ChatColor.DARK_GREEN + prefix  + message);
+        sender.sendMessage(ChatColor.DARK_GREEN + prefix + " " + message);
     }
 
     public static Boolean sendSuccess(String sender, String message){
@@ -43,7 +46,7 @@ public class Chatty
     }
 
     public static void sendGlobal(String message){
-        plugin.getServer().broadcastMessage(ChatColor.DARK_GREEN + prefix  + message);
+        plugin.getServer().broadcastMessage(ChatColor.DARK_GREEN + prefix + " " + message);
     }
 
     public static Logger getLogger(){
@@ -67,24 +70,28 @@ public class Chatty
 		sendError(sender, "That is not a proper number.");
 	}
 
+	public static void invalidGamemode(CommandSender sender, GameMode mode){
+		sendError(sender, "You cannot use the Virtual Market in " + mode.toString().toLowerCase() + " mode!");
+	}
+	
 	public static String formatSeller(String seller){
-		return ChatColor.RED + seller + ChatColor.WHITE;
+		return ChatColor.RED + seller + color;
 	}
 
 	public static String formatAmount(Integer amount){
-		return ChatColor.GOLD + amount.toString() + ChatColor.WHITE;
+		return ChatColor.GOLD + amount.toString() + color;
 	}
 
 	public static String formatItem(String item){
-		return ChatColor.BLUE + item.toLowerCase() + ChatColor.WHITE;
+		return ChatColor.BLUE + item.toLowerCase() + color;
 	}
 
 	public static String formatPrice(double price){
-		return ChatColor.YELLOW + VirtualShop.econ.format(price) + ChatColor.WHITE;
+		return ChatColor.YELLOW + VirtualShop.econ.format(price) + color;
 	}
 
 	public static String formatBuyer(String buyer){
-		return ChatColor.AQUA + buyer.toString() + ChatColor.WHITE;
+		return ChatColor.AQUA + buyer.toString() + color;
 	}
 
 	public static void noPermissions(CommandSender sender){

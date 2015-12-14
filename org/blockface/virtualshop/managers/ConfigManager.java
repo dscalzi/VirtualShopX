@@ -34,6 +34,10 @@ public class ConfigManager
     	return ChatColor.translateAlternateColorCodes('&', config.getString("chatty.prefix"));
     }
     
+    public static String getColor(){
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chatty.message-color"));
+    }
+    
 	public static Boolean broadcastOffers(){
 		return config.getBoolean("broadcast-offers", true);
 	}

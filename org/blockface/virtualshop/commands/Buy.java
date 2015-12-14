@@ -8,6 +8,7 @@ import org.blockface.virtualshop.objects.Transaction;
 import org.blockface.virtualshop.util.InventoryManager;
 import org.blockface.virtualshop.util.ItemDb;
 import org.blockface.virtualshop.util.Numbers;
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,15 +20,18 @@ public class Buy {
 
     public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
     {
-		if(!(sender instanceof Player))
-		{
+		if(!(sender instanceof Player))	{
 			Chatty.denyConsole(sender);
 			return;
 		}
-        if(!sender.hasPermission("virtualshop.buy"))
-        {
+		Player player = (Player)sender;
+        if(!sender.hasPermission("virtualshop.buy")){
             Chatty.noPermissions(sender);
             return;
+        }
+        if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+        	Chatty.invalidGamemode(sender, player.getGameMode());
+        	return;
         }
 		if(args.length < 3)
 		{
@@ -40,7 +44,7 @@ public class Buy {
 			Chatty.numberFormat(sender);
 			return;
 		}
-
+		
 //      float maxprice = 1000000000;
 //      if(args.length > 2)
         int maxprice = Numbers.parseInteger(args[2]);
@@ -57,7 +61,6 @@ public class Buy {
 			Chatty.wrongItem(sender, args[1]);
 			return;
 		}
-		Player player = (Player)sender;
         int bought = 0;
         double spent = 0;
         InventoryManager im = new InventoryManager(player);
@@ -66,10 +69,22 @@ public class Buy {
             Chatty.sendError(sender,"There is no " + Chatty.formatItem(args[1])+ " for sale.");
             return;
         }
+        
+        ItemStack[] inv = player.getInventory().getContents();
+        int openNum = 0;
+        for(int i=0; i<inv.length; ++i){
+    		if(inv[i] == null){
+    			openNum += 64;
+    			continue;
+    		} else if(inv[i].getType() == item.getType()){
+    			openNum += (64-inv[i].getAmount());
+    		}
+    	}
+        
         for(Offer o: offers)
         {
             if(o.price > maxprice) continue;
-            if(o.seller.equals(player.getName())) return;
+            if(o.seller.equals(player.getName())) continue;
             if((amount - bought) >= o.item.getAmount())
             {
                 int canbuy = o.item.getAmount();
@@ -128,6 +143,10 @@ public class Buy {
         }
 
         item.setAmount(bought);
+        if(openNum < bought){
+        	item.setAmount(bought-openNum);
+        	player.getWorld().dropItem(player.getLocation(), item);
+        }
         if(bought > 0) im.addItem(item);
         Chatty.sendSuccess(player,"Managed to buy " + Chatty.formatAmount(bought) + " " + Chatty.formatItem(args[1]) + " for " + Chatty.formatPrice(spent));
     }

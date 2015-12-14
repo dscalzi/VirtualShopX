@@ -6,6 +6,7 @@ import org.blockface.virtualshop.managers.DatabaseManager;
 import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.util.InventoryManager;
 import org.blockface.virtualshop.util.ItemDb;
+import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,9 +19,14 @@ public class Cancel {
             Chatty.denyConsole(sender);
             return;
         }
+        Player player = (Player)sender;
         if(!sender.hasPermission("virtualshop.cancel")){
             Chatty.noPermissions(sender);
             return;
+        }
+        if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+        	Chatty.invalidGamemode(sender, player.getGameMode());
+        	return;
         }
         if(args.length < 2){
             Chatty.sendError(sender, "Proper usage is /cancel <amount> <item>");
@@ -36,7 +42,6 @@ public class Cancel {
 			return;
 		}
 		
-        Player player = (Player)sender;
         int total = 0;
         for(Offer o: DatabaseManager.getSellerOffers(player.getName(),item))
         {
@@ -68,7 +73,21 @@ public class Cancel {
 			cancelAmt = total;
 		
         item.setAmount(cancelAmt);
+        ItemStack[] inv = player.getInventory().getContents();
+        int openNum = 0;
+        for(int i=0; i<inv.length; ++i){
+    		if(inv[i] == null){
+    			openNum += 64;
+    			continue;
+    		} else if(inv[i].getType() == item.getType()){
+    			openNum += (64-inv[i].getAmount());
+    		}
+    	}
         new InventoryManager(player).addItem(item);
+        if(openNum < cancelAmt){
+        	item.setAmount(cancelAmt-openNum);
+        	player.getWorld().dropItem(player.getLocation(), item);
+        }
         int a = 0;
         double oPrice = 0;
         for(Offer o: DatabaseManager.getSellerOffers(player.getName(),item)){

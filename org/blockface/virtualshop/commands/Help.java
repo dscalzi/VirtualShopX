@@ -1,5 +1,6 @@
 package org.blockface.virtualshop.commands;
 
+import org.blockface.virtualshop.Chatty;
 import org.blockface.virtualshop.VirtualShop;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -8,7 +9,7 @@ public class Help {
 
     public static void execute(CommandSender sender, VirtualShop plugin)
     {
-        sender.sendMessage(ChatColor.GRAY + "|-------------" + ChatColor.DARK_GREEN +"VirtualShop" + ChatColor.GRAY + "-------------|");
+        sender.sendMessage(ChatColor.GRAY + "|-------------" + Chatty.getPrefix() + ChatColor.GRAY + "-------------|");
         sender.sendMessage(ChatColor.RED + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<maxprice>" + ChatColor.WHITE + " - buy items.");
         sender.sendMessage(ChatColor.RED + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + ChatColor.WHITE + " - sell items.");
         sender.sendMessage(ChatColor.RED + "/cancel " + ChatColor.BLUE + "<item> " + ChatColor.WHITE + " - remove item from shop.");

@@ -7,4 +7,5 @@ MySQL:
   database: minecraft
 broadcast-offers: true
 chatty:
-  prefix: "&6&l[&f&lA&ftlas&lN&fetwork&6&l] + &f"
+  prefix: "&6&l[&f&lA&ftlas&lS&fhop&6&l]&e"
+  message-color: "&e"
