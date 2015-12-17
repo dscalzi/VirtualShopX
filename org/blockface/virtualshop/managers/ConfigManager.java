@@ -42,6 +42,22 @@ public class ConfigManager
 		return config.getBoolean("broadcast-offers", true);
 	}
 
+	public static Long getMaxPrice(){
+		return config.getLong("price-limits.default_limit");
+	}
+	
+	public static Long getMaxPrice(int itemID){
+		return getMaxPrice(itemID, 0);
+	}
+	
+	public static Long getMaxPrice(int itemID, int dataValue){
+		if(!config.contains("price-limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue)))
+			return getMaxPrice();
+		if(!config.contains("price-limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price"))
+			return getMaxPrice();
+		return config.getLong("price-limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price");
+	}
+	
     public static Integer getPort(){
         return config.getInt("MySQL.port",3306);
     }

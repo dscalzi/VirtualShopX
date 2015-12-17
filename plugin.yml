@@ -27,6 +27,9 @@ commands:
         description: Displays help.
         usage: /vs
 permissions:
+    virtualshop.access.beta:
+        description: Restricts access during beta period
+        default: OP
     virtualshop.sell:
         description: Allow usage of /sell
         default: true

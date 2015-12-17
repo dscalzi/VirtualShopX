@@ -1,7 +1,11 @@
 package org.blockface.virtualshop;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import net.md_5.bungee.api.ChatColor;
 import net.milkbowl.vault.economy.Economy;
 
 import org.blockface.virtualshop.commands.Buy;
@@ -69,6 +73,13 @@ public class VirtualShop extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
+    	List<String> cmdList = new ArrayList<>(Arrays.asList("sell", "buy", "cancel", "stock", "sales", "find", "shop"));
+    	for(String s : cmdList){
+    		if(label.equalsIgnoreCase(s) && !sender.hasPermission("virtualshop.access.beta")){
+    			sender.sendMessage(ChatColor.RED + "VIRTUAL MARKET IS CURRENTLY RESTRICTED FOR BETA TESTING!");
+    			return true;
+    		}
+    	}
         if(label.equalsIgnoreCase("sell")) Sell.execute(sender, args, this);
         if(label.equalsIgnoreCase("buy")) Buy.execute(sender, args, this);
         if(label.equalsIgnoreCase("cancel")) Cancel.execute(sender, args, this);

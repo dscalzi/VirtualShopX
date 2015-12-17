@@ -62,6 +62,10 @@ public class Chatty
 		sendError(sender, "What is " + item + "?");
 	}
 
+    public static void priceTooHigh(CommandSender sender, String item, long priceLimit){
+    	sendError(sender, "Woah, you're selling your " + formatItem(item) + " for a rather high price. To avoid scamming, we've set the limit for that item to $" + priceLimit);
+    }
+    
 	public static void denyConsole(CommandSender sender){
 		sendError(sender, "You must be in-game to do this.");
 	}

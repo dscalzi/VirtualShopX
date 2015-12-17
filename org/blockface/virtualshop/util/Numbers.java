@@ -37,4 +37,19 @@ public class Numbers
 
 		return -1f;
 	}
+	
+	public static Double parseDouble(String s)
+	{
+		try
+		{
+			Double i = Double.parseDouble(s);
+			if(i > 0) return i;
+		}
+		catch(NumberFormatException ex)
+		{
+			return -1D;
+		}
+
+		return -1D;
+	}
 }

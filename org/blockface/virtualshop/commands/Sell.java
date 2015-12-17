@@ -15,7 +15,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class Sell
 {
-    public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
+    @SuppressWarnings("deprecation")
+	public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
     {
         if(!(sender instanceof Player))
         {
@@ -37,7 +38,7 @@ public class Sell
 			Chatty.sendError(sender, "Proper usage is /sell <amount> <item> <price>");
 			return;
 		}
-        float price = Numbers.parseFloat(args[2]);
+        double price = Numbers.parseDouble(args[2]);
 		int amount = Numbers.parseInteger(args[0]);
 		if(amount < 0 || price < 0)
 		{
@@ -53,6 +54,10 @@ public class Sell
 		if(item==null)
 		{
 			Chatty.wrongItem(sender, args[1]);
+			return;
+		}
+		if(price > ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
+			Chatty.priceTooHigh(sender, args[1], ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return;
 		}
         InventoryManager im = new InventoryManager(player);

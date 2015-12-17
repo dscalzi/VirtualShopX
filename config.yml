@@ -1,3 +1,6 @@
+#------------------------------------------
+#            Virtual Shop Config
+#------------------------------------------
 using-MySQL: false
 MySQL:
   port: 3306
@@ -9,3 +12,18 @@ broadcast-offers: true
 chatty:
   prefix: "&6&l[&f&lA&ftlas&lS&fhop&6&l]&e"
   message-color: "&e"
+#------------------------------------------
+#           Item Price Limits
+#  Below you can set max price limits for 
+#  items based on their item id. Example below:
+#
+#     itemid-datavalue: //if there is no specific data value put 0
+#       name: ItemName //not required but helpful for the user
+#       max-price: //maximum price the user can sell this item at
+#------------------------------------------
+price-limits:
+  default_limit: 100000
+  items:
+    399-0: 
+      name: NetherStar
+      max-price: 1000000
