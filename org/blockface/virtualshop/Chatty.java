@@ -114,5 +114,11 @@ public class Chatty
 		return formatSeller(t.seller)+ " --> " + formatBuyer(t.buyer) + ": " + formatAmount(t.item.getAmount())+" " + formatItem(ItemDb.reverseLookup(t.item)) + " for "+ formatPrice(t.cost);
 
 	}
+    
+    public static String capitalize(String s){
+		if(s.length() < 1)
+			return s;
+		return s.substring(0, 1).toUpperCase() + s.substring(1);
+	}
 
 }

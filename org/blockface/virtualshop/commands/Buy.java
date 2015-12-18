@@ -33,27 +33,30 @@ public class Buy {
         	Chatty.invalidGamemode(sender, player.getGameMode());
         	return;
         }
-		if(args.length < 3)
+		if(args.length < 2)
 		{
-			Chatty.sendError(sender, "Proper usage is /buy <amount> <item> <maxprice>");
+			Chatty.sendError(sender, "Proper usage is /buy <amount> <item> [maxprice]");
 			return;
 		}
 		int amount = Numbers.parseInteger(args[0]);
-		if(amount < 0)
-		{
+		if(amount < 0)		{
 			Chatty.numberFormat(sender);
 			return;
 		}
 		
-//      float maxprice = 1000000000;
-//      if(args.length > 2)
-        int maxprice = Numbers.parseInteger(args[2]);
-        if(maxprice < 0)
-        {
-              Chatty.numberFormat(sender);
-              return;
-          }
-//      }
+		if(amount == Numbers.ALL){
+			Chatty.numberFormat(sender);
+			return;
+		}
+		
+        double maxprice = Double.MAX_VALUE-1;
+        if(args.length > 2){
+        	maxprice = Numbers.parseDouble(args[2]);
+        	if(maxprice < 0){
+        		Chatty.numberFormat(sender);
+        		return;
+        	}
+        }
 
 		ItemStack item = ItemDb.get(args[1], 0);
 		if(item==null)
@@ -81,9 +84,16 @@ public class Buy {
     		}
     	}
         
+        boolean tooHigh = false;
+        @SuppressWarnings("unused")
+		boolean boughtAny = false;
+        
         for(Offer o: offers)
         {
-            if(o.price > maxprice) continue;
+            if(o.price > maxprice){
+            	tooHigh = true;
+            	continue;
+            }
             if(o.seller.equals(player.getName())) continue;
             if((amount - bought) >= o.item.getAmount())
             {
@@ -111,6 +121,7 @@ public class Buy {
                 else DatabaseManager.updateQuantity(o.id, left);
                 Transaction t = new Transaction(o.seller, player.getName(), o.item.getTypeId(), o.item.getDurability(), canbuy, cost);
                 DatabaseManager.logTransaction(t);
+                boughtAny = true;
             }
             else
             {
@@ -148,6 +159,9 @@ public class Buy {
         	player.getWorld().dropItem(player.getLocation(), item);
         }
         if(bought > 0) im.addItem(item);
-        Chatty.sendSuccess(player,"Managed to buy " + Chatty.formatAmount(bought) + " " + Chatty.formatItem(args[1]) + " for " + Chatty.formatPrice(spent));
+        if(tooHigh && bought == 0 && args.length > 2)
+        	Chatty.sendError(player,"No one is selling " + Chatty.formatItem(args[1]) + " cheaper than " + Chatty.formatPrice(maxprice));
+        else
+        	Chatty.sendSuccess(player,"Managed to buy " + Chatty.formatAmount(bought) + " " + Chatty.formatItem(args[1]) + " for " + Chatty.formatPrice(spent));
     }
 }

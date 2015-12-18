@@ -37,7 +37,7 @@ public class Find
         if(args.length>1)  page = Numbers.parseInteger(args[1]);
 		if(offers.size()==0)
 		{
-			Chatty.sendError(sender, "No one is selling " + args[0]);
+			Chatty.sendError(sender, "No one is selling " + Chatty.formatItem(args[0]) + ".");
             return;
 		}
 
@@ -49,7 +49,21 @@ public class Find
             start = 0;
             page = 1;
         }
-        sender.sendMessage(ChatColor.DARK_GRAY + "---------------" + ChatColor.GRAY + "Page (" + ChatColor.RED + page + ChatColor.GRAY + " of " + ChatColor.RED +pages + ChatColor.GRAY + ")" + ChatColor.DARK_GRAY + "---------------");
+        int charCount = 74;
+        String header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "L" + ChatColor.WHITE + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + ChatColor.WHITE + args[0].substring(1) + ChatColor.GOLD + ChatColor.BOLD + " >";
+        charCount -= header.length()-1;
+        if(charCount % 2 == 0)
+        	charCount -= 1;
+        String left = ChatColor.WHITE + "";
+        String right = ChatColor.GOLD + "";
+        for(int i=0; i<charCount/2-1; ++i){
+        	left += "-";
+        }
+        for(int i=0; i<charCount/2-1; ++i){
+        	right += "-";
+        }
+        sender.sendMessage(left + header + right);
+        //sender.sendMessage(ChatColor.DARK_GRAY + "---------------" + ChatColor.GRAY + "Page (" + ChatColor.RED + page + ChatColor.GRAY + " of " + ChatColor.RED +pages + ChatColor.GRAY + ")" + ChatColor.DARK_GRAY + "---------------");
         for(Offer o : offers)
         {
             if(count==start+9) break;
@@ -59,5 +73,6 @@ public class Find
             }
             count++;
 		}
+        sender.sendMessage(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + page + " of " + pages + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
     }
 }
