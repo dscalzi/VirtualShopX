@@ -102,6 +102,14 @@ public class Chatty
 		sendError(sender, "You do not have permission to do this");
 	}
 
+	public static void noTransactions(CommandSender sender, String name){
+		sendError(sender, "No transaction data found for " + name);
+	}
+	
+	public static void noStock(CommandSender sender, String name){
+		sendError(sender, name + " is not selling any items.");
+	}
+	
     public static void broadcastOffer(Offer o){
          sendGlobal(formatOffer(o));
     }

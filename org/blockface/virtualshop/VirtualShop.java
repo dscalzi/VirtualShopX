@@ -83,8 +83,22 @@ public class VirtualShop extends JavaPlugin {
         if(label.equalsIgnoreCase("sell")) Sell.execute(sender, args, this);
         if(label.equalsIgnoreCase("buy")) Buy.execute(sender, args, this);
         if(label.equalsIgnoreCase("cancel")) Cancel.execute(sender, args, this);
-        if(label.equalsIgnoreCase("stock")) Stock.execute(sender, args, this);
-        if(label.equalsIgnoreCase("sales")) Sales.execute(sender, args, this);
+        if(label.equalsIgnoreCase("stock")){
+        	try{
+        	Stock.execute(sender, args, this);
+        	} catch (LinkageError e){
+        		Chatty.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
+        		return true;
+        	}
+        }
+        if(label.equalsIgnoreCase("sales")){
+        	try{
+        	Sales.execute(sender, args, this);
+        	} catch (LinkageError e){
+        		Chatty.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
+        		return true;
+        	}
+        }
         if(label.equalsIgnoreCase("find")) Find.execute(sender, args, this);
         if(label.equalsIgnoreCase("shop")) Help.execute(sender, this);
         return true;
