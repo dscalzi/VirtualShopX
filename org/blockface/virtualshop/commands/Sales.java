@@ -5,10 +5,15 @@ import org.blockface.virtualshop.VirtualShop;
 import org.blockface.virtualshop.managers.DatabaseManager;
 import org.blockface.virtualshop.objects.Transaction;
 import org.blockface.virtualshop.util.Numbers;
+import org.blockface.virtualshop.util.PageList;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.text.BadLocationException;
 
 public class Sales
 {
@@ -30,8 +35,10 @@ public class Sales
         List<Transaction> transactions;
         transactions = DatabaseManager.getTransactions();
         String header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "T" + ChatColor.WHITE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.WHITE + "og ◄► AtlasNetwork " + ChatColor.GOLD + ChatColor.BOLD + " >";
+        //If /sales args, check to see if it's a number
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
+        //If /sales args is not a number (String)
         if(start < 0){
             String search = args[0];
             target = plugin.getServer().getOfflinePlayer(args[0]);
@@ -39,7 +46,6 @@ public class Sales
 				start = Numbers.parseInteger(args[1]);
 			if(start < 0) 
 				start = 1;
-			start = (start -1) * 8;
 			try{
 				transactions = DatabaseManager.getTransactions(search);
 			} catch (NullPointerException e){
@@ -50,24 +56,15 @@ public class Sales
             	return;
             }
             for(Transaction t : transactions){
-            	if(t.seller.contains(target.getName())){
+            	if(t.seller.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
             		header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "T" + ChatColor.WHITE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.WHITE + "og ◄► " + t.seller + ChatColor.GOLD + ChatColor.BOLD + " >";
             		break;
             	}
-            	else if(t.buyer.contains(target.getName())){
+            	else if(t.buyer.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
             		header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "T" + ChatColor.WHITE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.WHITE + "og ◄► " + t.buyer + ChatColor.GOLD + ChatColor.BOLD + " >";
             		break;
             	}
             }
-        }
-        else 
-        	start = (start-1) * 8;
-
-        int page = start/8 + 1;
-        int pages = transactions.size()/8 + 1;
-        if(page > pages){
-            start = 0;
-            page = 1;
         }
         
         int charCount = 74;
@@ -81,19 +78,24 @@ public class Sales
         for(int i=0; i<charCount/2-1; ++i)
         	right += "-";
         
-        sender.sendMessage(left + header + right);
+        PageList<Transaction> sales = new PageList<>(transactions, 7);
+        List<String> finalMsg = new ArrayList<String>();
+        finalMsg.add(left + header + right);
         
-        int count =0;
-        for(Transaction t : transactions){
-            if(count==start+8) 
-            	break;
-            if(count >= start){
-                sender.sendMessage(Chatty.formatTransaction(t));
-            }
-            count++;
-        }
+        try {
+			for(Transaction t : sales.getPage(start)){
+			    finalMsg.add(Chatty.formatTransaction(t));
+			}
+		} catch (BadLocationException e) {
+			Chatty.sendError(sender, "Page does not exist");
+			return;
+		}
 
-        sender.sendMessage(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + page + " of " + pages + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        finalMsg.add(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + start + " of " + sales.getTotalPages() + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        
+        
+        for(String s : finalMsg)
+        	sender.sendMessage(s);
         
 
     }

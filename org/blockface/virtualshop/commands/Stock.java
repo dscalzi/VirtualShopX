@@ -5,11 +5,15 @@ import org.blockface.virtualshop.VirtualShop;
 import org.blockface.virtualshop.managers.DatabaseManager;
 import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.util.Numbers;
+import org.blockface.virtualshop.util.PageList;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.text.BadLocationException;
 
 public class Stock
 {
@@ -38,7 +42,6 @@ public class Stock
 				start = Numbers.parseInteger(args[1]);
 			if(start < 0) 
 				start = 1;
-			start = (start -1) * 8;
 			try{
 				offers = DatabaseManager.searchBySeller(seller);
 			} catch (NullPointerException e){
@@ -49,20 +52,11 @@ public class Stock
             	return;
             }
             for(Offer o : offers){
-            	if(o.seller.contains(target.getName())){
+            	if(o.seller.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
             		header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "I" + ChatColor.WHITE + "tem " + ChatColor.BOLD + "S" + ChatColor.WHITE + "tock ◄► " + o.seller + ChatColor.GOLD + ChatColor.BOLD + " >";
             		break;
             	}
             }
-        }
-        else 
-        	start = (start-1) * 8;
-
-        int page = start/8 + 1;
-        int pages = offers.size()/8 + 1;
-        if(page > pages){
-            start = 0;
-            page = 1;
         }
         
         int charCount = 74;
@@ -76,19 +70,24 @@ public class Stock
         for(int i=0; i<charCount/2-1; ++i)
         	right += "-";
         
-        sender.sendMessage(left + header + right);
+        PageList<Offer> stock = new PageList<>(offers, 7);
+        List<String> finalMsg = new ArrayList<String>();
+        finalMsg.add(left + header + right);
         
-        int count =0;
-        for(Offer o : offers){
-            if(count==start+8) 
-            	break;
-            if(count >= start){
-                sender.sendMessage(Chatty.formatOffer(o));
-            }
-            count++;
-        }
+        try {
+			for(Offer o : stock.getPage(start)){
+				finalMsg.add(Chatty.formatOffer(o));
+			}
+		} catch (BadLocationException e) {
+			Chatty.sendError(sender, "Page does not exist");
+			return;
+		}
         
-        sender.sendMessage(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + page + " of " + pages + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        finalMsg.add(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + start + " of " + stock.getTotalPages() + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        
+        
+        for(String s : finalMsg)
+        	sender.sendMessage(s);
         
     }
 
