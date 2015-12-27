@@ -8,6 +8,8 @@ import org.blockface.virtualshop.util.Numbers;
 import org.blockface.virtualshop.util.PageList;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -15,20 +17,39 @@ import java.util.List;
 
 import javax.swing.text.BadLocationException;
 
-public class Sales
-{
-    @SuppressWarnings("deprecation")
-	public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
-    {
-        if(!sender.hasPermission("virtualshop.sales")){
+public class Sales implements CommandExecutor{
+	
+	VirtualShop plugin;
+	
+	public Sales(VirtualShop plugin){
+		this.plugin = plugin;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if(!sender.hasPermission("virtualshop.sales")){
             Chatty.noPermissions(sender);
-            return;
+            return true;
         }
-        
-        if(args.length > 0 && args[0].contains("'")){
+		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
+			Chatty.denyBeta(sender);
+			return true;
+		}
+		if(args.length > 0 && args[0].contains("'")){
         	Chatty.noTransactions(sender, args[0]);
-        	return;
+        	return true;
         }
+		
+		try{
+			this.execute(sender, args);
+    	} catch (LinkageError e){
+    		Chatty.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
+    	}
+		return true;
+	}
+	
+    @SuppressWarnings("deprecation")
+	public void execute(CommandSender sender, String[] args) throws LinkageError {
         
         OfflinePlayer target;
         int start = 1;

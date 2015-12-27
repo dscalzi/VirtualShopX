@@ -1,25 +1,18 @@
 package org.blockface.virtualshop;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import net.md_5.bungee.api.ChatColor;
 import net.milkbowl.vault.economy.Economy;
 
 import org.blockface.virtualshop.commands.Buy;
 import org.blockface.virtualshop.commands.Cancel;
 import org.blockface.virtualshop.commands.Find;
-import org.blockface.virtualshop.commands.Help;
 import org.blockface.virtualshop.commands.Sales;
 import org.blockface.virtualshop.commands.Sell;
 import org.blockface.virtualshop.commands.Stock;
+import org.blockface.virtualshop.commands.VM;
 import org.blockface.virtualshop.managers.ConfigManager;
 import org.blockface.virtualshop.managers.DatabaseManager;
 import org.blockface.virtualshop.util.ItemDb;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class VirtualShop extends JavaPlugin {
     
     public static Economy econ = null;
+    public static final boolean BETA = true;
     
     public void onDisable(){
         DatabaseManager.close();
@@ -48,6 +42,7 @@ public class VirtualShop extends JavaPlugin {
             this.getPluginLoader().disablePlugin(this);
             return;
         }
+        this.registerCommands();
     }
     
     public boolean setupEconomy(){
@@ -62,6 +57,17 @@ public class VirtualShop extends JavaPlugin {
         return econ != null;
     }
     
+    public void registerCommands(){
+    	this.getCommand("buy").setExecutor(new Buy(this));
+    	this.getCommand("cancel").setExecutor(new Cancel(this));
+    	this.getCommand("find").setExecutor(new Find(this));
+    	this.getCommand("shop").setExecutor(new VM(this));
+    	this.getCommand("sales").setExecutor(new Sales(this));
+    	this.getCommand("sell").setExecutor(new Sell(this));
+    	this.getCommand("stock").setExecutor(new Stock(this));
+    	this.getCommand("vm").setExecutor(new VM(this));
+    }
+    
     public boolean hasEnough(String playerName, double money){
         double balance = econ.getBalance(playerName) - money;
         if (balance > 0){
@@ -69,38 +75,5 @@ public class VirtualShop extends JavaPlugin {
         } else {
             return false;
         }
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
-    	List<String> cmdList = new ArrayList<>(Arrays.asList("sell", "buy", "cancel", "stock", "sales", "find", "shop"));
-    	for(String s : cmdList){
-    		if(label.equalsIgnoreCase(s) && !sender.hasPermission("virtualshop.access.beta")){
-    			sender.sendMessage(ChatColor.RED + "VIRTUAL MARKET IS CURRENTLY RESTRICTED FOR BETA TESTING!");
-    			return true;
-    		}
-    	}
-        if(label.equalsIgnoreCase("sell")) Sell.execute(sender, args, this);
-        if(label.equalsIgnoreCase("buy")) Buy.execute(sender, args, this);
-        if(label.equalsIgnoreCase("cancel")) Cancel.execute(sender, args, this);
-        if(label.equalsIgnoreCase("stock")){
-        	try{
-        	Stock.execute(sender, args, this);
-        	} catch (LinkageError e){
-        		Chatty.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
-        		return true;
-        	}
-        }
-        if(label.equalsIgnoreCase("sales")){
-        	try{
-        	Sales.execute(sender, args, this);
-        	} catch (LinkageError e){
-        		Chatty.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
-        		return true;
-        	}
-        }
-        if(label.equalsIgnoreCase("find")) Find.execute(sender, args, this);
-        if(label.equalsIgnoreCase("shop")) Help.execute(sender, this);
-        return true;
     }
 }

@@ -9,40 +9,55 @@ import org.blockface.virtualshop.util.InventoryManager;
 import org.blockface.virtualshop.util.ItemDb;
 import org.blockface.virtualshop.util.Numbers;
 import org.bukkit.GameMode;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class Sell
-{
-    @SuppressWarnings("deprecation")
-	public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
-    {
-        if(!(sender instanceof Player))
-        {
+public class Sell implements CommandExecutor{
+	
+	VirtualShop plugin;
+	
+	public Sell(VirtualShop plugin){
+		this.plugin = plugin;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		
+		if(!(sender instanceof Player)){
             Chatty.denyConsole(sender);
-            return;
+            return true;
         }
-        Player player = (Player)sender;
-        if(!sender.hasPermission("virtualshop.sell"))
-        {
+		if(!sender.hasPermission("virtualshop.sell")){
             Chatty.noPermissions(sender);
-            return;
+            return true;
         }
-        if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
-        	Chatty.invalidGamemode(sender, player.getGameMode());
-        	return;
-        }
-        if(args.length < 3)
-		{
-			Chatty.sendError(sender, "Proper usage is /sell <amount> <item> <price>");
-			return;
+		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
+			Chatty.denyBeta(sender);
+			return true;
 		}
+		if(args.length < 3){
+			Chatty.sendError(sender, "Proper usage is /sell <amount> <item> <price>");
+			return true;
+		}
+		Player player = (Player)sender;
+		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+        	Chatty.invalidGamemode(sender, player.getGameMode());
+        	return true;
+        }
+		
+		this.execute(player, args);
+		return true;
+	}
+	
+    @SuppressWarnings("deprecation")
+	public void execute(Player player, String[] args){
         double price = Numbers.parseDouble(args[2]);
 		int amount = Numbers.parseInteger(args[0]);
-		if(amount < 0 || price < 0)
-		{
-			Chatty.numberFormat(sender);
+		if(amount < 0 || price < 0){
+			Chatty.numberFormat(player);
 			return;
 		}
         ItemStack item = ItemDb.get(args[1], amount);
@@ -53,11 +68,11 @@ public class Sell
 		}
 		if(item==null)
 		{
-			Chatty.wrongItem(sender, args[1]);
+			Chatty.wrongItem(player, args[1]);
 			return;
 		}
 		if(price > ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			Chatty.priceTooHigh(sender, args[1], ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+			Chatty.priceTooHigh(player, args[1], ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return;
 		}
         InventoryManager im = new InventoryManager(player);
@@ -76,9 +91,9 @@ public class Sell
 		if(!im.contains(item,true,true))
 		{
 			if(item.getAmount() == 0)
-        		Chatty.sendError(sender, "You do not have any " + Chatty.formatItem(args[1]));
+        		Chatty.sendError(player, "You do not have any " + Chatty.formatItem(args[1]));
 			else
-				Chatty.sendError(sender, "You do not have " + Chatty.formatAmount(item.getAmount()) + " " + Chatty.formatItem(args[1]));
+				Chatty.sendError(player, "You do not have " + Chatty.formatAmount(item.getAmount()) + " " + Chatty.formatItem(args[1]));
 			return;
 		}
         im.remove(item, true, true);

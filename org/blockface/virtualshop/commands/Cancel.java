@@ -7,38 +7,57 @@ import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.util.InventoryManager;
 import org.blockface.virtualshop.util.ItemDb;
 import org.bukkit.GameMode;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class Cancel {
+public class Cancel implements CommandExecutor{
 
-    public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
-    {
-        if(!(sender instanceof Player)){
+	VirtualShop plugin;
+	
+	public Cancel(VirtualShop plugin){
+		this.plugin = plugin;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		
+		if(!(sender instanceof Player)){
             Chatty.denyConsole(sender);
-            return;
+            return true;
         }
-        Player player = (Player)sender;
-        if(!sender.hasPermission("virtualshop.cancel")){
+		if(!sender.hasPermission("virtualshop.cancel")){
             Chatty.noPermissions(sender);
-            return;
+            return true;
         }
-        if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
+			Chatty.denyBeta(sender);
+			return true;
+		}
+		Player player = (Player)sender;
+		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
         	Chatty.invalidGamemode(sender, player.getGameMode());
-        	return;
+        	return true;
         }
-        if(args.length < 2){
+		if(args.length < 2){
             Chatty.sendError(sender, "Proper usage is /cancel <amount> <item>");
-            return;
+            return true;
         }
+		
+		this.execute(player, args);
+		return true;
+	}
+	
+    public void execute(Player player, String[] args){
         
         ItemStack item = ItemDb.get(args[1], 0);
         int cancelAmt = 0;
         
 		if(item==null)
 		{
-			Chatty.wrongItem(sender, args[1]);
+			Chatty.wrongItem(player, args[1]);
 			return;
 		}
 		
@@ -49,7 +68,7 @@ public class Cancel {
         }
 		if(total == 0)
 		{
-			Chatty.sendError(sender,"You do not have any " + args[1] + " for sale.");
+			Chatty.sendError(player,"You do not have any " + args[1] + " for sale.");
 			return;
 		}
 		
@@ -60,11 +79,11 @@ public class Cancel {
         	try{
         		cancelAmt = Integer.parseInt(args[0]);
         		if(cancelAmt < 1){
-        			Chatty.numberFormat(sender);
+        			Chatty.numberFormat(player);
             		return;
         		}
         	} catch (NumberFormatException e){
-        		Chatty.numberFormat(sender);
+        		Chatty.numberFormat(player);
         		return;
         	}
 		}
@@ -101,7 +120,7 @@ public class Cancel {
         	Offer o = new Offer(player.getName(),item,oPrice);
         	DatabaseManager.addOffer(o);
         }
-        Chatty.sendSuccess(sender, "Removed " + Chatty.formatAmount(cancelAmt) + " " + Chatty.formatItem(args[1]));
+        Chatty.sendSuccess(player, "Removed " + Chatty.formatAmount(cancelAmt) + " " + Chatty.formatItem(args[1]));
 
 
     }

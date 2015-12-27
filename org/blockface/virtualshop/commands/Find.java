@@ -7,25 +7,43 @@ import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.util.ItemDb;
 import org.blockface.virtualshop.util.Numbers;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class Find
-{
-    public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
-    {
-        if(!sender.hasPermission("virtualshop.find"))
-        {
+public class Find implements CommandExecutor{
+	
+	VirtualShop plugin;
+	
+	public Find(VirtualShop plugin){
+		this.plugin = plugin;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		
+		if(!sender.hasPermission("virtualshop.find")){
             Chatty.noPermissions(sender);
-            return;
+            return true;
         }
-        if(args.length < 1)
-		{
-			Chatty.sendError(sender, "You need to specify the item.");
-			return;
+		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
+			Chatty.denyBeta(sender);
+			return true;
 		}
+		if(args.length < 1){
+			Chatty.sendError(sender, "You need to specify the item.");
+			return true;
+		}
+		
+		 this.execute(sender, args);
+		return true;
+	}
+	
+    public void execute(CommandSender sender, String[] args)
+    {
 		ItemStack item = ItemDb.get(args[0], 0);
 		if(item==null)
 		{
@@ -63,7 +81,6 @@ public class Find
         	right += "-";
         }
         sender.sendMessage(left + header + right);
-        //sender.sendMessage(ChatColor.DARK_GRAY + "---------------" + ChatColor.GRAY + "Page (" + ChatColor.RED + page + ChatColor.GRAY + " of " + ChatColor.RED +pages + ChatColor.GRAY + ")" + ChatColor.DARK_GRAY + "---------------");
         for(Offer o : offers)
         {
             if(count==start+9) break;

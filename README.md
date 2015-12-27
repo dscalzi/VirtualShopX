@@ -1,6 +1,6 @@
 # Virtual Shop #
 
-This is a revamp of the [plugin originally created by SwearWords](http://dev.bukkit.org/bukkit-plugins/virtualshop/). No uodate has been deployed since October 29th, 2011. 
+This is a revamp of the [plugin originally created by SwearWords](http://dev.bukkit.org/bukkit-plugins/virtualshop/). No update has been deployed since October 29th, 2011. 
 
 ### Plugin Details ###
 

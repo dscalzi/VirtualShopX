@@ -9,43 +9,62 @@ import org.blockface.virtualshop.util.InventoryManager;
 import org.blockface.virtualshop.util.ItemDb;
 import org.blockface.virtualshop.util.Numbers;
 import org.bukkit.GameMode;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-@SuppressWarnings("deprecation")
-public class Buy {
+public class Buy implements CommandExecutor{
 
-    public static void execute(CommandSender sender, String[] args, VirtualShop plugin)
-    {
-		if(!(sender instanceof Player))	{
+	VirtualShop plugin;
+	
+	public Buy(VirtualShop plugin){
+		this.plugin = plugin;
+	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		
+		if(!(sender instanceof Player)){
 			Chatty.denyConsole(sender);
-			return;
+			return true;
+		}
+		if(!sender.hasPermission("virtualshop.buy")){
+            Chatty.noPermissions(sender);
+            return true;
+        }
+		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
+			Chatty.denyBeta(sender);
+			return true;
 		}
 		Player player = (Player)sender;
-        if(!sender.hasPermission("virtualshop.buy")){
-            Chatty.noPermissions(sender);
-            return;
-        }
-        if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
         	Chatty.invalidGamemode(sender, player.getGameMode());
-        	return;
+        	return true;
         }
 		if(args.length < 2)
 		{
 			Chatty.sendError(sender, "Proper usage is /buy <amount> <item> [maxprice]");
-			return;
+			return true;
 		}
+		
+		this.execute(player, args);
+		return true;
+	}
+	
+    @SuppressWarnings("deprecation")
+	public void execute(Player player, String[] args){
 		int amount = Numbers.parseInteger(args[0]);
 		if(amount < 0)		{
-			Chatty.numberFormat(sender);
+			Chatty.numberFormat(player);
 			return;
 		}
 		
 		if(amount == Numbers.ALL){
-			Chatty.numberFormat(sender);
+			Chatty.numberFormat(player);
 			return;
 		}
 		
@@ -53,7 +72,7 @@ public class Buy {
         if(args.length > 2){
         	maxprice = Numbers.parseDouble(args[2]);
         	if(maxprice < 0){
-        		Chatty.numberFormat(sender);
+        		Chatty.numberFormat(player);
         		return;
         	}
         }
@@ -61,7 +80,7 @@ public class Buy {
 		ItemStack item = ItemDb.get(args[1], 0);
 		if(item==null)
 		{
-			Chatty.wrongItem(sender, args[1]);
+			Chatty.wrongItem(player, args[1]);
 			return;
 		}
         int bought = 0;
@@ -69,7 +88,7 @@ public class Buy {
         InventoryManager im = new InventoryManager(player);
         List<Offer> offers = DatabaseManager.getItemOffers(item);
         if(offers.size()==0) {
-            Chatty.sendError(sender,"There is no " + Chatty.formatItem(args[1])+ " for sale.");
+            Chatty.sendError(player,"There is no " + Chatty.formatItem(args[1])+ " for sale.");
             return;
         }
         

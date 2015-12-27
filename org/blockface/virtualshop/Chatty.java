@@ -58,7 +58,6 @@ public class Chatty
     }
 
     public static void wrongItem(CommandSender sender, String item){
-
 		sendError(sender, "What is " + item + "?");
 	}
 
@@ -74,6 +73,10 @@ public class Chatty
 		sendError(sender, "That is not a proper number.");
 	}
 
+	public static void denyBeta(CommandSender sender){
+		sendError(sender, ChatColor.RED + "VIRTUAL MARKET IS CURRENTLY RESTRICTED FOR BETA TESTING!");
+	}
+	
 	public static void invalidGamemode(CommandSender sender, GameMode mode){
 		sendError(sender, "You cannot use the Virtual Market in " + mode.toString().toLowerCase() + " mode!");
 	}

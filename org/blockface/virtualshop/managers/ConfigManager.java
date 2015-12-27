@@ -11,14 +11,7 @@ public class ConfigManager
     private static ConfigurationSection config;
 
     public static void initialize(Plugin plugin){
-        config = plugin.getConfig();
-        plugin.getConfig().options().copyDefaults(true); 
-        File file = new File(plugin.getDataFolder(), "config.yml");
-		if (!file.exists())
-		{
-			plugin.saveDefaultConfig();
-		}
-        plugin.reloadConfig();
+        loadConfig(plugin);
         broadcastOffers();
         usingMySQL();
         mySQLUserName();
@@ -30,8 +23,17 @@ public class ConfigManager
         plugin.saveConfig();
     }
 
+    public static void loadConfig(Plugin plugin){
+    	File file = new File(plugin.getDataFolder(), "config.yml");
+		if (!file.exists()){
+			plugin.saveDefaultConfig();
+		}
+		config = plugin.getConfig(); 
+		plugin.reloadConfig();
+    }
+    
     public static String getPrefix(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chatty.prefix"));
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chatty.prefix")) + getColor();
     }
     
     public static String getColor(){

@@ -25,10 +25,16 @@ commands:
         usage: /sales [player] [page]
     shop:
         description: Displays help.
-        usage: /vs
+        usage: /shop
+    vm:
+        description: Technical commands under /vm.
+        usage: /vm [param]
 permissions:
     virtualshop.access.beta:
         description: Restricts access during beta period
+        default: OP
+    virtualshop.access.admin:
+        description: Access to administrator commands
         default: OP
     virtualshop.sell:
         description: Allow usage of /sell
