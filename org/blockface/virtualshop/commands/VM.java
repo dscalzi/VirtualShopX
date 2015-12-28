@@ -161,6 +161,12 @@ public class VM implements CommandExecutor{
 	
 	@SuppressWarnings("deprecation")
 	public void formatMarket(CommandSender sender){
+		
+		if(!sender.hasPermission("virtualshop.access.admin")){
+			Chatty.noPermissions(sender);
+            return;
+		}
+		
 		int amt = 0;
 		for(Offer o : DatabaseManager.getAllOffers()){
 			if(o.price > ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData())){
@@ -176,6 +182,12 @@ public class VM implements CommandExecutor{
 	
 	@SuppressWarnings("deprecation")
 	public void formatMarket(CommandSender sender, String itm){
+		
+		if(!sender.hasPermission("virtualshop.access.admin")){
+			Chatty.noPermissions(sender);
+            return;
+		}
+		
 		int amt = 0;
 		ItemStack item = ItemDb.get(itm, 0);
 		if(itm.equalsIgnoreCase("hand") && sender instanceof Player){
@@ -201,6 +213,12 @@ public class VM implements CommandExecutor{
 	}
 	
 	public void cmdReload(CommandSender sender){
+		
+		if(!sender.hasPermission("virtualshop.access.admin")){
+			Chatty.noPermissions(sender);
+            return;
+		}
+		
 		ConfigManager.loadConfig(plugin);
 		Chatty.initialize(plugin);
 		Chatty.sendSuccess(sender, ChatColor.GREEN + "Configuration successfully reloaded.");

@@ -27,3 +27,7 @@ price-limits:
     399-0: 
       name: NetherStar
       max-price: 1000000
+allowed-worlds:
+  - Survival
+  - Survival_the_end
+  - Survival_nether

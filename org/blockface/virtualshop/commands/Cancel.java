@@ -2,6 +2,7 @@ package org.blockface.virtualshop.commands;
 
 import org.blockface.virtualshop.Chatty;
 import org.blockface.virtualshop.VirtualShop;
+import org.blockface.virtualshop.managers.ConfigManager;
 import org.blockface.virtualshop.managers.DatabaseManager;
 import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.util.InventoryManager;
@@ -38,8 +39,12 @@ public class Cancel implements CommandExecutor{
 			return true;
 		}
 		Player player = (Player)sender;
+		if(!ConfigManager.getAllowedWorlds().contains(player.getWorld().getName())){
+			Chatty.invalidWorld(sender, command.getName(), player.getWorld());
+			return true;
+		}
 		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
-        	Chatty.invalidGamemode(sender, player.getGameMode());
+        	Chatty.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
 		if(args.length < 2){

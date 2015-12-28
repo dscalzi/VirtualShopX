@@ -1,6 +1,8 @@
 package org.blockface.virtualshop.managers;
 
 import java.io.File;
+import java.util.List;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
@@ -58,6 +60,11 @@ public class ConfigManager
 		if(!config.contains("price-limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price"))
 			return getMaxPrice();
 		return config.getLong("price-limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price");
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static List<String> getAllowedWorlds(){
+		return (List<String>)config.getList("allowed-worlds");
 	}
 	
     public static Integer getPort(){

@@ -8,6 +8,7 @@ import org.blockface.virtualshop.objects.Transaction;
 import org.blockface.virtualshop.util.ItemDb;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -77,8 +78,12 @@ public class Chatty
 		sendError(sender, ChatColor.RED + "VIRTUAL MARKET IS CURRENTLY RESTRICTED FOR BETA TESTING!");
 	}
 	
-	public static void invalidGamemode(CommandSender sender, GameMode mode){
-		sendError(sender, "You cannot use the Virtual Market in " + mode.toString().toLowerCase() + " mode!");
+	public static void invalidGamemode(CommandSender sender, String cmd, GameMode mode){
+		sendError(sender, "You cannot " + cmd + " in " + mode.toString().toLowerCase() + " mode!");
+	}
+	
+	public static void invalidWorld(CommandSender sender, String cmd, World world){
+		sendError(sender, "You cannot " + cmd + " in " + world.getName() + "!");
 	}
 	
 	public static String formatSeller(String seller){
