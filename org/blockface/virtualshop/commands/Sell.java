@@ -17,7 +17,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class Sell implements CommandExecutor{
 	
-	VirtualShop plugin;
+	@SuppressWarnings("unused")
+	private VirtualShop plugin;
 	
 	public Sell(VirtualShop plugin){
 		this.plugin = plugin;

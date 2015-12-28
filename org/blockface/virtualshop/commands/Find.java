@@ -16,7 +16,8 @@ import java.util.List;
 
 public class Find implements CommandExecutor{
 	
-	VirtualShop plugin;
+	@SuppressWarnings("unused")
+	private VirtualShop plugin;
 	
 	public Find(VirtualShop plugin){
 		this.plugin = plugin;

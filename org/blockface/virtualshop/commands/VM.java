@@ -8,15 +8,20 @@ import javax.swing.text.BadLocationException;
 import org.blockface.virtualshop.Chatty;
 import org.blockface.virtualshop.VirtualShop;
 import org.blockface.virtualshop.managers.ConfigManager;
+import org.blockface.virtualshop.managers.DatabaseManager;
+import org.blockface.virtualshop.objects.Offer;
+import org.blockface.virtualshop.util.ItemDb;
 import org.blockface.virtualshop.util.PageList;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class VM implements CommandExecutor{
 
-	VirtualShop plugin;
+	private VirtualShop plugin;
 	
 	public VM(VirtualShop plugin){
 		this.plugin = plugin;
@@ -62,6 +67,14 @@ public class VM implements CommandExecutor{
 					this.vmList(sender, 1);
 					return true;
 				}
+				if(args[0].equalsIgnoreCase("formatmarket")){
+					if(args.length > 1){
+						this.formatMarket(sender, args[1]);
+						return true;
+					}
+					this.formatMarket(sender);
+					return true;
+				}
 				if(args[0].equalsIgnoreCase("reload")){
 					this.cmdReload(sender);
 					return true;
@@ -84,7 +97,7 @@ public class VM implements CommandExecutor{
     	List<String> cmds = new ArrayList<String>();
         cmds.add(listPrefix + ChatColor.GOLD + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + ChatColor.WHITE + " - buy items.");
         cmds.add(listPrefix + ChatColor.GOLD + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + ChatColor.WHITE + " - sell items.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/cancel " + ChatColor.BLUE + "<item> " + ChatColor.WHITE + " - remove item from shop.");
+        cmds.add(listPrefix + ChatColor.GOLD + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.WHITE + " - remove item from shop.");
         cmds.add(listPrefix + ChatColor.GOLD + "/find " + ChatColor.BLUE + "<item> " + ChatColor.WHITE + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - find offers for the item.");
         cmds.add(listPrefix + ChatColor.GOLD + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - browse offers.");
         cmds.add(listPrefix + ChatColor.GOLD + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - view transaction log.");
@@ -120,6 +133,7 @@ public class VM implements CommandExecutor{
 		cmds.add(listPrefix + ChatColor.GOLD + "/vm help " + ChatColor.GRAY + "[page]" + ChatColor.WHITE + " - VirtualShop's technical commands.");
 		cmds.add(listPrefix + ChatColor.GOLD + "/vm version" + ChatColor.WHITE + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.access.admin")){
+			cmds.add(listPrefix + ChatColor.GOLD + "/vm formatmarket " + ChatColor.BLUE + "[item]" + ChatColor.WHITE + " - Reprice all items who's market price exceeds the set limit.");
 			cmds.add(listPrefix + ChatColor.GOLD + "/vm reload" + ChatColor.WHITE + " - Reload the plugin's configuration.");
 		}
 		
@@ -143,6 +157,47 @@ public class VM implements CommandExecutor{
         for(String s : finalMsg)
         	sender.sendMessage(s);
         
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void formatMarket(CommandSender sender){
+		int amt = 0;
+		for(Offer o : DatabaseManager.getAllOffers()){
+			if(o.price > ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData())){
+				DatabaseManager.updatePrice(o.id, ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
+				++amt;
+			}
+		}
+		if(amt == 0)
+			Chatty.sendSuccess(sender, ChatColor.GREEN + "All listings are already correctly formatted!");
+		else
+			Chatty.sendSuccess(sender, ChatColor.GREEN + "Successfully formatted " + amt + " listings.");
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void formatMarket(CommandSender sender, String itm){
+		int amt = 0;
+		ItemStack item = ItemDb.get(itm, 0);
+		if(itm.equalsIgnoreCase("hand") && sender instanceof Player){
+			Player player = (Player)sender;
+			item = new ItemStack(player.getItemInHand().getType(), 0, player.getItemInHand().getDurability());
+			itm = ItemDb.reverseLookup(item);
+		}
+		if(item == null){
+			Chatty.wrongItem(sender, itm);
+			return;
+		}
+		for(Offer o : DatabaseManager.getAllOffers()){
+			boolean isSameItem = ItemDb.reverseLookup(item).equalsIgnoreCase(ItemDb.reverseLookup(o.item));
+			if(o.price > ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()) && isSameItem){
+				DatabaseManager.updatePrice(o.id, ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
+				++amt;
+			}
+		}
+		if(amt == 0)
+			Chatty.sendSuccess(sender, ChatColor.GREEN + "All listings are already correctly formatted!");
+		else
+			Chatty.sendSuccess(sender, ChatColor.GREEN + "Successfully formatted " + amt + " listings.");
 	}
 	
 	public void cmdReload(CommandSender sender){

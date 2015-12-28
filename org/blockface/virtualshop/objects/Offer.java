@@ -15,26 +15,22 @@ public class Offer
     public String seller;
     public int id;
 
-    public Offer(String seller, int id, short damage, double price, int amount)
-    {
+    public Offer(String seller, int id, short damage, double price, int amount){
         this.item = new ItemStack(id,amount,damage);
         this.seller = seller;
         this.price = price;
     }
 
-    public Offer(String seller, ItemStack item, double price)
-    {
+    public Offer(String seller, ItemStack item, double price){
         this.seller = seller;
         this.item = item;
         this.price = price;
     }
 
-    public static List<Offer> listOffers(ResultSet result)
-    {
+    public static List<Offer> listOffers(ResultSet result){
         List<Offer> ret = new ArrayList<Offer>();
         try {
-            while(result.next())
-            {
+            while(result.next()){
                 Offer o = new Offer(result.getString("seller"), result.getInt("item"), (short)result.getInt("damage"),result.getDouble("price"),result.getInt("amount"));
                 o.id = result.getInt("id");
                 ret.add(o);

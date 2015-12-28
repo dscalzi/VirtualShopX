@@ -19,7 +19,7 @@ import javax.swing.text.BadLocationException;
 
 public class Stock implements CommandExecutor{
 	
-	VirtualShop plugin;
+	private VirtualShop plugin;
 	
 	public Stock(VirtualShop plugin){
 		this.plugin = plugin;

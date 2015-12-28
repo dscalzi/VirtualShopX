@@ -2,6 +2,7 @@ package org.blockface.virtualshop.commands;
 
 import org.blockface.virtualshop.Chatty;
 import org.blockface.virtualshop.VirtualShop;
+import org.blockface.virtualshop.managers.ConfigManager;
 import org.blockface.virtualshop.managers.DatabaseManager;
 import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.objects.Transaction;
@@ -15,14 +16,21 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import net.md_5.bungee.api.ChatColor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Buy implements CommandExecutor{
 
-	VirtualShop plugin;
+	private VirtualShop plugin;
+	private Map<String, ArrayList<Object>> confirmations; //0 keepBuying, 1 checked, 2 args, 3 time
 	
 	public Buy(VirtualShop plugin){
 		this.plugin = plugin;
+		this.confirmations = new HashMap<String, ArrayList<Object>>();
 	}
 	
 	@Override
@@ -45,8 +53,13 @@ public class Buy implements CommandExecutor{
         	Chatty.invalidGamemode(sender, player.getGameMode());
         	return true;
         }
-		if(args.length < 2)
-		{
+		if(args.length > 0){
+			if(args[0].equalsIgnoreCase("confirm")){
+				this.cmdConfirm(player);
+				return true;
+			}
+		}
+		if(args.length < 2){
 			Chatty.sendError(sender, "Proper usage is /buy <amount> <item> [maxprice]");
 			return true;
 		}
@@ -107,27 +120,51 @@ public class Buy implements CommandExecutor{
         @SuppressWarnings("unused")
 		boolean boughtAny = false;
         
-        for(Offer o: offers)
-        {
+        if(!confirmations.containsKey(player.getName())){
+        	ArrayList<Object> data = new ArrayList<Object>();
+    		data.add(false);
+    		data.add(false);
+    		data.add(args);
+    		data.add(System.currentTimeMillis());
+    		confirmations.put(player.getName(), data);
+        }
+        
+        for(Offer o: offers){
             if(o.price > maxprice){
             	tooHigh = true;
             	continue;
             }
             if(o.seller.equals(player.getName())) continue;
-            if((amount - bought) >= o.item.getAmount())
-            {
+            
+            if(o.price > ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
+            	if(!((Boolean)confirmations.get(player.getName()).get(1))){
+            		Chatty.sendError(player, ChatColor.RED + "Some of the items you are trying to buy are listed for more than our price limit of " + Chatty.formatPrice(ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())) + ChatColor.RED + ". To continue buying please type " + ChatColor.GREEN + "/buy confirm" + ChatColor.RED + ". Command expires in 10 seconds.");
+            		ArrayList<Object> data = new ArrayList<Object>();
+            		data.add(false);
+            		data.add(false);
+            		args[0] = Integer.toString(amount-bought);
+            		data.add(args);
+            		data.add(System.currentTimeMillis());
+            		confirmations.put(player.getName(), data);
+            		if(!((Boolean)confirmations.get(player.getName()).get(0)) && !((Boolean)confirmations.get(player.getName()).get(1)))
+    					break;
+            		if(!((Boolean)confirmations.get(player.getName()).get(0)) && ((Boolean)confirmations.get(player.getName()).get(1))){
+            			break;
+            		}
+            	}
+            }
+            
+            if((amount - bought) >= o.item.getAmount()){
                 int canbuy = o.item.getAmount();
                 double cost = o.price * canbuy;
 
                 //Revise amounts if not enough money.
-                if(!plugin.hasEnough(player.getName(), cost))
-                {
+                if(!plugin.hasEnough(player.getName(), cost)){
                     canbuy = (int)(VirtualShop.econ.getBalance(player.getName()) / o.price);
                     cost = canbuy*o.price;
-                    if(canbuy < 1)
-                    {
-							Chatty.sendError(player,"Ran out of money!");
-							break;
+                    if(canbuy < 1){
+						Chatty.sendError(player,"Ran out of money!");
+						break;
                     }
                 }
                 bought += canbuy;
@@ -141,21 +178,17 @@ public class Buy implements CommandExecutor{
                 Transaction t = new Transaction(o.seller, player.getName(), o.item.getTypeId(), o.item.getDurability(), canbuy, cost);
                 DatabaseManager.logTransaction(t);
                 boughtAny = true;
-            }
-            else
-            {
+            } else {
                 int canbuy = amount - bought;
                 double cost = canbuy * o.price;
 
                 //Revise amounts if not enough money.
-                if(!plugin.hasEnough(player.getName(), cost))
-                {
+                if(!plugin.hasEnough(player.getName(), cost)){
                     canbuy = (int)(VirtualShop.econ.getBalance(player.getName()) / o.price);
                     cost = canbuy*o.price;
-                    if(canbuy < 1)
-                    {
-							Chatty.sendError(player,"Ran out of money!");
-							break;
+                    if(canbuy < 1){
+						Chatty.sendError(player,"Ran out of money!");
+						break;
                     }
                 }
                 bought += canbuy;
@@ -182,5 +215,27 @@ public class Buy implements CommandExecutor{
         	Chatty.sendError(player,"No one is selling " + Chatty.formatItem(args[1]) + " cheaper than " + Chatty.formatPrice(maxprice));
         else
         	Chatty.sendSuccess(player,"Managed to buy " + Chatty.formatAmount(bought) + " " + Chatty.formatItem(args[1]) + " for " + Chatty.formatPrice(spent));
+    }
+    
+	public void cmdConfirm(Player player){
+    	if(confirmations.containsKey(player.getName())){
+    		long timeElapse = System.currentTimeMillis() - (Long)confirmations.get(player.getName()).get(3);
+    		if(timeElapse > 10000){
+    			Chatty.sendError(player, "Nothing to confirm!");
+    			confirmations.remove(player.getName());
+    			return;
+    		}
+    		ArrayList<Object> temp = new ArrayList<Object>();
+    		temp.add(true);
+    		temp.add(true);
+    		temp.add(confirmations.get(player.getName()).get(2));
+    		confirmations.remove(player.getName());
+    		confirmations.put(player.getName(), temp);
+    		Chatty.sendSuccess(player, "Confirmed, proccessing..");
+    		this.execute(player, (String[])confirmations.get(player.getName()).get(2));
+    		confirmations.remove(player.getName());
+    	} else {
+    		Chatty.sendError(player, "Nothing to confirm!");
+    	}
     }
 }

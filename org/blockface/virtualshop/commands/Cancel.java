@@ -15,7 +15,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class Cancel implements CommandExecutor{
 
-	VirtualShop plugin;
+	@SuppressWarnings("unused")
+	private VirtualShop plugin;
 	
 	public Cancel(VirtualShop plugin){
 		this.plugin = plugin;

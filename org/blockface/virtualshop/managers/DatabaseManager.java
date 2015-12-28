@@ -49,6 +49,11 @@ public class DatabaseManager
 			String query = "insert into stock(seller,item,amount,price,damage) values('" +offer.seller +"',"+ offer.item.getType().getId() + ","+offer.item.getAmount() +","+offer.price+"," + offer.item.getDurability()+")";
 			database.query(query);
 	}
+    
+    public static List<Offer> getAllOffers(){
+    	String query = "select * from stock order by price asc";
+    	return Offer.listOffers(database.query(query));
+    }
 
     public static List<Offer> getItemOffers(ItemStack item)
 	{
@@ -80,6 +85,11 @@ public class DatabaseManager
 		database.query(query);
 	}
 
+    public static void updatePrice(int id, double price){
+    	String query = "update stock set price="+price+" where id=" + id;
+    	database.query(query);
+    }
+    
     public static void logTransaction(Transaction transaction)
 	{
 		String query = "insert into transactions(seller,buyer,item,amount,cost,damage) values('" +transaction.seller +"','"+ transaction.buyer + "'," + transaction.item.getTypeId() + ","+ transaction.item.getAmount() +","+transaction.cost+","+transaction.item.getDurability()+")";
