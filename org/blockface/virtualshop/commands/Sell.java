@@ -195,7 +195,7 @@ public class Sell implements CommandExecutor{
 		}
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
-			Chatty.sendSuccess(player, ChatColor.GREEN + "Sell confirmations turned off. To undo this /sell confirm toggle off");
+			Chatty.sendSuccess(player, ChatColor.GREEN + "Sell confirmations turned on. To undo this /sell confirm toggle off");
 			DatabaseManager.updateSellToggle(player.getName(), true);
 			return;
 		}

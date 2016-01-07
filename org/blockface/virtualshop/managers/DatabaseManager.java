@@ -55,18 +55,14 @@ public class DatabaseManager
     	String query = "select * from toggles where merchant='" + merchant + "'";
     	ResultSet result = database.query(query);
     	try {
-    		while(result.next())
-    			if(result.getString("merchant").equalsIgnoreCase(merchant))
-    				return true;
-			
-		}catch (Exception e) {
+    		return result.getString("merchant").equalsIgnoreCase(merchant);
+		}catch (SQLException e) {
 			return false;
 		}
-    	return false;
     }
     
     public static void addPlayerToToggles(String merchant){
-    	String query = "insert into toggles(merchant,buyconfirm,sellconfirm) values('" + merchant + "',0,0)";
+    	String query = "insert into toggles(merchant,buyconfirm,sellconfirm) values('" + merchant + "',1,1)";
     	database.query(query);
     }
     
@@ -97,7 +93,7 @@ public class DatabaseManager
     	ResultSet result = database.query(query);
     	try {
 			return result.getBoolean("sellconfirm");
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			return false;
 		}
     }
@@ -109,7 +105,7 @@ public class DatabaseManager
     	ResultSet result = database.query(query);
     	try { 
 			return result.getBoolean("buyconfirm");
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			return false;
 		}
     }
