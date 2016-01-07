@@ -27,15 +27,20 @@ public class SQLiteDB implements Database
 	{
 		if(!this.db.checkTable("stock"))
 		{
-			String query = "create table stock('id' integer primary key,'damage' integer,'seller' varchar(80) not null,'item' integer not null, 'price' float not null,'amount' integer not null)";
+			String query = "create table stock('id' integer primary key,'damage' integer,'seller' varchar(80) not null,'item' integer not null, 'price' double not null,'amount' integer not null)";
 			db.createTable(query);
 			Chatty.logInfo("Created stock table.");
 		}
 		if(!this.db.checkTable("transactions"))
 		{
-			String query = "create table transactions('id' integer primary key,'damage' integer not null,'buyer' varchar(80) not null,'seller' varchar(80) not null,'item' integer not null, 'cost' float not null,'amount' integer not null)";
+			String query = "create table transactions('id' integer primary key,'damage' integer not null,'buyer' varchar(80) not null,'seller' varchar(80) not null,'item' integer not null, 'cost' double not null,'amount' integer not null)";
 			db.createTable(query);
 			Chatty.logInfo("Created transaction table.");
+		}
+		if(!db.checkTable("toggles")){
+			String query = "create table toggles('id' integer primary key,'merchant' varchar(80) not null,'buyconfirm' bit not null,'sellconfirm' bit not null)";
+			db.createTable(query);
+			Chatty.logInfo("Created toggles table.");
 		}
 	}
 

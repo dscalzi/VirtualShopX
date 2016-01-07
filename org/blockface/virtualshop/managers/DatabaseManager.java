@@ -9,6 +9,8 @@ import org.blockface.virtualshop.persistance.SQLiteDB;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -44,11 +46,73 @@ public class DatabaseManager
         database.unload();
     }
 
-    public static void addOffer(Offer offer)
-	{
+    public static void addOffer(Offer offer){
 			String query = "insert into stock(seller,item,amount,price,damage) values('" +offer.seller +"',"+ offer.item.getType().getId() + ","+offer.item.getAmount() +","+offer.price+"," + offer.item.getDurability()+")";
 			database.query(query);
 	}
+    
+    public static boolean isPlayerInToggles(String merchant){
+    	String query = "select * from toggles where merchant='" + merchant + "'";
+    	ResultSet result = database.query(query);
+    	try {
+    		while(result.next())
+    			if(result.getString("merchant").equalsIgnoreCase(merchant))
+    				return true;
+			
+		}catch (Exception e) {
+			return false;
+		}
+    	return false;
+    }
+    
+    public static void addPlayerToToggles(String merchant){
+    	String query = "insert into toggles(merchant,buyconfirm,sellconfirm) values('" + merchant + "',0,0)";
+    	database.query(query);
+    }
+    
+    public static void updateSellToggle(String merchant, boolean value){
+    	if(!isPlayerInToggles(merchant))
+    		addPlayerToToggles(merchant);
+    	int dataval = 0;
+    	if(value)
+    		dataval = 1;
+    	String query = "update toggles set sellconfirm=" + dataval + " where merchant='" + merchant + "'";
+		database.query(query);
+    }
+    
+    public static void updateBuyToggle(String merchant, boolean value){
+    	if(!isPlayerInToggles(merchant))
+    		addPlayerToToggles(merchant);
+    	int dataval = 0;
+    	if(value)
+    		dataval = 1;
+    	String query = "update toggles set buyconfirm=" + dataval + " where merchant='" + merchant + "'";
+		database.query(query);
+    }
+    
+    public static boolean getSellToggle(String merchant){
+    	if(!isPlayerInToggles(merchant))
+    		addPlayerToToggles(merchant);
+    	String query = "select * from toggles where merchant='" + merchant + "'";
+    	ResultSet result = database.query(query);
+    	try {
+			return result.getBoolean("sellconfirm");
+		} catch (Exception e) {
+			return false;
+		}
+    }
+    
+    public static boolean getBuyToggle(String merchant){
+    	if(!isPlayerInToggles(merchant))
+    		addPlayerToToggles(merchant);
+    	String query = "select * from toggles where merchant='" + merchant + "'";
+    	ResultSet result = database.query(query);
+    	try { 
+			return result.getBoolean("buyconfirm");
+		} catch (Exception e) {
+			return false;
+		}
+    }
     
     public static List<Offer> getAllOffers(){
     	String query = "select * from stock order by price asc";

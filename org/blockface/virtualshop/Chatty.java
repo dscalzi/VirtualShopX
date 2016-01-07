@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.blockface.virtualshop.managers.ConfigManager;
 import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.objects.Transaction;
+import org.blockface.virtualshop.objects.TransactionData;
 import org.blockface.virtualshop.util.ItemDb;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -39,6 +40,10 @@ public class Chatty
         sender.sendMessage(ChatColor.DARK_GREEN + prefix + " " + message);
     }
 
+    public static void sendMessage(CommandSender sender, String message){
+    	sender.sendMessage(prefix + " " + message);
+    }
+    
     public static Boolean sendSuccess(String sender, String message){
     	Player player = plugin.getServer().getPlayer(sender);
 		if(player == null) return false;
@@ -124,6 +129,19 @@ public class Chatty
 
     public static String formatOffer(Offer o){
         return formatSeller(o.seller) + ": " + formatAmount(o.item.getAmount()) + " " + formatItem(ItemDb.reverseLookup(o.item)) + " for " + formatPrice(o.price) + " each.";
+    }
+    
+    public static void sellConfirmation(Player player, TransactionData data){
+    	if(data.getCurrentListings() < 1)
+    		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    	else{
+    		if(data.getOldPrice() == data.getPrice())
+    			sendMessage(player, "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    		if(data.getOldPrice() > data.getPrice())
+    			sendMessage(player, "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing for a lower price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    		if(data.getOldPrice() < data.getPrice())
+    			sendMessage(player, "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing for a higher price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    	}
     }
 
     public static String formatTransaction(Transaction t){
