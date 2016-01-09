@@ -17,7 +17,12 @@ public class TransactionData {
 	private final long TIME;
 	private final String[] ARGS;
 	
+	private final boolean canContinue;
+	
 	public TransactionData(int amount, ItemStack item, double price, double maxPrice, List<Offer> offers, long systemTime, String[] args){
+		this(amount, item, price, maxPrice, offers, systemTime, args, true);
+	}
+	public TransactionData(int amount, ItemStack item, double price, double maxPrice, List<Offer> offers, long systemTime, String[] args, boolean canContinue){
 		this.AMOUNT = amount;
 		this.ITEM = item;
 		this.PRICE = price;
@@ -25,6 +30,7 @@ public class TransactionData {
 		this.OFFERS = offers;
 		this.TIME = systemTime;
 		this.ARGS = args;
+		this.canContinue = canContinue;
 	}
 	
 	public int getAmount(){
@@ -55,6 +61,10 @@ public class TransactionData {
 		return this.ARGS;
 	}
 	
+	public boolean canContinue(){
+		return this.canContinue;
+	}
+	
 	/** 
 	Compares the transaction data excluding the system time, and initial string arguments.
 	*/
@@ -70,6 +80,8 @@ public class TransactionData {
 		if(this.getMaxPrice() != other.getMaxPrice())
 			return false;
 		if(!this.getOffers().equals(other.getOffers()))
+			return false;
+		if(this.canContinue() != other.canContinue())
 			return false;
 		return true;
 	}

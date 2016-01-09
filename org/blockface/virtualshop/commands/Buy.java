@@ -99,7 +99,7 @@ public class Buy implements CommandExecutor{
 		//Set data
 		int amount = Numbers.parseInteger(args[0]);
 		ItemStack item = ItemDb.get(args[1], 0);
-		double maxprice = Double.MAX_VALUE-1;
+		double maxprice;
 		//Validate data
 		if(amount < 1)		{
 			Chatty.numberFormat(player);
@@ -115,6 +115,8 @@ public class Buy implements CommandExecutor{
         		Chatty.numberFormat(player);
         		return false;
         	}
+        } else {
+        	maxprice = ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData());
         }
 		if(item==null){
 			Chatty.wrongItem(player, args[1]);
@@ -128,68 +130,51 @@ public class Buy implements CommandExecutor{
         }
         
         //Validate request with market.
-        int bought = 0;
-        double spent = 0;
-        boolean tooHigh = false;
-        for(Offer o: offers){
-        	//Offer's price exceeds user's maxprice param
-            if(o.price > maxprice){
-            	tooHigh = true;
-            	continue;
-            }
-            //Offer is the user's own offer;
-            if(o.seller.equals(player.getName())) 
-            	continue;
-            int canbuy = amount-bought;
-            double cost = o.price * canbuy;
-            if(!plugin.hasEnough(player.getName(), cost)){
-                canbuy = (int)(VirtualShop.econ.getBalance(player.getName()) / o.price); //canbuy what they afford
-                cost = canbuy*o.price; //update cost
-                if(canbuy < 1){
-					//ran out of money, buy what we can afford.
-					break;
-                }
-            }
-            bought += canbuy;
-            spent += cost;
-            if(bought >= amount) 
-            	break;
-        }
-        item.setAmount(bought);
-        if(tooHigh && bought == 0 && args.length > 2){
-        	Chatty.sendError(player,"No one is selling " + Chatty.formatItem(args[1]) + " cheaper than " + Chatty.formatPrice(maxprice));
+        TransactionData temp = new TransactionData(amount, item, -1, maxprice, offers, System.currentTimeMillis(), args) ;
+        TransactionData data = parseListings(player, temp, false);
+        
+        if(!data.canContinue()){
         	return false;
         }
+        
         //Submit Data
-        TransactionData data = new TransactionData(amount, item, spent, maxprice, offers, System.currentTimeMillis(), args);
         confirmations.put(player, data);
 		return true;
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void finalizeTransaction(Player player, TransactionData data){
+		parseListings(player, data, true);
+		confirmations.remove(player);
+	}
+	
+	
+	@SuppressWarnings("deprecation")
+	private TransactionData parseListings(Player player, TransactionData data, boolean finalize){
+		boolean canContinue = true;
 		int amount = data.getAmount();
 		ItemStack item = data.getItem();
-		double totalPrice = data.getPrice();
 		double maxprice = data.getMaxPrice();
 		String[] args = data.getArgs();
 		List<Offer> offers = data.getOffers();
 		InventoryManager im = new InventoryManager(player);
 		
-		ItemStack[] inv = player.getInventory().getContents();
-        int openNum = 0;
-        for(int i=0; i<inv.length; ++i){
-    		if(inv[i] == null){
-    			openNum += 64;
-    			continue;
-    		} else if(inv[i].getType() == item.getType()){
-    			openNum += (64-inv[i].getAmount());
-    		}
-    	}
+		int openNum = 0;
+		if(finalize){
+			ItemStack[] inv = player.getInventory().getContents();
+        	for(int i=0; i<inv.length; ++i){
+        		if(inv[i] == null){
+        			openNum += 64;
+        			continue;
+        		} else if(inv[i].getType() == item.getType()){
+        			openNum += (64-inv[i].getAmount());
+        		}
+        	}
+		}
 		
         int bought = 0;
         double spent = 0;
         boolean tooHigh = false;
+        boolean anyLessThanMax = false;;
         
         for(Offer o: offers){
             if(o.price > maxprice){
@@ -200,43 +185,70 @@ public class Buy implements CommandExecutor{
             	continue;
             
             int canbuy = amount-bought;
+            int stock = o.item.getAmount();
+            if(canbuy > stock)
+            	canbuy = stock;  
             double cost = o.price * canbuy;
-
+            anyLessThanMax = true;
+            
             //Revise amounts if not enough money.
             if(!plugin.hasEnough(player.getName(), cost)){
             	canbuy = (int)(VirtualShop.econ.getBalance(player.getName()) / o.price);
                 cost = canbuy*o.price;
+                amount = bought+canbuy;
+                tooHigh = true;
                 if(canbuy < 1){
-                	Chatty.sendError(player,"Ran out of money!");
+                	Chatty.sendError(player, ChatColor.RED + "Ran out of money!");
+                	canContinue = false;
 					break;
+                } else {
+                	if(!finalize)
+                		Chatty.sendError(player, ChatColor.RED + "You only have enough money for " + Chatty.formatAmount(bought+canbuy) + " " + Chatty.formatItem(args[1]) + ChatColor.RED + ".");
                 }
             }
             bought += canbuy;
             spent += cost;
-            VirtualShop.econ.withdrawPlayer(player.getName(), cost);
-            VirtualShop.econ.depositPlayer(o.seller, cost);
-            Chatty.sendSuccess(o.seller, Chatty.formatSeller(player.getName()) + " just bought " + Chatty.formatAmount(canbuy) + " " + Chatty.formatItem(args[1]) + " for " + Chatty.formatPrice(cost));
-            int left = o.item.getAmount() - canbuy;
-            if(left < 1) 
-            	DatabaseManager.deleteItem(o.id);
-            else 
-                DatabaseManager.updateQuantity(o.id, left);
-            Transaction t = new Transaction(o.seller, player.getName(), o.item.getTypeId(), o.item.getDurability(), canbuy, cost);
-            DatabaseManager.logTransaction(t);
+            if(finalize){
+            	VirtualShop.econ.withdrawPlayer(player.getName(), cost);
+            	VirtualShop.econ.depositPlayer(o.seller, cost);
+            	Chatty.sendSuccess(o.seller, Chatty.formatSeller(player.getName()) + " just bought " + Chatty.formatAmount(canbuy) + " " + Chatty.formatItem(args[1]) + " for " + Chatty.formatPrice(cost));
+            	int left = o.item.getAmount() - canbuy;
+            	if(left < 1) 
+            		DatabaseManager.deleteItem(o.id);
+            	else 
+            		DatabaseManager.updateQuantity(o.id, left);
+            	Transaction t = new Transaction(o.seller, player.getName(), o.item.getTypeId(), o.item.getDurability(), canbuy, cost);
+            	DatabaseManager.logTransaction(t);
+            }
             if(bought >= amount) 
             	break;
+            if(tooHigh)
+            	break;
         }
-        if(openNum < bought){
-        	item.setAmount(bought-openNum);
-        	player.getWorld().dropItem(player.getLocation(), item);
+        if(!tooHigh && !finalize){
+        	if(bought == 0){
+            	Chatty.sendError(player,"There is no " + Chatty.formatItem(args[1]) + " for sale.");
+            	canContinue = false;
+            }
+        	if(bought < amount && bought > 0)
+        		Chatty.sendError(player, ChatColor.RED + "There's only " + Chatty.formatAmount(bought) + " " + Chatty.formatItem(args[1]) + ChatColor.RED + " for sale.");
         }
-        if(bought > 0) im.addItem(item);
-        if(tooHigh && bought == 0 && args.length > 2)
+        item.setAmount(bought);
+        if(finalize){
+        	if(openNum < bought){
+        		item.setAmount(bought-openNum);
+        		player.getWorld().dropItem(player.getLocation(), item);
+        	}
+        	if(bought > 0) im.addItem(item);
+        }
+        if(tooHigh && bought == 0 && args.length > 2 && !anyLessThanMax){
         	Chatty.sendError(player,"No one is selling " + Chatty.formatItem(args[1]) + " cheaper than " + Chatty.formatPrice(maxprice));
-        else
-        	Chatty.sendSuccess(player,"Managed to buy " + Chatty.formatAmount(bought) + " " + Chatty.formatItem(args[1]) + " for " + Chatty.formatPrice(totalPrice));
-        
-		confirmations.remove(player);
+        	canContinue = false;
+        }else{
+        	if(finalize)
+        		Chatty.sendSuccess(player,"Managed to buy " + Chatty.formatAmount(bought) + " " + Chatty.formatItem(args[1]) + " for " + Chatty.formatPrice(spent));
+        }
+        return new TransactionData(bought, item, spent, maxprice, offers, System.currentTimeMillis(), args, canContinue);
 	}
 	
 	private void confirm(Player player){
@@ -275,9 +287,10 @@ public class Buy implements CommandExecutor{
 			
 		if(value.equalsIgnoreCase("off")){
 			Chatty.sendSuccess(player, ChatColor.GREEN + "Buy confirmations turned off. To undo this /buy confirm toggle on");
+			confirmations.remove(player);
 			DatabaseManager.updateBuyToggle(player.getName(), false);
 			return;
 		}
-		Chatty.sendMessage(player, "You may turn sell confirmations on or off using /buy confirm toggle <on/off>");
+		Chatty.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");
 	}
 }

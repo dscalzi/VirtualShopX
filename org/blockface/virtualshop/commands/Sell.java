@@ -152,7 +152,7 @@ public class Sell implements CommandExecutor{
         return true;
 	}
 	
-	public void createListing(Player player, ListingData data){
+	private void createListing(Player player, ListingData data){
 		ItemStack item = data.getItem();
 		double price = data.getPrice();
 		InventoryManager im = new InventoryManager(player);
@@ -205,6 +205,7 @@ public class Sell implements CommandExecutor{
 			
 		if(value.equalsIgnoreCase("off")){
 			Chatty.sendSuccess(player, ChatColor.GREEN + "Sell confirmations turned off. To undo this /sell confirm toggle on");
+			confirmations.remove(player);
 			DatabaseManager.updateSellToggle(player.getName(), false);
 			return;
 		}

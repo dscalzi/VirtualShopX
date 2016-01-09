@@ -102,6 +102,8 @@ public class VM implements CommandExecutor{
         cmds.add(listPrefix + ChatColor.GOLD + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - browse offers.");
         cmds.add(listPrefix + ChatColor.GOLD + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - view transaction log.");
         cmds.add(listPrefix + ChatColor.GOLD + "/vm" + ChatColor.WHITE + " - Virtual Shop's technical commands.");
+        cmds.add(listPrefix + ChatColor.GOLD + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.WHITE + " - Turn buy confirmations on/off.");
+        cmds.add(listPrefix + ChatColor.GOLD + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.WHITE + " - Turn sell confirmations on/off.");
         
         PageList<String> commands = new PageList<>(cmds, 7);
         
