@@ -8,7 +8,7 @@ import org.blockface.virtualshop.VirtualShop;
 import org.blockface.virtualshop.managers.ConfigManager;
 import org.blockface.virtualshop.managers.DatabaseManager;
 import org.blockface.virtualshop.objects.Offer;
-import org.blockface.virtualshop.objects.TransactionData;
+import org.blockface.virtualshop.objects.ListingData;
 import org.blockface.virtualshop.util.InventoryManager;
 import org.blockface.virtualshop.util.ItemDb;
 import org.blockface.virtualshop.util.Numbers;
@@ -25,11 +25,11 @@ public class Sell implements CommandExecutor{
 	
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
-	private Map<Player, TransactionData> confirmations;
+	private Map<Player, ListingData> confirmations;
 	
 	public Sell(VirtualShop plugin){
 		this.plugin = plugin;
-		this.confirmations = new HashMap<Player, TransactionData>();
+		this.confirmations = new HashMap<Player, ListingData>();
 	}
 	
 	@Override
@@ -91,8 +91,8 @@ public class Sell implements CommandExecutor{
 			}
 			return;
 		}
-		this.validateData(player, args);
-		Chatty.sellConfirmation(player, confirmations.get(player));
+		if(this.validateData(player, args))
+			Chatty.sellConfirmation(player, confirmations.get(player));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -107,6 +107,18 @@ public class Sell implements CommandExecutor{
 			Chatty.numberFormat(player);
 			return false;
 		}
+		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
+        	ItemStack[] inv = player.getInventory().getContents();
+        	int total = 0;
+        	for(int i=0; i<inv.length; ++i){
+        		if(inv[i] == null)
+        			continue;
+        		else if(ItemDb.reverseLookup(inv[i]).equals(ItemDb.reverseLookup(item)))
+        			total += inv[i].getAmount();
+        	}
+        	amount = total;
+        	item.setAmount(total);
+        }
 		if(args[1].equalsIgnoreCase("hand")){
 			item = new ItemStack(player.getItemInHand().getType(),amount, player.getItemInHand().getDurability());
 			args[1] = ItemDb.reverseLookup(item);
@@ -126,17 +138,6 @@ public class Sell implements CommandExecutor{
 				Chatty.sendError(player, "You do not have " + Chatty.formatAmount(item.getAmount()) + " " + Chatty.formatItem(args[1]));
 			return false;
 		}
-		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
-        	ItemStack[] inv = player.getInventory().getContents();
-        	int total = 0;
-        	for(int i=0; i<inv.length; ++i){
-        		if(inv[i] == null)
-        			continue;
-        		else if(inv[i].getType() == item.getType())
-        			total += inv[i].getAmount();
-        	}
-        	item.setAmount(total);
-        }
 		//Database checks
 		int currentlyListed = 0;
 		double oldPrice = -1;
@@ -146,12 +147,12 @@ public class Sell implements CommandExecutor{
         }
         
         //Submit data
-        TransactionData data = new TransactionData(amount, item, price, currentlyListed, oldPrice, System.currentTimeMillis(), args);
+        ListingData data = new ListingData(amount, item, price, currentlyListed, oldPrice, System.currentTimeMillis(), args);
         this.confirmations.put(player, data);
         return true;
 	}
 	
-	public void createListing(Player player, TransactionData data){
+	public void createListing(Player player, ListingData data){
 		ItemStack item = data.getItem();
 		double price = data.getPrice();
 		InventoryManager im = new InventoryManager(player);
@@ -173,16 +174,18 @@ public class Sell implements CommandExecutor{
 			Chatty.sendError(player, ChatColor.RED + "Nothing to confirm!");
 			return;
 		}
-		TransactionData initialData = confirmations.get(player);
+		ListingData initialData = confirmations.get(player);
 		validateData(player, initialData.getArgs());
-		TransactionData currentData = confirmations.get(player);
+		ListingData currentData = confirmations.get(player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
 		if(timeElapsed > 15000){
 			Chatty.sendError(player, ChatColor.RED + "Transaction expired, please try again!");
+			confirmations.remove(player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
 			Chatty.sendError(player, ChatColor.RED + "Data changed, please try again!");
+			confirmations.remove(player);
 			return;
 		}
 		createListing(player, initialData);

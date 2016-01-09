@@ -1,28 +1,23 @@
 package org.blockface.virtualshop.objects;
 
-import java.util.List;
-
 import org.bukkit.inventory.ItemStack;
 
-/**
-Data Caching for use in /buy
-*/
-public class TransactionData {
+public class ListingData {
 
 	private final int AMOUNT;
 	private final ItemStack ITEM;
 	private final double PRICE;
-	private final double MAXPRICE;
-	private final List<Offer> OFFERS;
+	private final int CURRENTLYLISTED;
+	private final double OLDPRICE;
 	private final long TIME;
 	private final String[] ARGS;
 	
-	public TransactionData(int amount, ItemStack item, double price, double maxPrice, List<Offer> offers, long systemTime, String[] args){
+	public ListingData(int amount, ItemStack item, double price, int currentlyListed, double oldPrice, long systemTime, String[] args){
 		this.AMOUNT = amount;
 		this.ITEM = item;
 		this.PRICE = price;
-		this.MAXPRICE = maxPrice;
-		this.OFFERS = offers;
+		this.CURRENTLYLISTED = currentlyListed;
+		this.OLDPRICE = oldPrice;
 		this.TIME = systemTime;
 		this.ARGS = args;
 	}
@@ -39,12 +34,12 @@ public class TransactionData {
 		return this.PRICE;
 	}
 	
-	public double getMaxPrice(){
-		return this.MAXPRICE;
+	public int getCurrentListings(){
+		return this.CURRENTLYLISTED;
 	}
 	
-	public List<Offer> getOffers(){
-		return this.OFFERS;
+	public double getOldPrice(){
+		return this.OLDPRICE;
 	}
 	
 	public long getTransactionTime(){
@@ -58,20 +53,19 @@ public class TransactionData {
 	/** 
 	Compares the transaction data excluding the system time, and initial string arguments.
 	*/
-	public boolean equals(TransactionData other){
+	public boolean equals(ListingData other){
 		if (this == other) 
             return true;
 		if(this.getAmount() != other.getAmount())
 			return false;
 		if(!this.getItem().equals(other.getItem()))
 			return false;
+		if(this.getCurrentListings() != other.getCurrentListings())
+			return false;
+		if(this.getOldPrice() != other.getOldPrice())
+			return false;
 		if(this.getPrice() != other.getPrice())
-			return false;
-		if(this.getMaxPrice() != other.getMaxPrice())
-			return false;
-		if(!this.getOffers().equals(other.getOffers()))
 			return false;
 		return true;
 	}
-	
 }

@@ -6,6 +6,7 @@ import org.blockface.virtualshop.managers.ConfigManager;
 import org.blockface.virtualshop.objects.Offer;
 import org.blockface.virtualshop.objects.Transaction;
 import org.blockface.virtualshop.objects.TransactionData;
+import org.blockface.virtualshop.objects.ListingData;
 import org.blockface.virtualshop.util.ItemDb;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -131,7 +132,7 @@ public class Chatty
         return formatSeller(o.seller) + ": " + formatAmount(o.item.getAmount()) + " " + formatItem(ItemDb.reverseLookup(o.item)) + " for " + formatPrice(o.price) + " each.";
     }
     
-    public static void sellConfirmation(Player player, TransactionData data){
+    public static void sellConfirmation(Player player, ListingData data){
     	if(data.getCurrentListings() < 1)
     		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
     	else{
@@ -142,6 +143,10 @@ public class Chatty
     		if(data.getOldPrice() < data.getPrice())
     			sendMessage(player, "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing for a higher price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
     	}
+    }
+    
+    public static void buyConfirmation(Player player, TransactionData data){
+    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /buy confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
     }
 
     public static String formatTransaction(Transaction t){

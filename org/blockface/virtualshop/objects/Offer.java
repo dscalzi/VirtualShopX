@@ -39,4 +39,19 @@ public class Offer
         }
         return ret;
     }
+    
+    public boolean equals(Object obj){
+    	if(!(obj instanceof Offer))
+    		return false;
+    	Offer other = (Offer)obj;
+    	if(other == this)
+    		return true;
+    	if(!this.item.equals(other.item))
+    		return false;
+    	if(this.price != other.price)
+    		return false;
+    	if(!this.seller.equals(other.seller))
+    		return false;
+    	return true;
+    }
 }
