@@ -21,6 +21,10 @@ public class Chatty
     private static VirtualShop plugin;
 	private static Logger logger;
 
+	/**
+	 * Initialize the chatty class
+	 * @throws java.io.FileNotFoundException
+	 */
     public static void initialize(VirtualShop p){
 		logger = Logger.getLogger("minecraft");
         plugin = p;

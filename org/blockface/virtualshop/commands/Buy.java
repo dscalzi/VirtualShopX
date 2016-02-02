@@ -109,6 +109,10 @@ public class Buy implements CommandExecutor{
 			Chatty.numberFormat(player);
 			return false;
 		}
+		if(item==null){
+			Chatty.wrongItem(player, args[1]);
+			return false;
+		}
         if(args.length > 2){
         	maxprice = Numbers.parseDouble(args[2]);
         	if(maxprice < 0){
@@ -118,10 +122,6 @@ public class Buy implements CommandExecutor{
         } else {
         	maxprice = ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData());
         }
-		if(item==null){
-			Chatty.wrongItem(player, args[1]);
-			return false;
-		}
 		//Check for listings
 		List<Offer> offers = DatabaseManager.getItemOffers(item);
         if(offers.size()==0) {
