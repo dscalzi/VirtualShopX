@@ -1,4 +1,4 @@
-package org.blockface.virtualshop.managers;
+package com.dscalzi.virtualshop.managers;
 
 import java.io.File;
 import java.util.List;

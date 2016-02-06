@@ -1,20 +1,21 @@
-package org.blockface.virtualshop;
+package com.dscalzi.virtualshop;
 
 import java.io.IOException;
 import net.milkbowl.vault.economy.Economy;
 
-import org.blockface.virtualshop.commands.Buy;
-import org.blockface.virtualshop.commands.Cancel;
-import org.blockface.virtualshop.commands.Find;
-import org.blockface.virtualshop.commands.Sales;
-import org.blockface.virtualshop.commands.Sell;
-import org.blockface.virtualshop.commands.Stock;
-import org.blockface.virtualshop.commands.VM;
-import org.blockface.virtualshop.managers.ConfigManager;
-import org.blockface.virtualshop.managers.DatabaseManager;
-import org.blockface.virtualshop.util.ItemDb;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.dscalzi.virtualshop.commands.Buy;
+import com.dscalzi.virtualshop.commands.Cancel;
+import com.dscalzi.virtualshop.commands.Find;
+import com.dscalzi.virtualshop.commands.Sales;
+import com.dscalzi.virtualshop.commands.Sell;
+import com.dscalzi.virtualshop.commands.Stock;
+import com.dscalzi.virtualshop.commands.VM;
+import com.dscalzi.virtualshop.managers.ConfigManager;
+import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.util.ItemDb;
 
 @SuppressWarnings("deprecation")
 public class VirtualShop extends JavaPlugin {

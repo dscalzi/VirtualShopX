@@ -1,9 +1,10 @@
-package org.blockface.virtualshop.persistance;
+package com.dscalzi.virtualshop.persistance;
 
-import org.blockface.virtualshop.Chatty;
 import lib.PatPeter.SQLibrary.*;
 
 import java.sql.ResultSet;
+
+import com.dscalzi.virtualshop.Chatty;
 
 public class SQLiteDB implements Database
 {

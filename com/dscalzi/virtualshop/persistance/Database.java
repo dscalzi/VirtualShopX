@@ -1,4 +1,4 @@
-package org.blockface.virtualshop.persistance;
+package com.dscalzi.virtualshop.persistance;
 
 import java.sql.ResultSet;
 

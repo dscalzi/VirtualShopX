@@ -1,10 +1,11 @@
-package org.blockface.virtualshop.persistance;
+package com.dscalzi.virtualshop.persistance;
 
 import lib.PatPeter.SQLibrary.MySQL;
-import org.blockface.virtualshop.Chatty;
-import org.blockface.virtualshop.managers.ConfigManager;
 
 import java.sql.ResultSet;
+
+import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.managers.ConfigManager;
 
 public class MySQLDB implements Database
 {

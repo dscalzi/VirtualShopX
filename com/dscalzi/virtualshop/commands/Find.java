@@ -1,16 +1,17 @@
-package org.blockface.virtualshop.commands;
+package com.dscalzi.virtualshop.commands;
 
-import org.blockface.virtualshop.Chatty;
-import org.blockface.virtualshop.VirtualShop;
-import org.blockface.virtualshop.managers.DatabaseManager;
-import org.blockface.virtualshop.objects.Offer;
-import org.blockface.virtualshop.util.ItemDb;
-import org.blockface.virtualshop.util.Numbers;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
+
+import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.Numbers;
 
 import java.util.List;
 

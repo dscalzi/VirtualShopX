@@ -1,4 +1,4 @@
-package org.blockface.virtualshop.util;
+package com.dscalzi.virtualshop.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;

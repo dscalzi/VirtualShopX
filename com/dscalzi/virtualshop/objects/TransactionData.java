@@ -1,4 +1,4 @@
-package org.blockface.virtualshop.objects;
+package com.dscalzi.virtualshop.objects;
 
 import java.util.List;
 

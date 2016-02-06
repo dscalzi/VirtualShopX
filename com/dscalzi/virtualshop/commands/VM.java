@@ -1,23 +1,24 @@
-package org.blockface.virtualshop.commands;
+package com.dscalzi.virtualshop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.text.BadLocationException;
 
-import org.blockface.virtualshop.Chatty;
-import org.blockface.virtualshop.VirtualShop;
-import org.blockface.virtualshop.managers.ConfigManager;
-import org.blockface.virtualshop.managers.DatabaseManager;
-import org.blockface.virtualshop.objects.Offer;
-import org.blockface.virtualshop.util.ItemDb;
-import org.blockface.virtualshop.util.PageList;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ConfigManager;
+import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.PageList;
 
 public class VM implements CommandExecutor{
 

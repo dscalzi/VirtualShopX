@@ -1,4 +1,4 @@
-package org.blockface.virtualshop.util;
+package com.dscalzi.virtualshop.util;
 
 import org.bukkit.inventory.ItemStack;
 

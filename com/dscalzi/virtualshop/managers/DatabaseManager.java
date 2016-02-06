@@ -1,13 +1,14 @@
-package org.blockface.virtualshop.managers;
+package com.dscalzi.virtualshop.managers;
 
-import org.blockface.virtualshop.Chatty;
-import org.blockface.virtualshop.objects.Offer;
-import org.blockface.virtualshop.objects.Transaction;
-import org.blockface.virtualshop.persistance.Database;
-import org.blockface.virtualshop.persistance.MySQLDB;
-import org.blockface.virtualshop.persistance.SQLiteDB;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.objects.Transaction;
+import com.dscalzi.virtualshop.persistance.Database;
+import com.dscalzi.virtualshop.persistance.MySQLDB;
+import com.dscalzi.virtualshop.persistance.SQLiteDB;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

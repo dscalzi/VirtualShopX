@@ -1,18 +1,19 @@
-package org.blockface.virtualshop;
+package com.dscalzi.virtualshop;
 
 import java.util.logging.Logger;
 
-import org.blockface.virtualshop.managers.ConfigManager;
-import org.blockface.virtualshop.objects.Offer;
-import org.blockface.virtualshop.objects.Transaction;
-import org.blockface.virtualshop.objects.TransactionData;
-import org.blockface.virtualshop.objects.ListingData;
-import org.blockface.virtualshop.util.ItemDb;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.dscalzi.virtualshop.managers.ConfigManager;
+import com.dscalzi.virtualshop.objects.ListingData;
+import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.objects.Transaction;
+import com.dscalzi.virtualshop.objects.TransactionData;
+import com.dscalzi.virtualshop.util.ItemDb;
 
 public class Chatty
 {
