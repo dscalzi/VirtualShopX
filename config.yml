@@ -10,7 +10,7 @@ MySQL:
   database: minecraft
 broadcast-offers: true
 chatty:
-  prefix: "&6&l[&f&lA&ftlas&lS&fhop&6&l]&e"
+  prefix: "&5[&dOShop&5]&e"
   message-color: "&e"
 #------------------------------------------
 #           Item Price Limits
