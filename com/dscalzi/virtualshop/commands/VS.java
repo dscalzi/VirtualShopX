@@ -20,11 +20,11 @@ import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDb;
 import com.dscalzi.virtualshop.util.PageList;
 
-public class VM implements CommandExecutor{
+public class VS implements CommandExecutor{
 
 	private VirtualShop plugin;
 	
-	public VM(VirtualShop plugin){
+	public VS(VirtualShop plugin){
 		this.plugin = plugin;
 	}
 	

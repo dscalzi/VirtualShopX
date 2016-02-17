@@ -12,7 +12,7 @@ import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.Stock;
-import com.dscalzi.virtualshop.commands.VM;
+import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.util.ItemDb;
@@ -62,11 +62,11 @@ public class VirtualShop extends JavaPlugin {
     	this.getCommand("buy").setExecutor(new Buy(this));
     	this.getCommand("cancel").setExecutor(new Cancel(this));
     	this.getCommand("find").setExecutor(new Find(this));
-    	this.getCommand("shop").setExecutor(new VM(this));
+    	this.getCommand("shop").setExecutor(new VS(this));
     	this.getCommand("sales").setExecutor(new Sales(this));
     	this.getCommand("sell").setExecutor(new Sell(this));
     	this.getCommand("stock").setExecutor(new Stock(this));
-    	this.getCommand("vm").setExecutor(new VM(this));
+    	this.getCommand("vs").setExecutor(new VS(this));
     }
     
     public boolean hasEnough(String playerName, double money){

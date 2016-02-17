@@ -26,9 +26,9 @@ commands:
     shop:
         description: Displays help.
         usage: /shop
-    vm:
-        description: Technical commands under /vm.
-        usage: /vm [param]
+    vs:
+        description: Technical commands under /vs.
+        usage: /vs [param]
 permissions:
     virtualshop.access.beta:
         description: Restricts access during beta period
