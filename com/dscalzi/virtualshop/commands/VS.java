@@ -52,20 +52,20 @@ public class VS implements CommandExecutor{
 			return true;
 		}
 		
-		if(cmd.equalsIgnoreCase("vm")){
+		if(cmd.equalsIgnoreCase("vs")){
 			if(args.length > 0){
 				if(args[0].equalsIgnoreCase("help")){
 					if(args.length > 1){
 						try{
 		    				int page = Integer.parseInt(args[1]);
-		    				this.vmList(sender, page);
+		    				this.vsList(sender, page);
 		    				return true;
 		    			} catch (NumberFormatException e){
 		    				Chatty.sendError(sender, "Page does not exist");
 							return true;
 		    			}
 					}
-					this.vmList(sender, 1);
+					this.vsList(sender, 1);
 					return true;
 				}
 				if(args[0].equalsIgnoreCase("formatmarket")){
@@ -85,7 +85,7 @@ public class VS implements CommandExecutor{
 					return true;
 				}
 			}
-			this.vmList(sender, 1);
+			this.vsList(sender, 1);
 			return true;
 		}
 		
@@ -102,7 +102,7 @@ public class VS implements CommandExecutor{
         cmds.add(listPrefix + ChatColor.GOLD + "/find " + ChatColor.BLUE + "<item> " + ChatColor.WHITE + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - find offers for the item.");
         cmds.add(listPrefix + ChatColor.GOLD + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - browse offers.");
         cmds.add(listPrefix + ChatColor.GOLD + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - view transaction log.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/vm" + ChatColor.WHITE + " - Virtual Shop's technical commands.");
+        cmds.add(listPrefix + ChatColor.GOLD + "/vs" + ChatColor.WHITE + " - Virtual Shop's technical commands.");
         cmds.add(listPrefix + ChatColor.GOLD + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.WHITE + " - Turn buy confirmations on/off.");
         cmds.add(listPrefix + ChatColor.GOLD + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.WHITE + " - Turn sell confirmations on/off.");
         
@@ -128,16 +128,16 @@ public class VS implements CommandExecutor{
         
 	}
 	
-	public void vmList(CommandSender sender, int page){
+	public void vsList(CommandSender sender, int page){
 		final String listPrefix = ChatColor.RED + " • ";
 		
 		List<String> cmds = new ArrayList<String>();
 		cmds.add(listPrefix + ChatColor.GOLD + "/shop " + ChatColor.GRAY + "[page]" + ChatColor.WHITE + " - View merchant commands.");
-		cmds.add(listPrefix + ChatColor.GOLD + "/vm help " + ChatColor.GRAY + "[page]" + ChatColor.WHITE + " - VirtualShop's technical commands.");
-		cmds.add(listPrefix + ChatColor.GOLD + "/vm version" + ChatColor.WHITE + " - View plugin's version.");
+		cmds.add(listPrefix + ChatColor.GOLD + "/vs help " + ChatColor.GRAY + "[page]" + ChatColor.WHITE + " - VirtualShop's technical commands.");
+		cmds.add(listPrefix + ChatColor.GOLD + "/vs version" + ChatColor.WHITE + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.access.admin")){
-			cmds.add(listPrefix + ChatColor.GOLD + "/vm formatmarket " + ChatColor.BLUE + "[item]" + ChatColor.WHITE + " - Reprice all items who's market price exceeds the set limit.");
-			cmds.add(listPrefix + ChatColor.GOLD + "/vm reload" + ChatColor.WHITE + " - Reload the plugin's configuration.");
+			cmds.add(listPrefix + ChatColor.GOLD + "/vs formatmarket " + ChatColor.BLUE + "[item]" + ChatColor.WHITE + " - Reprice all items who's market price exceeds the set limit.");
+			cmds.add(listPrefix + ChatColor.GOLD + "/vs reload" + ChatColor.WHITE + " - Reload the plugin's configuration.");
 		}
 		
 		PageList<String> commands = new PageList<>(cmds, 7);
