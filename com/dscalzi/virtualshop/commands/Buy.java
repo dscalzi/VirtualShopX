@@ -34,6 +34,7 @@ public class Buy implements CommandExecutor{
 		this.confirmations = new HashMap<Player, TransactionData>();
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		

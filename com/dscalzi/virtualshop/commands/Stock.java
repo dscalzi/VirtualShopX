@@ -26,6 +26,7 @@ public class Stock implements CommandExecutor{
 		this.plugin = plugin;
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
@@ -57,7 +58,7 @@ public class Stock implements CommandExecutor{
         int start = 1;
         List<Offer> offers;
         offers = DatabaseManager.getBestPrices();
-        String header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "I" + ChatColor.WHITE + "tem " + ChatColor.BOLD + "S" + ChatColor.WHITE + "tock ◄► AtlasNetwork " + ChatColor.GOLD + ChatColor.BOLD + " >";;
+        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "I" + ChatColor.LIGHT_PURPLE + "tem " + ChatColor.BOLD + "S" + ChatColor.LIGHT_PURPLE + "tock ◄► ObsidianCraft " + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";;
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
         if(start < 0){
@@ -78,7 +79,7 @@ public class Stock implements CommandExecutor{
             }
             for(Offer o : offers){
             	if(o.seller.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "I" + ChatColor.WHITE + "tem " + ChatColor.BOLD + "S" + ChatColor.WHITE + "tock ◄► " + o.seller + ChatColor.GOLD + ChatColor.BOLD + " >";
+            		header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "I" + ChatColor.LIGHT_PURPLE + "tem " + ChatColor.BOLD + "S" + ChatColor.LIGHT_PURPLE + "tock ◄► " + o.seller + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
             		break;
             	}
             }
@@ -88,8 +89,8 @@ public class Stock implements CommandExecutor{
         charCount -= header.length()-1;
         if(charCount % 2 == 0)
         	charCount -= 1;
-        String left = ChatColor.WHITE + "";
-        String right = ChatColor.GOLD + "";
+        String left = ChatColor.LIGHT_PURPLE + "";
+        String right = ChatColor.DARK_PURPLE + "";
         for(int i=0; i<charCount/2-1; ++i)
         	left += "-";
         for(int i=0; i<charCount/2-1; ++i)
@@ -108,7 +109,7 @@ public class Stock implements CommandExecutor{
 			return;
 		}
         
-        finalMsg.add(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + start + " of " + stock.getTotalPages() + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + start + " of " + stock.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
         
         
         for(String s : finalMsg)

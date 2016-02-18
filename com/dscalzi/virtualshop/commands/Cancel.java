@@ -24,6 +24,7 @@ public class Cancel implements CommandExecutor{
 		this.plugin = plugin;
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		

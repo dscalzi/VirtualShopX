@@ -21,7 +21,7 @@ import com.dscalzi.virtualshop.util.ItemDb;
 public class VirtualShop extends JavaPlugin {
     
     public static Economy econ = null;
-    public static final boolean BETA = true;
+    public static final boolean BETA = false;
     
     public void onDisable(){
         DatabaseManager.close();

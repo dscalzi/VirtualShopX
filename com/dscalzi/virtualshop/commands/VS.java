@@ -28,6 +28,7 @@ public class VS implements CommandExecutor{
 		this.plugin = plugin;
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
@@ -96,21 +97,21 @@ public class VS implements CommandExecutor{
     	final String listPrefix = ChatColor.RED + " • ";
     	
     	List<String> cmds = new ArrayList<String>();
-        cmds.add(listPrefix + ChatColor.GOLD + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + ChatColor.WHITE + " - buy items.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + ChatColor.WHITE + " - sell items.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.WHITE + " - remove item from shop.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/find " + ChatColor.BLUE + "<item> " + ChatColor.WHITE + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - find offers for the item.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - browse offers.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.WHITE + " - view transaction log.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/vs" + ChatColor.WHITE + " - Virtual Shop's technical commands.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.WHITE + " - Turn buy confirmations on/off.");
-        cmds.add(listPrefix + ChatColor.GOLD + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.WHITE + " - Turn sell confirmations on/off.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + ChatColor.LIGHT_PURPLE + " - buy items.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + ChatColor.LIGHT_PURPLE + " - sell items.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.LIGHT_PURPLE + " - remove item from shop.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/find " + ChatColor.BLUE + "<item> " + ChatColor.GRAY + "[page] " + ChatColor.LIGHT_PURPLE + " - find offers for the item.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.LIGHT_PURPLE + " - browse offers.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.LIGHT_PURPLE + " - view transaction log.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs" + ChatColor.LIGHT_PURPLE + " - Virtual Shop's technical commands.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + ChatColor.LIGHT_PURPLE + " - Turn buy confirmations on/off.");
+        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + ChatColor.LIGHT_PURPLE + " - Turn sell confirmations on/off.");
         
         PageList<String> commands = new PageList<>(cmds, 7);
         
         List<String> finalMsg = new ArrayList<String>();
-        finalMsg.add("------------------- " + Chatty.getPrefix() + ChatColor.GOLD + " -------------------");
-        finalMsg.add(ChatColor.GOLD + "              Command List - <Required> [Optional]");
+        finalMsg.add(ChatColor.LIGHT_PURPLE + "------------------- " + Chatty.getPrefix() + ChatColor.DARK_PURPLE + " -------------------");
+        finalMsg.add(ChatColor.DARK_PURPLE + "              Command List - <Required> [Optional]");
         
         try {
 			for(String s : commands.getPage(page)){
@@ -121,7 +122,7 @@ public class VS implements CommandExecutor{
 			return;
 		}
         
-        finalMsg.add(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
         
         for(String s : finalMsg)
         	sender.sendMessage(s);
@@ -132,19 +133,19 @@ public class VS implements CommandExecutor{
 		final String listPrefix = ChatColor.RED + " • ";
 		
 		List<String> cmds = new ArrayList<String>();
-		cmds.add(listPrefix + ChatColor.GOLD + "/shop " + ChatColor.GRAY + "[page]" + ChatColor.WHITE + " - View merchant commands.");
-		cmds.add(listPrefix + ChatColor.GOLD + "/vs help " + ChatColor.GRAY + "[page]" + ChatColor.WHITE + " - VirtualShop's technical commands.");
-		cmds.add(listPrefix + ChatColor.GOLD + "/vs version" + ChatColor.WHITE + " - View plugin's version.");
+		cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/shop " + ChatColor.GRAY + "[page]" + ChatColor.LIGHT_PURPLE + " - View merchant commands.");
+		cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs help " + ChatColor.GRAY + "[page]" + ChatColor.LIGHT_PURPLE + " - VirtualShop's technical commands.");
+		cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs version" + ChatColor.LIGHT_PURPLE + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.access.admin")){
-			cmds.add(listPrefix + ChatColor.GOLD + "/vs formatmarket " + ChatColor.BLUE + "[item]" + ChatColor.WHITE + " - Reprice all items who's market price exceeds the set limit.");
-			cmds.add(listPrefix + ChatColor.GOLD + "/vs reload" + ChatColor.WHITE + " - Reload the plugin's configuration.");
+			cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs formatmarket " + ChatColor.BLUE + "[item]" + ChatColor.LIGHT_PURPLE + " - Reprice all items who's market price exceeds the set limit.");
+			cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs reload" + ChatColor.LIGHT_PURPLE + " - Reload the plugin's configuration.");
 		}
 		
 		PageList<String> commands = new PageList<>(cmds, 7);
 		
 		List<String> finalMsg = new ArrayList<String>();
-		finalMsg.add("------------------- " + Chatty.getPrefix() + ChatColor.GOLD + " -------------------");
-        finalMsg.add(ChatColor.GOLD + "              Command List - <Required> [Optional]");
+		finalMsg.add(ChatColor.LIGHT_PURPLE + "------------------- " + Chatty.getPrefix() + ChatColor.DARK_PURPLE + " -------------------");
+        finalMsg.add(ChatColor.DARK_PURPLE + "              Command List - <Required> [Optional]");
 		
         try {
 			for(String s : commands.getPage(page)){
@@ -155,7 +156,7 @@ public class VS implements CommandExecutor{
 			return;
 		}
         
-        finalMsg.add(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
         
         for(String s : finalMsg)
         	sender.sendMessage(s);

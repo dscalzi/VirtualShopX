@@ -26,6 +26,7 @@ public class Sales implements CommandExecutor{
 		this.plugin = plugin;
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("virtualshop.sales")){
@@ -56,7 +57,7 @@ public class Sales implements CommandExecutor{
         int start = 1;
         List<Transaction> transactions;
         transactions = DatabaseManager.getTransactions();
-        String header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "T" + ChatColor.WHITE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.WHITE + "og ◄► AtlasNetwork " + ChatColor.GOLD + ChatColor.BOLD + " >";
+        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "T" + ChatColor.LIGHT_PURPLE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "og ◄► ObsidianCraft " + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
         //If /sales args, check to see if it's a number
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
@@ -79,11 +80,11 @@ public class Sales implements CommandExecutor{
             }
             for(Transaction t : transactions){
             	if(t.seller.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "T" + ChatColor.WHITE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.WHITE + "og ◄► " + t.seller + ChatColor.GOLD + ChatColor.BOLD + " >";
+            		header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "T" + ChatColor.LIGHT_PURPLE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "og ◄► " + t.seller + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
             		break;
             	}
             	else if(t.buyer.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "T" + ChatColor.WHITE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.WHITE + "og ◄► " + t.buyer + ChatColor.GOLD + ChatColor.BOLD + " >";
+            		header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "T" + ChatColor.LIGHT_PURPLE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "og ◄► " + t.buyer + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
             		break;
             	}
             }
@@ -93,8 +94,8 @@ public class Sales implements CommandExecutor{
         charCount -= header.length()-1;
         if(charCount % 2 == 0)
         	charCount -= 1;
-        String left = ChatColor.WHITE + "";
-        String right = ChatColor.GOLD + "";
+        String left = ChatColor.LIGHT_PURPLE + "";
+        String right = ChatColor.DARK_PURPLE + "";
         for(int i=0; i<charCount/2-1; ++i)
         	left += "-";
         for(int i=0; i<charCount/2-1; ++i)
@@ -113,7 +114,7 @@ public class Sales implements CommandExecutor{
 			return;
 		}
 
-        finalMsg.add(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + start + " of " + sales.getTotalPages() + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + start + " of " + sales.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
         
         
         for(String s : finalMsg)
