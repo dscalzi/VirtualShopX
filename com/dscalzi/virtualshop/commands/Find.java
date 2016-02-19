@@ -71,12 +71,12 @@ public class Find implements CommandExecutor{
             page = 1;
         }
         int charCount = 74;
-        String header = ChatColor.GOLD + "" + ChatColor.BOLD + "< " + ChatColor.WHITE + ChatColor.BOLD + "L" + ChatColor.WHITE + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + ChatColor.WHITE + args[0].substring(1) + ChatColor.GOLD + ChatColor.BOLD + " >";
+        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + ChatColor.LIGHT_PURPLE + args[0].substring(1) + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
         charCount -= header.length()-1;
         if(charCount % 2 == 0)
         	charCount -= 1;
-        String left = ChatColor.WHITE + "";
-        String right = ChatColor.GOLD + "";
+        String left = ChatColor.LIGHT_PURPLE + "";
+        String right = ChatColor.DARK_PURPLE + "";
         for(int i=0; i<charCount/2-1; ++i){
         	left += "-";
         }
@@ -93,6 +93,6 @@ public class Find implements CommandExecutor{
             }
             count++;
 		}
-        sender.sendMessage(ChatColor.WHITE + "-" + ChatColor.GOLD + "Oo" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "_____• " + ChatColor.GRAY + "Page " + page + " of " + pages + ChatColor.GOLD + " •_____" + ChatColor.WHITE + "__________" + ChatColor.GOLD + "oO" + ChatColor.WHITE + "-");
+        sender.sendMessage(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + page + " of " + pages + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
     }
 }

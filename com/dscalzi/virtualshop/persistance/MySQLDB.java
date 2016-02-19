@@ -7,10 +7,11 @@ import java.sql.ResultSet;
 import com.dscalzi.virtualshop.Chatty;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 
-public class MySQLDB implements Database
+public class MySQLDB implements com.dscalzi.virtualshop.persistance.Database
 {
     private MySQL db;
 
+    @Override
     public void load() throws Exception
     {
         Chatty.logInfo("Using MySQL.");
@@ -25,6 +26,7 @@ public class MySQLDB implements Database
         Chatty.logInfo("Could not connect to MySQL Database. Check settings.");
     }
 
+    @Override
     public ResultSet query(String query) {
         try {
             return db.query(query);
@@ -34,6 +36,7 @@ public class MySQLDB implements Database
         }
     }
 
+    @Override
     public void unload() {
         db.close();
     }
