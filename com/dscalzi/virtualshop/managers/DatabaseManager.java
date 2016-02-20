@@ -54,10 +54,21 @@ public class DatabaseManager
     
     public static boolean isPlayerInToggles(String merchant){
     	String query = "select * from toggles where merchant='" + merchant + "'";
-    	ResultSet result = database.query(query);
     	try {
-    		return result.getString("merchant").equalsIgnoreCase(merchant);
+    		ResultSet result = database.query(query);
+    		if(!result.next()) {
+    			Chatty.logInfo("returning false");
+    			return false;
+    		}
+    		else {
+    			if(result.getString("merchant").equalsIgnoreCase(merchant)) {
+    				Chatty.logInfo("returning true");
+    				return true;
+    			}
+    		}
+    		return false;
 		}catch (SQLException e) {
+			e.printStackTrace();
 			return false;
 		}
     }
@@ -91,10 +102,12 @@ public class DatabaseManager
     	if(!isPlayerInToggles(merchant))
     		addPlayerToToggles(merchant);
     	String query = "select * from toggles where merchant='" + merchant + "'";
-    	ResultSet result = database.query(query);
     	try {
+    		ResultSet result = database.query(query);
+    		result.next();    		
 			return result.getBoolean("sellconfirm");
 		} catch (SQLException e) {
+			e.printStackTrace();
 			return false;
 		}
     }
@@ -103,10 +116,12 @@ public class DatabaseManager
     	if(!isPlayerInToggles(merchant))
     		addPlayerToToggles(merchant);
     	String query = "select * from toggles where merchant='" + merchant + "'";
-    	ResultSet result = database.query(query);
-    	try { 
+    	try {
+    		ResultSet result = database.query(query);
+    		result.next();
 			return result.getBoolean("buyconfirm");
 		} catch (SQLException e) {
+			e.printStackTrace();
 			return false;
 		}
     }

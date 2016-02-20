@@ -53,22 +53,22 @@ public class MySQLDB implements com.dscalzi.virtualshop.persistance.Database
 
     private void checkTables() throws Exception
 	{
-		if(!db.checkTable("stock"))
+		if(!db.checkTable("vshop_stock"))
 		{
-			String query = "create table stock(`id` integer primary key auto_increment,`damage` integer,`seller` varchar(80) not null,`item` integer not null, `price` double not null,`amount` integer not null)";
+			String query = "create table vshop_stock(`id` integer primary key auto_increment,`damage` integer,`seller` varchar(80) not null,`item` integer not null, `price` double not null,`amount` integer not null)";
 			db.createTable(query);
-            Chatty.logInfo("Created stock table.");
+            Chatty.logInfo("Created vshop_stock table.");
 		}
-		if(!db.checkTable("transactions"))
+		if(!db.checkTable("vshop_transactions"))
 		{
-			String query = "create table transactions(`id` integer primary key auto_increment,`damage` integer not null, `buyer` varchar(20) not null,`seller` varchar(20) not null,`item` integer not null, `cost` double not null,`amount` integer not null)";
+			String query = "create table vshop_transactions(`id` integer primary key auto_increment,`damage` integer not null, `buyer` varchar(20) not null,`seller` varchar(20) not null,`item` integer not null, `cost` double not null,`amount` integer not null)";
 			db.createTable(query);
-			Chatty.logInfo("Created transaction table.");
+			Chatty.logInfo("Created vshop_transaction table.");
 		}
-		if(!db.checkTable("toggles")){
-			String query = "create table toggles(`id` integer primary key auto_increment,`merchant` varchar(80) not null,`buyconfirm` bit not null,`sellconfirm` bit not null)";
+		if(!db.checkTable("vshop_toggles")){
+			String query = "create table vshop_toggles(`id` integer primary key auto_increment,`merchant` varchar(80) not null,`buyconfirm` bit not null,`sellconfirm` bit not null)";
 			db.createTable(query);
-			Chatty.logInfo("Created toggles table.");
+			Chatty.logInfo("Created vshop_toggles table.");
 		}
 	}
 
