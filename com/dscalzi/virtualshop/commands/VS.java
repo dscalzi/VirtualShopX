@@ -94,7 +94,7 @@ public class VS implements CommandExecutor{
 	}
 	
 	public void cmdList(CommandSender sender, int page){
-    	final String listPrefix = ChatColor.RED + " â€¢ ";
+    	final String listPrefix = ChatColor.RED + " • ";
     	
     	List<String> cmds = new ArrayList<String>();
         cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + ChatColor.LIGHT_PURPLE + " - buy items.");
