@@ -19,13 +19,12 @@ public class DatabaseManager
 {
     private static Database database;
 
-    public static void initialize()
-    {
+    public static void initialize(){
         if(ConfigManager.usingMySQL()) loadMySQL();
         else loadSQLite();
     }
 
-    private static void loadSQLite() {
+    private static void loadSQLite(){
         database = new SQLiteDB();
         try {
             database.load();
@@ -34,16 +33,16 @@ public class DatabaseManager
         }
     }
 
-    private static void loadMySQL() {
+    private static void loadMySQL(){
         database = new MySQLDB();
         try {
             database.load();
-        } catch (Exception e) {
+        } catch (Exception e){
             loadSQLite();
         }
     }
 
-    public static void close() {
+    public static void close(){
         database.unload();
     }
 
@@ -61,7 +60,7 @@ public class DatabaseManager
     			return false;
     		}
     		else {
-    			if(result.getString("merchant").equalsIgnoreCase(merchant)) {
+    			if(result.getString("merchant").equalsIgnoreCase(merchant)){
     				Chatty.logInfo("returning true");
     				return true;
     			}
@@ -131,32 +130,27 @@ public class DatabaseManager
     	return Offer.listOffers(database.query(query));
     }
 
-    public static List<Offer> getItemOffers(ItemStack item)
-	{
+    public static List<Offer> getItemOffers(ItemStack item){
 		String query = "select * from vshop_stock where item=" + item.getTypeId()+ " and damage=" + item.getDurability() + " order by price asc";
 		return Offer.listOffers(database.query(query));
 	}
 
-    public static List<Offer> getSellerOffers(String player, ItemStack item)
-	{
+    public static List<Offer> getSellerOffers(String player, ItemStack item){
 		String query = "select * from vshop_stock where seller = '" + player + "' and item =" + item.getTypeId() + " and damage=" + item.getDurability();
 		return Offer.listOffers(database.query(query));
 	}
 
-    public static void removeSellerOffers(Player player, ItemStack item)
-	{
+    public static void removeSellerOffers(Player player, ItemStack item){
 		String query = "delete from vshop_stock where seller = '" + player.getName() + "' and item =" + item.getTypeId() + " and damage = " + item.getDurability();
 		database.query(query);
 	}
 
-    public static void deleteItem(int id)
-	{
+    public static void deleteItem(int id){
 		String query = "delete from vshop_stock where id="+id;
 		database.query(query);
 	}
 
-    public static void updateQuantity(int id, int quantity)
-	{
+    public static void updateQuantity(int id, int quantity){
 		String query = "update vshop_stock set amount="+quantity+" where id=" + id;
 		database.query(query);
 	}
@@ -166,35 +160,29 @@ public class DatabaseManager
     	database.query(query);
     }
     
-    public static void logTransaction(Transaction transaction)
-	{
+    public static void logTransaction(Transaction transaction){
 		String query = "insert into vshop_transactions(seller,buyer,item,amount,cost,damage) values('" +transaction.seller +"','"+ transaction.buyer + "'," + transaction.item.getTypeId() + ","+ transaction.item.getAmount() +","+transaction.cost+","+transaction.item.getDurability()+")";
 		database.query(query);
 	}
 
-    public static List<Offer> getBestPrices()
-    {
+    public static List<Offer> getBestPrices(){
         String query = "select f.* from (select item,min(price) as minprice from vshop_stock group by item) as x inner join vshop_stock as f on f.item = x.item and f.price = x.minprice";
         return Offer.listOffers(database.query(query));
     }
 
-    public static List<Offer> searchBySeller(String seller)
-    {
+    public static List<Offer> searchBySeller(String seller){
 		return Offer.listOffers(database.query("select * from vshop_stock where seller like '%" + seller +  "%'"));
     }
 
-    public static List<Transaction> getTransactions()
-	{
+    public static List<Transaction> getTransactions(){
 		return Transaction.listTransactions(database.query("select * from vshop_transactions order by id desc"));
 	}
 
-	public static List<Transaction> getTransactions(String search)
-	{
+	public static List<Transaction> getTransactions(String search){
 		return Transaction.listTransactions(database.query("select * from vshop_transactions where seller like '%" + search +"%' OR buyer like '%" + search +"%' order by id"));
 	}
 
-    public static List<Offer> getPrices(ItemStack item)
-	{
+    public static List<Offer> getPrices(ItemStack item){
 		String query = "select * from vshop_stock where item=" + item.getTypeId() + " AND damage=" + item.getDurability() + " order by price asc limit 0,10";
 		return Offer.listOffers(database.query(query));
 	}
