@@ -28,6 +28,8 @@ public class MySQLDB implements com.dscalzi.virtualshop.persistance.Database
 
     @Override
     public ResultSet query(String query) {
+    	if(!db.checkConnection())
+    		reconnect();
         try {
             return db.query(query);
         } catch (Exception e) {

@@ -42,7 +42,7 @@ public class DatabaseManager
             loadSQLite();
         }
     }
-
+    
     public static void close() {
         database.unload();
     }
