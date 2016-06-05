@@ -12,8 +12,12 @@ import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDb;
 import com.dscalzi.virtualshop.util.Numbers;
+import com.dscalzi.virtualshop.util.PageList;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.text.BadLocationException;
 
 public class Find implements CommandExecutor{
 	
@@ -47,29 +51,24 @@ public class Find implements CommandExecutor{
 	
     public void execute(CommandSender sender, String[] args)
     {
-		ItemStack item = ItemDb.get(args[0], 0);
-		if(item==null)
-		{
-			Chatty.wrongItem(sender, args[0]);
-			return;
-		}
-        int page = 1;
-		List<Offer> offers = DatabaseManager.getPrices(item);
-        if(args.length>1)  page = Numbers.parseInteger(args[1]);
-		if(offers.size()==0)
-		{
-			Chatty.sendError(sender, "No one is selling " + Chatty.formatItem(args[0]) + ".");
+    	ItemStack item = ItemDb.get(args[0], 0);
+    	if(item == null){
+    		Chatty.wrongItem(sender, args[0]);
+    		return;
+    	}
+    	
+    	List<Offer> offers = DatabaseManager.getPrices(item);
+    	if(offers.size() == 0){
+    		Chatty.sendError(sender, "No one is selling " + Chatty.formatItem(args[0]) + ".");
             return;
-		}
-
-        int start = (page-1) * 9;
-        int pages = offers.size()/9 + 1;
-		int count=0;
-        if(page > pages)
-        {
-            start = 0;
-            page = 1;
-        }
+    	}
+    	
+    	int requestedPage = 1;
+    	if(args.length > 1) requestedPage = Numbers.parseInteger(args[1]);
+    	
+    	PageList<Offer> listings = new PageList<Offer>(offers, 7);
+    	List<String> finalMsg = new ArrayList<String>();
+    	
         int charCount = 74;
         String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + ChatColor.LIGHT_PURPLE + args[0].substring(1) + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
         charCount -= header.length()-1;
@@ -77,22 +76,22 @@ public class Find implements CommandExecutor{
         	charCount -= 1;
         String left = ChatColor.LIGHT_PURPLE + "";
         String right = ChatColor.DARK_PURPLE + "";
-        for(int i=0; i<charCount/2-1; ++i){
-        	left += "-";
-        }
-        for(int i=0; i<charCount/2-1; ++i){
-        	right += "-";
-        }
-        sender.sendMessage(left + header + right);
-        for(Offer o : offers)
-        {
-            if(count==start+9) break;
-            if(count >= start)
-            {
-                sender.sendMessage(Chatty.formatOffer(o));
-            }
-            count++;
+        for(int i=0; i<charCount/2-1; ++i) left += "-";
+        for(int i=0; i<charCount/2-1; ++i) right += "-";
+        finalMsg.add(left + header + right);
+        
+        try {
+			for(Offer o : listings.getPage(requestedPage)){
+				finalMsg.add(Chatty.formatOffer(o));
+			}
+		} catch (BadLocationException e) {
+			Chatty.sendError(sender, "Page does not exist");
+			return;
 		}
-        sender.sendMessage(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + page + " of " + pages + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
+        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + requestedPage + " of " + listings.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
+        
+        for(String s : finalMsg)
+        	sender.sendMessage(s);
+        
     }
 }
