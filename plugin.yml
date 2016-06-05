@@ -2,7 +2,7 @@ author: SwearWord
 description: Allows players to buy and sell goods on a VirtualShop.
 main: com.dscalzi.virtualshop.VirtualShop
 name: VirtualShop
-version: OC 1.8.8-R0.1
+version: OC 1.9.4-R0.2
 depend: [Vault]
 commands:
     buy:
