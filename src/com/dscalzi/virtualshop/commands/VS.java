@@ -130,7 +130,7 @@ public class VS implements CommandExecutor{
 	}
 	
 	public void vsList(CommandSender sender, int page){
-		final String listPrefix = ChatColor.RED + " â€¢ ";
+		final String listPrefix = ChatColor.RED + " • ";
 		
 		List<String> cmds = new ArrayList<String>();
 		cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/shop " + ChatColor.GRAY + "[page]" + ChatColor.LIGHT_PURPLE + " - View merchant commands.");
@@ -156,7 +156,7 @@ public class VS implements CommandExecutor{
 			return;
 		}
         
-        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____â€¢ " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + ChatColor.DARK_PURPLE + " â€¢_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
+        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
         
         for(String s : finalMsg)
         	sender.sendMessage(s);
