@@ -1,5 +1,5 @@
-#version: TeamCity
-#If you change this file, it will not be automatically updated after the next release.
+#version: TeamCity,,
+#If you change this file, it will not be automatically updated after the next release.,
 #item,id,metadata
 stone,1,0
 sstone,1,0
@@ -7719,15 +7719,15 @@ purplepillar,202,0
 purpurcollum,202,0
 purcollum,202,0
 purplecollum,202,0
-purpurstairs,203
-purpurstep,203
-purpursteps,203
-purplestairs,203
-purplesteps,203
-purplestep,203
-purstairs,203
-pursteps,203
-purstep,203
+purpurstairs,203,0
+purpurstep,203,0
+purpursteps,203,0
+purplestairs,203,0
+purplesteps,203,0
+purplestep,203,0
+purstairs,203,0
+pursteps,203,0
+purstep,203,0
 purpurslab,205,0
 purpurhalf,205,0
 purslab,205,0
