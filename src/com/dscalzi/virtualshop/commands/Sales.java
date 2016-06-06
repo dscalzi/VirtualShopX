@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import com.dscalzi.virtualshop.Chatty;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.util.Numbers;
@@ -57,7 +58,7 @@ public class Sales implements CommandExecutor{
         int start = 1;
         List<Transaction> transactions;
         transactions = DatabaseManager.getTransactions();
-        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "T" + ChatColor.LIGHT_PURPLE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "og ◄► ObsidianCraft " + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
+        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "T" + ChatColor.LIGHT_PURPLE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "og ◄► " + ConfigManager.getServerName() + " " + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
         //If /sales args, check to see if it's a number
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);

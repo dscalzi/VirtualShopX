@@ -3,39 +3,43 @@ package com.dscalzi.virtualshop.managers;
 import java.io.File;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+
+import com.dscalzi.virtualshop.VirtualShop;
 
 import net.md_5.bungee.api.ChatColor;
 
 public class ConfigManager
 {
-    private static ConfigurationSection config;
+	private static VirtualShop plugin;
+    private static FileConfiguration config;
 
     public static void initialize(Plugin plugin){
-        loadConfig(plugin);
-        broadcastOffers();
-        usingMySQL();
-        mySQLUserName();
-        mySQLHost();
-        mySQLdatabase();
-        mySQLport();
-        mySQLPassword();
-        getPort();
-        plugin.saveConfig();
+    	ConfigManager.plugin = (VirtualShop) plugin;
+        ConfigManager.loadConfig(ConfigManager.plugin);
+        plugin.getLogger().info(getServerName());
     }
 
     public static void loadConfig(Plugin plugin){
+    	verifyConfig(plugin);
+    	plugin.reloadConfig();
+		config = plugin.getConfig(); 
+    }
+    
+    public static void verifyConfig(Plugin plugin){
     	File file = new File(plugin.getDataFolder(), "config.yml");
 		if (!file.exists()){
 			plugin.saveDefaultConfig();
 		}
-		config = plugin.getConfig(); 
-		plugin.reloadConfig();
     }
     
     public static String getPrefix(){
     	return ChatColor.translateAlternateColorCodes('&', config.getString("chatty.prefix")) + getColor();
+    }
+    
+    public static String getServerName(){
+    	return config.getString("chatty.server-name");
     }
     
     public static String getColor(){

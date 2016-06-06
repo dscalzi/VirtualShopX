@@ -225,6 +225,7 @@ public class VS implements CommandExecutor{
 		
 		ConfigManager.loadConfig(plugin);
 		Chatty.initialize(plugin);
+		
 		Chatty.sendSuccess(sender, ChatColor.GREEN + "Configuration successfully reloaded.");
 	}
 	

@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 
 import com.dscalzi.virtualshop.Chatty;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.Numbers;
@@ -58,7 +59,7 @@ public class Stock implements CommandExecutor{
         int start = 1;
         List<Offer> offers;
         offers = DatabaseManager.getBestPrices();
-        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "I" + ChatColor.LIGHT_PURPLE + "tem " + ChatColor.BOLD + "S" + ChatColor.LIGHT_PURPLE + "tock ◄► ObsidianCraft " + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";;
+        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "I" + ChatColor.LIGHT_PURPLE + "tem " + ChatColor.BOLD + "S" + ChatColor.LIGHT_PURPLE + "tock ◄► " + ConfigManager.getServerName() + " " + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";;
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
         if(start < 0){
