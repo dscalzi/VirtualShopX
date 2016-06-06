@@ -1,34 +1,78 @@
-#------------------------------------------
-#            Virtual Shop Config
-#------------------------------------------
-using-MySQL: false
-MySQL:
-  port: 3306
-  username: username
-  host: localhost
-  password: password
-  database: minecraft
-broadcast-offers: true
-chatty:
-  prefix: "&5[&dOShop&5]&e"
-  server-name: ObsidianCraft
-  message-color: "&e"
-#------------------------------------------
-#           Item Price Limits
-#  Below you can set max price limits for 
-#  items based on their item id. Example below:
-#
-#     itemid-datavalue: //if there is no specific data value put 0
-#       name: ItemName //not required but helpful for the user
-#       max-price: //maximum price the user can sell this item at
-#------------------------------------------
-price-limits:
-  default_limit: 100000
-  items:
-    399-0: 
-      name: NetherStar
-      max-price: 1000000
-allowed-worlds:
-  - Survival
-  - Survival_the_end
-  - Survival_nether
+#-----------------------------------------------
+#              Virtual Shop Config
+#-----------------------------------------------
+
+#DO NOT CHANGE THIS VALUE.
+#CHANGING IT COULD RESULT IN DATA LOSS.
+ConfigVersion: 1.9
+
+#--------------[General Settings]---------------
+
+general_settings:
+
+  # Users will only be allowed to use the shop in
+  # the worlds specified here.
+  allowed_worlds:
+    - world
+    - world_nether
+    - world_the_end
+
+#--------------[Database Settings]--------------
+# Indicate whether you want to use a MySQL database
+# to store plugin data. If you do not use MySQL, a
+# SQLite database will be used.
+
+database_settings:
+
+  #True for MySQL, false for SQLite.
+  using_MySQL: false
+  
+  #MySQL Credentials.
+  #If using SQLite, this will be ignored.
+  MySQL:
+    port: 3306
+    username: username
+    host: localhost
+    password: password
+    database: minecraft
+
+#----------------[Chat Settings]----------------
+# Configure the style of the Virtual Shop's messages below.
+
+chat_settings:
+
+  #Broadcast when a user sells an item.
+  broadcast_offers: true
+  
+  details:
+    #Prefix that will be prepended to each Virtual Shop message.
+    msg_prefix: '&5[&dOShop&5]&e'
+
+    #The name of the server, will be used in several messages.
+    server_name: ObsidianCraft
+
+    #Specify the color of message content.
+    message_color: '&e'
+
+#----------------[Item Settings]----------------
+# Configure item properties such as restrictions.
+
+item_settings:
+
+  #-----------------------------------------------
+  #           Item Price Limits
+  # Below you can set max price limits for items based on their
+  # item id as well as a general max price for all items.
+  #  
+  # Example below: (// Means comment)
+  #
+  #     itemid-datavalue:    //If there is no specific data value put 0
+  #       name: ItemName     //Not required but helpful for the user
+  #       max-price:         //Maximum price the user can sell this item at
+  price_limits:
+    default_limit: 100000
+    items:
+      399-0: 
+        name: NetherStar
+        max-price: 1000000
+      

@@ -12,6 +12,9 @@ import net.md_5.bungee.api.ChatColor;
 
 public class ConfigManager
 {
+	//TODO Will be implemented in a later version
+	public static final double ConfigVersion = 1.9;
+	
 	private static VirtualShop plugin;
     private static FileConfiguration config;
 
@@ -22,12 +25,12 @@ public class ConfigManager
     }
 
     public static void loadConfig(Plugin plugin){
-    	verifyConfig(plugin);
+    	verifyConfigExists(plugin);
     	plugin.reloadConfig();
 		config = plugin.getConfig(); 
     }
     
-    public static void verifyConfig(Plugin plugin){
+    public static void verifyConfigExists(Plugin plugin){
     	File file = new File(plugin.getDataFolder(), "config.yml");
 		if (!file.exists()){
 			plugin.saveDefaultConfig();
@@ -35,23 +38,23 @@ public class ConfigManager
     }
     
     public static String getPrefix(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chatty.prefix")) + getColor();
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.msg_prefix")) + getColor();
     }
     
     public static String getServerName(){
-    	return config.getString("chatty.server-name");
+    	return config.getString("chat_settings.details.server_name");
     }
     
     public static String getColor(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chatty.message-color"));
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.message_color"));
     }
     
 	public static Boolean broadcastOffers(){
-		return config.getBoolean("broadcast-offers", true);
+		return config.getBoolean("chat_settings.broadcast_offers", true);
 	}
 
 	public static Long getMaxPrice(){
-		return config.getLong("price-limits.default_limit");
+		return config.getLong("item_settings.price_limits.default_limit");
 	}
 	
 	public static Long getMaxPrice(int itemID){
@@ -59,16 +62,16 @@ public class ConfigManager
 	}
 	
 	public static Long getMaxPrice(int itemID, int dataValue){
-		if(!config.contains("price-limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue)))
+		if(!config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue)))
 			return getMaxPrice();
-		if(!config.contains("price-limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price"))
+		if(!config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price"))
 			return getMaxPrice();
-		return config.getLong("price-limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price");
+		return config.getLong("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price");
 	}
 	
 	@SuppressWarnings("unchecked")
 	public static List<String> getAllowedWorlds(){
-		return (List<String>)config.getList("allowed-worlds");
+		return (List<String>)config.getList("general_settings.allowed_worlds");
 	}
 	
     public static Integer getPort(){
@@ -76,23 +79,23 @@ public class ConfigManager
     }
 
 	public static Boolean usingMySQL(){
-		return config.getBoolean("using-MySQL", false);
+		return config.getBoolean("database_settings.using_MySQL", false);
 	}
 
 	public static String mySQLUserName(){
-		return config.getString("MySQL.username", "root");
+		return config.getString("database_settings.MySQL.username", "root");
 	}
 
 	public static String mySQLPassword(){
-		return config.getString("MySQL.password", "password");
+		return config.getString("database_settings.MySQL.password", "password");
 	}
 
 	public static String mySQLHost(){
-		return config.getString("MySQL.host", "localhost");
+		return config.getString("database_settings.MySQL.host", "localhost");
 	}
 
 	public static String mySQLdatabase(){
-		return config.getString("MySQL.database", "minecraft");
+		return config.getString("database_settings.MySQL.database", "minecraft");
 	}
 
 	public static Integer mySQLport(){
