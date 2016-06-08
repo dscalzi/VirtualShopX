@@ -23,10 +23,12 @@ public class Sales implements CommandExecutor{
 	
 	private VirtualShop plugin;
 	private final ChatManager cm;
+	private final ConfigManager configM;
 	
 	public Sales(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
+		this.configM = ConfigManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -55,14 +57,14 @@ public class Sales implements CommandExecutor{
 	
     @SuppressWarnings("deprecation")
 	public void execute(CommandSender sender, String[] args) throws LinkageError {
-    	final String baseColor = ConfigManager.getBaseColor();
-    	final String trimColor = ConfigManager.getTrimColor();
+    	final String baseColor = configM.getBaseColor();
+    	final String trimColor = configM.getTrimColor();
     	
         OfflinePlayer target;
         int start = 1;
         List<Transaction> transactions;
         transactions = DatabaseManager.getTransactions();
-        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + ConfigManager.getServerName() + " " + trimColor + ChatColor.BOLD + " >";
+        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + configM.getServerName() + " " + trimColor + ChatColor.BOLD + " >";
         //If /sales args, check to see if it's a number
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
@@ -116,7 +118,7 @@ public class Sales implements CommandExecutor{
 			}
 		} catch (BadLocationException e) {
 			if(start == 1)
-				cm.noTransactions(sender, ConfigManager.getServerName());
+				cm.noTransactions(sender, configM.getServerName());
 			else
 				cm.sendError(sender, "Page does not exist");
 			return;

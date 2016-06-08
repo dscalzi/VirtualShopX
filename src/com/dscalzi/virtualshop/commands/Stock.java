@@ -23,10 +23,12 @@ public class Stock implements CommandExecutor{
 	
 	private VirtualShop plugin;
 	private final ChatManager cm;
+	private final ConfigManager configM;
 	
 	public Stock(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
+		this.configM = ConfigManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -56,14 +58,14 @@ public class Stock implements CommandExecutor{
 	
     @SuppressWarnings("deprecation")
 	public void execute(CommandSender sender, String[] args) throws LinkageError {
-    	final String baseColor = ConfigManager.getBaseColor();
-    	final String trimColor = ConfigManager.getTrimColor();
+    	final String baseColor = configM.getBaseColor();
+    	final String trimColor = configM.getTrimColor();
     	
         OfflinePlayer target;
         int start = 1;
         List<Offer> offers;
         offers = DatabaseManager.getBestPrices();
-        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "I" + baseColor + "tem " + ChatColor.BOLD + "S" + baseColor + "tock ◄► " + ConfigManager.getServerName() + " " + trimColor + ChatColor.BOLD + " >";;
+        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "I" + baseColor + "tem " + ChatColor.BOLD + "S" + baseColor + "tock ◄► " + configM.getServerName() + " " + trimColor + ChatColor.BOLD + " >";;
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
         if(start < 0){

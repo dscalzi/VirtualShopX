@@ -28,11 +28,13 @@ public class Buy implements CommandExecutor{
 
 	private VirtualShop plugin;
 	private final ChatManager cm;
+	private final ConfigManager configM;
 	private Map<Player, TransactionData> confirmations;
 	
 	public Buy(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
+		this.configM = ConfigManager.getInstance();
 		this.confirmations = new HashMap<Player, TransactionData>();
 	}
 	
@@ -53,7 +55,7 @@ public class Buy implements CommandExecutor{
 			return true;
 		}
 		Player player = (Player)sender;
-		if(!ConfigManager.getAllowedWorlds().contains(player.getWorld().getName())){
+		if(!configM.getAllowedWorlds().contains(player.getWorld().getName())){
 			cm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
@@ -124,7 +126,7 @@ public class Buy implements CommandExecutor{
         		return false;
         	}
         } else {
-        	maxprice = ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData());
+        	maxprice = configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData());
         }
 		//Check for listings
 		List<Offer> offers = DatabaseManager.getItemOffers(item);

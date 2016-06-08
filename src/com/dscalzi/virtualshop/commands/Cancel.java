@@ -20,10 +20,12 @@ public class Cancel implements CommandExecutor{
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
 	private final ChatManager cm;
+	private final ConfigManager configM;
 	
 	public Cancel(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
+		this.configM = ConfigManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -43,7 +45,7 @@ public class Cancel implements CommandExecutor{
 			return true;
 		}
 		Player player = (Player)sender;
-		if(!ConfigManager.getAllowedWorlds().contains(player.getWorld().getName())){
+		if(!configM.getAllowedWorlds().contains(player.getWorld().getName())){
 			cm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}

@@ -11,12 +11,13 @@ public class MySQLDB implements com.dscalzi.virtualshop.persistance.Database
 {
     private MySQL db;
     private final ChatManager cm = ChatManager.getInstance();
+    private final ConfigManager configM = ConfigManager.getInstance();
 
     @Override
     public void load() throws Exception
     {
         cm.logInfo("Using MySQL.");
-        db = new MySQL(cm.getLogger(), cm.getPrefix(), ConfigManager.mySQLHost(), ConfigManager.getPort().toString(), ConfigManager.mySQLdatabase(), ConfigManager.mySQLUserName(), ConfigManager.mySQLPassword());
+        db = new MySQL(cm.getLogger(), cm.getPrefix(), configM.mySQLHost(), Integer.toString(configM.getPort()), configM.mySQLdatabase(), configM.mySQLUserName(), configM.mySQLPassword());
         db.open();
         if(db.checkConnection())
         {

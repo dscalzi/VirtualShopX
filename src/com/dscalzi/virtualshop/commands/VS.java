@@ -24,10 +24,12 @@ public class VS implements CommandExecutor{
 
 	private VirtualShop plugin;
 	private final ChatManager cm;
+	private final ConfigManager configM;
 	
 	public VS(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
+		this.configM = ConfigManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -97,9 +99,9 @@ public class VS implements CommandExecutor{
 	
 	public void cmdList(CommandSender sender, int page){
     	final String listPrefix = ChatColor.RED + " • ";
-    	final String baseColor = ConfigManager.getBaseColor();
-    	final String trimColor = ConfigManager.getTrimColor();
-    	final String descColor = ConfigManager.getDescriptionColor();
+    	final String baseColor = configM.getBaseColor();
+    	final String trimColor = configM.getTrimColor();
+    	final String descColor = configM.getDescriptionColor();
     	
     	List<String> cmds = new ArrayList<String>();
         cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + descColor + " - buy items.");
@@ -136,9 +138,9 @@ public class VS implements CommandExecutor{
 	
 	public void vsList(CommandSender sender, int page){
 		final String listPrefix = ChatColor.RED + " • ";
-		final String baseColor = ConfigManager.getBaseColor();
-    	final String trimColor = ConfigManager.getTrimColor();
-    	final String descColor = ConfigManager.getDescriptionColor();
+		final String baseColor = configM.getBaseColor();
+    	final String trimColor = configM.getTrimColor();
+    	final String descColor = configM.getDescriptionColor();
 		
 		List<String> cmds = new ArrayList<String>();
 		cmds.add(listPrefix + trimColor + "/shop " + ChatColor.GRAY + "[page]" + descColor + " - View merchant commands.");
@@ -181,8 +183,8 @@ public class VS implements CommandExecutor{
 		
 		int amt = 0;
 		for(Offer o : DatabaseManager.getAllOffers()){
-			if(o.price > ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData())){
-				DatabaseManager.updatePrice(o.id, ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
+			if(o.price > configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData())){
+				DatabaseManager.updatePrice(o.id, configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
 				++amt;
 			}
 		}
@@ -213,8 +215,8 @@ public class VS implements CommandExecutor{
 		}
 		for(Offer o : DatabaseManager.getAllOffers()){
 			boolean isSameItem = ItemDb.reverseLookup(item).equalsIgnoreCase(ItemDb.reverseLookup(o.item));
-			if(o.price > ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()) && isSameItem){
-				DatabaseManager.updatePrice(o.id, ConfigManager.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
+			if(o.price > configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()) && isSameItem){
+				DatabaseManager.updatePrice(o.id, configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
 				++amt;
 			}
 		}
@@ -231,7 +233,7 @@ public class VS implements CommandExecutor{
             return;
 		}
 		
-		ConfigManager.loadConfig(plugin);
+		ConfigManager.reload();
 		ChatManager.reload();
 		
 		cm.sendSuccess(sender, "Configuration successfully reloaded.");

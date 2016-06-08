@@ -27,20 +27,22 @@ public class ChatManager {
     private String color;
     private String eColor;
     private String sColor;
+    private final ConfigManager configM;
 	
 	private ChatManager(Plugin plugin){
 		this.plugin = (VirtualShop)plugin;
 		this.logger = Logger.getLogger("minecraft");
+		this.configM = ConfigManager.getInstance();
 		this.assignVars();
 		
 		logInfo(plugin.getDescription().getName() + " is loading.");
 	}
 	
 	private void assignVars(){
-		this.prefix = ConfigManager.getPrefix();
-		this.color = ConfigManager.getColor();
-		this.eColor = ConfigManager.getErrorColor();
-		this.sColor = ConfigManager.getSuccessColor();
+		this.prefix = configM.getPrefix();
+		this.color = configM.getColor();
+		this.eColor = configM.getErrorColor();
+		this.sColor = configM.getSuccessColor();
 	}
 	
 	public static void initialize(Plugin plugin){
@@ -123,7 +125,7 @@ public class ChatManager {
 	}
 	
 	public void priceTooHigh(CommandSender sender, String item, long priceLimit){
-    	sendError(sender, "Woah, you're selling your " + formatItem(item) + " for a rather high price. To avoid scamming, we've set the limit for that item to $" + priceLimit);
+    	sendError(sender, "Woah, you're selling your " + formatItem(item) + this.eColor + " for a rather high price. To avoid scamming, we've set the limit for that item to $" + priceLimit);
     }
 	
 	public void numberFormat(CommandSender sender){

@@ -18,10 +18,11 @@ public class DatabaseManager
 {
     private static Database database;
     private static final ChatManager cm = ChatManager.getInstance();
+    private static final ConfigManager configM = ConfigManager.getInstance();
 
     public static void initialize()
     {
-        if(ConfigManager.usingMySQL()) loadMySQL();
+        if(configM.usingMySQL()) loadMySQL();
         else loadSQLite();
     }
 

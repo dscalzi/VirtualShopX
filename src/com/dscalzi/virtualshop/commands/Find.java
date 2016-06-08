@@ -25,10 +25,12 @@ public class Find implements CommandExecutor{
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
 	private final ChatManager cm;
+	private final ConfigManager configM;
 	
 	public Find(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
+		this.configM = ConfigManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -53,8 +55,8 @@ public class Find implements CommandExecutor{
 	}
 	
     public void execute(CommandSender sender, String[] args){
-    	final String baseColor = ConfigManager.getBaseColor();
-    	final String trimColor = ConfigManager.getTrimColor();
+    	final String baseColor = configM.getBaseColor();
+    	final String trimColor = configM.getTrimColor();
     	
     	ItemStack item = ItemDb.get(args[0], 0);
     	if(item == null){
@@ -64,7 +66,7 @@ public class Find implements CommandExecutor{
     	
     	List<Offer> offers = DatabaseManager.getPrices(item);
     	if(offers.size() == 0){
-    		cm.sendError(sender, "No one is selling " + cm.formatItem(args[0]) + ".");
+    		cm.sendError(sender, "No one is selling " + cm.formatItem(args[0]));
             return;
     	}
     	

@@ -28,6 +28,7 @@ public class Sell implements CommandExecutor{
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
 	private final ChatManager cm;
+	private final ConfigManager configM;
 	private Map<Player, ListingData> confirmations;
 	
 	/**
@@ -37,6 +38,7 @@ public class Sell implements CommandExecutor{
 	public Sell(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
+		this.configM = ConfigManager.getInstance();
 		this.confirmations = new HashMap<Player, ListingData>();
 	}
 	
@@ -57,7 +59,7 @@ public class Sell implements CommandExecutor{
 			return true;
 		}
 		Player player = (Player)sender;
-		if(!ConfigManager.getAllowedWorlds().contains(player.getWorld().getName())){
+		if(!configM.getAllowedWorlds().contains(player.getWorld().getName())){
 			cm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
@@ -151,8 +153,8 @@ public class Sell implements CommandExecutor{
         	amount = total;
         	item.setAmount(total);
         }
-		if(price > ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			cm.priceTooHigh(player, args[1], ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+		if(price > configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
+			cm.priceTooHigh(player, args[1], configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return false;
 		}
 		if(!im.contains(item,true,true)){
@@ -192,7 +194,7 @@ public class Sell implements CommandExecutor{
         Offer o = new Offer(player.getName(),item,price);
 		DatabaseManager.addOffer(o);
 		confirmations.remove(player);
-        if(ConfigManager.broadcastOffers())
+        if(configM.broadcastOffers())
         {
 			cm.broadcastOffer(o);
 			return;

@@ -10,116 +10,138 @@ import com.dscalzi.virtualshop.VirtualShop;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class ConfigManager
-{
-	//TODO Will be implemented in a later version
-	public static final double ConfigVersion = 1.9;
+public class ConfigManager {
+
+	private static boolean initialized;
+	private static ConfigManager instance;
 	
-	private static VirtualShop plugin;
-    private static FileConfiguration config;
-
-    public static void initialize(Plugin plugin){
-    	ConfigManager.plugin = (VirtualShop) plugin;
-        ConfigManager.loadConfig(ConfigManager.plugin);
-        plugin.getLogger().info(getServerName());
+	//TODO Will be implemented in a later version
+	private final double configVersion = 1.9;
+	private VirtualShop plugin;
+	private FileConfiguration config;
+	
+	private ConfigManager(Plugin plugin){
+		this.plugin = (VirtualShop)plugin;
+		loadConfig();
+	}
+	
+	public void loadConfig(){
+    	verifyFile();
+    	this.plugin.reloadConfig();
+		this.config = this.plugin.getConfig(); 
     }
-
-    public static void loadConfig(Plugin plugin){
-    	verifyConfigExists(plugin);
-    	plugin.reloadConfig();
-		config = plugin.getConfig(); 
-    }
-    
-    public static void verifyConfigExists(Plugin plugin){
-    	File file = new File(plugin.getDataFolder(), "config.yml");
+	
+	public void verifyFile(){
+    	File file = new File(this.plugin.getDataFolder(), "config.yml");
 		if (!file.exists()){
-			plugin.saveDefaultConfig();
+			this.plugin.saveDefaultConfig();
 		}
     }
-    
-    public static String getPrefix(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.msg_prefix")) + getColor();
-    }
-    
-    public static String getServerName(){
-    	return config.getString("chat_settings.details.server_name");
-    }
-    
-    public static String getColor(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.message_color"));
-    }
-    
-    public static String getBaseColor(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.base_color"));
-    }
-    
-    public static String getTrimColor(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.trim_color"));
-    }
-    
-    public static String getDescriptionColor(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.description_color"));
-    }
-    
-    public static String getErrorColor(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.error_color"));
-    }
-    
-    public static String getSuccessColor(){
-    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.success_color"));
-    }
-    
-	public static Boolean broadcastOffers(){
-		return config.getBoolean("chat_settings.broadcast_offers", true);
-	}
-
-	public static Long getMaxPrice(){
-		return config.getLong("item_settings.price_limits.default_limit");
+	
+	public static void initialize(Plugin plugin){
+		if(!initialized){
+			instance = new ConfigManager(plugin);
+			initialized = true;
+		}
 	}
 	
-	public static Long getMaxPrice(int itemID){
+	public static boolean reload(){
+		if(!initialized) return false;
+		getInstance().loadConfig();
+		return true;
+	}
+	
+	public static ConfigManager getInstance(){
+		return ConfigManager.instance;
+	}
+	
+	/* Configuration Accessors */
+	
+	public String getPrefix(){
+    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.msg_prefix")) + getColor();
+    }
+    
+    public String getServerName(){
+    	return this.config.getString("chat_settings.details.server_name");
+    }
+    
+    public String getColor(){
+    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.message_color"));
+    }
+    
+    public String getBaseColor(){
+    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.base_color"));
+    }
+    
+    public String getTrimColor(){
+    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.trim_color"));
+    }
+    
+    public String getDescriptionColor(){
+    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.description_color"));
+    }
+    
+    public String getErrorColor(){
+    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.error_color"));
+    }
+    
+    public String getSuccessColor(){
+    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.success_color"));
+    }
+    
+	public boolean broadcastOffers(){
+		return this.config.getBoolean("chat_settings.broadcast_offers", true);
+	}
+
+	public long getMaxPrice(){
+		return this.config.getLong("item_settings.price_limits.default_limit");
+	}
+	
+	public long getMaxPrice(int itemID){
 		return getMaxPrice(itemID, 0);
 	}
 	
-	public static Long getMaxPrice(int itemID, int dataValue){
-		if(!config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue)))
+	public long getMaxPrice(int itemID, int dataValue){
+		if(!this.config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue)))
 			return getMaxPrice();
-		if(!config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price"))
+		if(!this.config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price"))
 			return getMaxPrice();
-		return config.getLong("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price");
+		return this.config.getLong("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price");
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static List<String> getAllowedWorlds(){
-		return (List<String>)config.getList("general_settings.allowed_worlds");
+	public List<String> getAllowedWorlds(){
+		return this.config.getStringList("general_settings.allowed_worlds");
 	}
 	
-    public static Integer getPort(){
-        return config.getInt("MySQL.port",3306);
+    public int getPort(){
+        return this.config.getInt("MySQL.port",3306);
     }
 
-	public static Boolean usingMySQL(){
-		return config.getBoolean("database_settings.using_MySQL", false);
+	public boolean usingMySQL(){
+		return this.config.getBoolean("database_settings.using_MySQL", false);
 	}
 
-	public static String mySQLUserName(){
-		return config.getString("database_settings.MySQL.username", "root");
+	public String mySQLUserName(){
+		return this.config.getString("database_settings.MySQL.username", "root");
 	}
 
-	public static String mySQLPassword(){
-		return config.getString("database_settings.MySQL.password", "password");
+	public String mySQLPassword(){
+		return this.config.getString("database_settings.MySQL.password", "password");
 	}
 
-	public static String mySQLHost(){
-		return config.getString("database_settings.MySQL.host", "localhost");
+	public String mySQLHost(){
+		return this.config.getString("database_settings.MySQL.host", "localhost");
 	}
 
-	public static String mySQLdatabase(){
-		return config.getString("database_settings.MySQL.database", "minecraft");
+	public String mySQLdatabase(){
+		return this.config.getString("database_settings.MySQL.database", "minecraft");
 	}
 
-	public static Integer mySQLport(){
-		return config.getInt("MySQL.port", 3306);
+	public int mySQLport(){
+		return this.config.getInt("MySQL.port", 3306);
 	}
-
+	
+	public double getVersion(){
+		return this.configVersion;
+	}
 }
