@@ -49,6 +49,26 @@ public class ConfigManager
     	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.message_color"));
     }
     
+    public static String getBaseColor(){
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.base_color"));
+    }
+    
+    public static String getTrimColor(){
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.trim_color"));
+    }
+    
+    public static String getDescriptionColor(){
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.description_color"));
+    }
+    
+    public static String getErrorColor(){
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.error_color"));
+    }
+    
+    public static String getSuccessColor(){
+    	return ChatColor.translateAlternateColorCodes('&', config.getString("chat_settings.details.success_color"));
+    }
+    
 	public static Boolean broadcastOffers(){
 		return config.getBoolean("chat_settings.broadcast_offers", true);
 	}

@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
@@ -32,34 +32,36 @@ public class Stock implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!sender.hasPermission("virtualshop.stock")){
-            Chatty.noPermissions(sender);
+            ChatManager.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			Chatty.denyBeta(sender);
+			ChatManager.denyBeta(sender);
 			return true;
 		}
 		if(args.length > 0 && args[0].contains("'")){
-        	Chatty.noStock(sender, args[0]);
+        	ChatManager.noStock(sender, args[0]);
         	return true;
         }
 		
 		try{
 			this.execute(sender, args);
     	} catch (LinkageError e){
-    		Chatty.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
+    		ChatManager.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
     	}
 		return true;
 	}
 	
     @SuppressWarnings("deprecation")
 	public void execute(CommandSender sender, String[] args) throws LinkageError {
+    	final String baseColor = ConfigManager.getBaseColor();
+    	final String trimColor = ConfigManager.getTrimColor();
     	
         OfflinePlayer target;
         int start = 1;
         List<Offer> offers;
         offers = DatabaseManager.getBestPrices();
-        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "I" + ChatColor.LIGHT_PURPLE + "tem " + ChatColor.BOLD + "S" + ChatColor.LIGHT_PURPLE + "tock ◄► " + ConfigManager.getServerName() + " " + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";;
+        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "I" + baseColor + "tem " + ChatColor.BOLD + "S" + baseColor + "tock ◄► " + ConfigManager.getServerName() + " " + trimColor + ChatColor.BOLD + " >";;
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
         if(start < 0){
@@ -72,15 +74,15 @@ public class Stock implements CommandExecutor{
 			try{
 				offers = DatabaseManager.searchBySeller(seller);
 			} catch (NullPointerException e){
-				Chatty.noStock(sender, target.getName());
+				ChatManager.noStock(sender, target.getName());
 			}
             if(offers.size() < 1){
-            	Chatty.noStock(sender, target.getName());
+            	ChatManager.noStock(sender, target.getName());
             	return;
             }
             for(Offer o : offers){
             	if(o.seller.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "I" + ChatColor.LIGHT_PURPLE + "tem " + ChatColor.BOLD + "S" + ChatColor.LIGHT_PURPLE + "tock ◄► " + o.seller + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
+            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "I" + baseColor + "tem " + ChatColor.BOLD + "S" + baseColor + "tock ◄► " + o.seller + trimColor + ChatColor.BOLD + " >";
             		break;
             	}
             }
@@ -90,8 +92,8 @@ public class Stock implements CommandExecutor{
         charCount -= header.length()-1;
         if(charCount % 2 == 0)
         	charCount -= 1;
-        String left = ChatColor.LIGHT_PURPLE + "";
-        String right = ChatColor.DARK_PURPLE + "";
+        String left = baseColor + "";
+        String right = trimColor + "";
         for(int i=0; i<charCount/2-1; ++i)
         	left += "-";
         for(int i=0; i<charCount/2-1; ++i)
@@ -103,14 +105,17 @@ public class Stock implements CommandExecutor{
         
         try {
 			for(Offer o : stock.getPage(start)){
-				finalMsg.add(Chatty.formatOffer(o));
+				finalMsg.add(ChatManager.formatOffer(o));
 			}
 		} catch (BadLocationException e) {
-			Chatty.sendError(sender, "Page does not exist");
+			if(start == 1)
+				ChatManager.sendError(sender, "There are no items on the market");
+			else
+				ChatManager.sendError(sender, "Page does not exist");
 			return;
 		}
         
-        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + start + " of " + stock.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
+        finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + start + " of " + stock.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");
         
         
         for(String s : finalMsg)

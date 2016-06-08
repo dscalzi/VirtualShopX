@@ -3,7 +3,7 @@ package com.dscalzi.virtualshop.managers;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.persistance.Database;
@@ -30,7 +30,7 @@ public class DatabaseManager
         try {
             database.load();
         } catch (Exception e) {
-            Chatty.logInfo("Fatal error.");
+            ChatManager.logInfo("Fatal error.");
         }
     }
 

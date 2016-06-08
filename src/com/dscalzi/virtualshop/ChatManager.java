@@ -15,22 +15,22 @@ import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.objects.TransactionData;
 import com.dscalzi.virtualshop.util.ItemDb;
 
-public class Chatty
+public class ChatManager
 {
     private static String prefix;
     private static String color;
+    private static String eColor;
+    private static String sColor;
     private static VirtualShop plugin;
 	private static Logger logger;
 
-	/**
-	 * Initialize the chatty class
-	 * @throws java.io.FileNotFoundException
-	 */
     public static void initialize(VirtualShop p){
 		logger = Logger.getLogger("minecraft");
         plugin = p;
         prefix = ConfigManager.getPrefix();
         color = ConfigManager.getColor();
+        eColor = ConfigManager.getErrorColor();
+        sColor = ConfigManager.getSuccessColor();
         logInfo(plugin.getDescription().getName() + " is loading.");
     }
 
@@ -39,11 +39,11 @@ public class Chatty
 	}
 
     public static void sendError(CommandSender sender, String message){
-        sender.sendMessage(ChatColor.RED + prefix + " " + message);
+        sender.sendMessage(prefix + eColor + " " + message);
     }
 
     public static void sendSuccess(CommandSender sender, String message){
-        sender.sendMessage(ChatColor.DARK_GREEN + prefix + " " + message);
+        sender.sendMessage(prefix + sColor + " " + message);
     }
 
     public static void sendMessage(CommandSender sender, String message){
@@ -58,7 +58,7 @@ public class Chatty
     }
 
     public static void sendGlobal(String message){
-        plugin.getServer().broadcastMessage(ChatColor.DARK_GREEN + prefix + " " + message);
+        plugin.getServer().broadcastMessage(prefix + " " + message);
     }
 
     public static Logger getLogger(){
@@ -86,7 +86,7 @@ public class Chatty
 	}
 
 	public static void denyBeta(CommandSender sender){
-		sendError(sender, ChatColor.RED + "VIRTUAL MARKET IS CURRENTLY RESTRICTED FOR BETA TESTING!");
+		sendError(sender, "VIRTUAL MARKET IS CURRENTLY RESTRICTED FOR BETA TESTING!");
 	}
 	
 	public static void invalidGamemode(CommandSender sender, String cmd, GameMode mode){
@@ -139,19 +139,20 @@ public class Chatty
     
     public static void sellConfirmation(Player player, ListingData data){
     	if(data.getCurrentListings() < 1)
-    		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + ChatManager.color + " within 15 seconds to complete the transaction.");
     	else{
+    		String common = "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing";
     		if(data.getOldPrice() == data.getPrice())
-    			sendMessage(player, "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    			sendMessage(player, common + ". Please type" + ChatColor.GREEN + " /sell confirm" + ChatManager.color + " within 15 seconds to complete the transaction.");
     		if(data.getOldPrice() > data.getPrice())
-    			sendMessage(player, "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing for a lower price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    			sendMessage(player, common + " for a lower price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + ChatManager.color + " within 15 seconds to complete the transaction.");
     		if(data.getOldPrice() < data.getPrice())
-    			sendMessage(player, "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing for a higher price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    			sendMessage(player, common + " for a higher price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + ChatManager.color + " within 15 seconds to complete the transaction.");
     	}
     }
     
     public static void buyConfirmation(Player player, TransactionData data){
-    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /buy confirm" + Chatty.color + " within 15 seconds to complete the transaction.");
+    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /buy confirm" + ChatManager.color + " within 15 seconds to complete the transaction.");
     }
 
     public static String formatTransaction(Transaction t){
@@ -166,7 +167,7 @@ public class Chatty
 	}
     
     public static String getColor(){
-    	return Chatty.color;
+    	return ChatManager.color;
     }
 
 }

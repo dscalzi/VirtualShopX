@@ -51,8 +51,23 @@ chat_settings:
     #The name of the server, will be used in several messages.
     server_name: ObsidianCraft
 
+    #This is the base color of the Virtual Shop interface. Usually lighter.
+    base_color: '&d'
+
+    #This is the trim color of the Virtual Shop interface. Usually darker.
+    trim_color: '&5'
+
+    #This will be the color of command help descriptions.
+    description_color: '&d'
+
     #Specify the color of message content.
     message_color: '&e'
+
+    #The color of error messages.
+    error_color: '&c'
+
+    #The color of success messages.
+    success_color: '&a'
 
 #----------------[Item Settings]----------------
 # Configure item properties such as restrictions.
@@ -64,7 +79,7 @@ item_settings:
   # Below you can set max price limits for items based on their
   # item id as well as a general max price for all items.
   #  
-  # Example below: (// Means comment)
+  # Example below: (// is a comment)
   #
   #     itemid-datavalue:    //If there is no specific data value put 0
   #       name: ItemName     //Not required but helpful for the user

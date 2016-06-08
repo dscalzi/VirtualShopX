@@ -6,8 +6,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDb;
@@ -33,15 +34,15 @@ public class Find implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!sender.hasPermission("virtualshop.find")){
-            Chatty.noPermissions(sender);
+            ChatManager.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			Chatty.denyBeta(sender);
+			ChatManager.denyBeta(sender);
 			return true;
 		}
 		if(args.length < 1){
-			Chatty.sendError(sender, "You need to specify the item.");
+			ChatManager.sendError(sender, "You need to specify the item.");
 			return true;
 		}
 		
@@ -49,17 +50,19 @@ public class Find implements CommandExecutor{
 		return true;
 	}
 	
-    public void execute(CommandSender sender, String[] args)
-    {
+    public void execute(CommandSender sender, String[] args){
+    	final String baseColor = ConfigManager.getBaseColor();
+    	final String trimColor = ConfigManager.getTrimColor();
+    	
     	ItemStack item = ItemDb.get(args[0], 0);
     	if(item == null){
-    		Chatty.wrongItem(sender, args[0]);
+    		ChatManager.wrongItem(sender, args[0]);
     		return;
     	}
     	
     	List<Offer> offers = DatabaseManager.getPrices(item);
     	if(offers.size() == 0){
-    		Chatty.sendError(sender, "No one is selling " + Chatty.formatItem(args[0]) + ".");
+    		ChatManager.sendError(sender, "No one is selling " + ChatManager.formatItem(args[0]) + ".");
             return;
     	}
     	
@@ -70,25 +73,25 @@ public class Find implements CommandExecutor{
     	List<String> finalMsg = new ArrayList<String>();
     	
         int charCount = 74;
-        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + ChatColor.LIGHT_PURPLE + args[0].substring(1) + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
+        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "L" + baseColor + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + baseColor + args[0].substring(1) + trimColor + ChatColor.BOLD + " >";
         charCount -= header.length()-1;
         if(charCount % 2 == 0)
         	charCount -= 1;
-        String left = ChatColor.LIGHT_PURPLE + "";
-        String right = ChatColor.DARK_PURPLE + "";
+        String left = baseColor + "";
+        String right = trimColor + "";
         for(int i=0; i<charCount/2-1; ++i) left += "-";
         for(int i=0; i<charCount/2-1; ++i) right += "-";
         finalMsg.add(left + header + right);
         
         try {
 			for(Offer o : listings.getPage(requestedPage)){
-				finalMsg.add(Chatty.formatOffer(o));
+				finalMsg.add(ChatManager.formatOffer(o));
 			}
 		} catch (BadLocationException e) {
-			Chatty.sendError(sender, "Page does not exist");
+			ChatManager.sendError(sender, "Page does not exist");
 			return;
 		}
-        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + requestedPage + " of " + listings.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
+        finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + requestedPage + " of " + listings.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");
         
         for(String s : finalMsg)
         	sender.sendMessage(s);

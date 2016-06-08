@@ -1,4 +1,4 @@
-author: SwearWord
+author: Daniel Scalzi
 description: Allows players to buy and sell goods on a VirtualShop.
 main: com.dscalzi.virtualshop.VirtualShop
 name: VirtualShop

@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
@@ -31,34 +31,36 @@ public class Sales implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("virtualshop.sales")){
-            Chatty.noPermissions(sender);
+            ChatManager.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			Chatty.denyBeta(sender);
+			ChatManager.denyBeta(sender);
 			return true;
 		}
 		if(args.length > 0 && args[0].contains("'")){
-        	Chatty.noTransactions(sender, args[0]);
+        	ChatManager.noTransactions(sender, args[0]);
         	return true;
         }
 		
 		try{
 			this.execute(sender, args);
     	} catch (LinkageError e){
-    		Chatty.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
+    		ChatManager.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
     	}
 		return true;
 	}
 	
     @SuppressWarnings("deprecation")
 	public void execute(CommandSender sender, String[] args) throws LinkageError {
-        
+    	final String baseColor = ConfigManager.getBaseColor();
+    	final String trimColor = ConfigManager.getTrimColor();
+    	
         OfflinePlayer target;
         int start = 1;
         List<Transaction> transactions;
         transactions = DatabaseManager.getTransactions();
-        String header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "T" + ChatColor.LIGHT_PURPLE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "og ◄► " + ConfigManager.getServerName() + " " + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
+        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + ConfigManager.getServerName() + " " + trimColor + ChatColor.BOLD + " >";
         //If /sales args, check to see if it's a number
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
@@ -73,19 +75,19 @@ public class Sales implements CommandExecutor{
 			try{
 				transactions = DatabaseManager.getTransactions(search);
 			} catch (NullPointerException e){
-				Chatty.noTransactions(sender, target.getName());
+				ChatManager.noTransactions(sender, target.getName());
 			}
             if(transactions.size() < 1){
-            	Chatty.noTransactions(sender, target.getName());
+            	ChatManager.noTransactions(sender, target.getName());
             	return;
             }
             for(Transaction t : transactions){
             	if(t.seller.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "T" + ChatColor.LIGHT_PURPLE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "og ◄► " + t.seller + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
+            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + t.seller + trimColor + ChatColor.BOLD + " >";
             		break;
             	}
             	else if(t.buyer.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "< " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "T" + ChatColor.LIGHT_PURPLE + "ransaction " + ChatColor.BOLD + "L" + ChatColor.LIGHT_PURPLE + "og ◄► " + t.buyer + ChatColor.DARK_PURPLE + ChatColor.BOLD + " >";
+            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + t.buyer + trimColor + ChatColor.BOLD + " >";
             		break;
             	}
             }
@@ -95,8 +97,8 @@ public class Sales implements CommandExecutor{
         charCount -= header.length()-1;
         if(charCount % 2 == 0)
         	charCount -= 1;
-        String left = ChatColor.LIGHT_PURPLE + "";
-        String right = ChatColor.DARK_PURPLE + "";
+        String left = baseColor + "";
+        String right = trimColor + "";
         for(int i=0; i<charCount/2-1; ++i)
         	left += "-";
         for(int i=0; i<charCount/2-1; ++i)
@@ -108,14 +110,17 @@ public class Sales implements CommandExecutor{
         
         try {
 			for(Transaction t : sales.getPage(start)){
-			    finalMsg.add(Chatty.formatTransaction(t));
+			    finalMsg.add(ChatManager.formatTransaction(t));
 			}
 		} catch (BadLocationException e) {
-			Chatty.sendError(sender, "Page does not exist");
+			if(start == 1)
+				ChatManager.noTransactions(sender, ConfigManager.getServerName());
+			else
+				ChatManager.sendError(sender, "Page does not exist");
 			return;
 		}
 
-        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + start + " of " + sales.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
+        finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + start + " of " + sales.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");
         
         
         for(String s : finalMsg)

@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
@@ -33,7 +33,7 @@ public class VS implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			Chatty.denyBeta(sender);
+			ChatManager.denyBeta(sender);
 			return true;
 		}
 		
@@ -45,7 +45,7 @@ public class VS implements CommandExecutor{
     				this.cmdList(sender, page);
     				return true;
     			} catch (NumberFormatException e){
-    				Chatty.sendError(sender, "Page does not exist");
+    				ChatManager.sendError(sender, "Page does not exist");
 					return true;
     			}
 			}
@@ -62,7 +62,7 @@ public class VS implements CommandExecutor{
 		    				this.vsList(sender, page);
 		    				return true;
 		    			} catch (NumberFormatException e){
-		    				Chatty.sendError(sender, "Page does not exist");
+		    				ChatManager.sendError(sender, "Page does not exist");
 							return true;
 		    			}
 					}
@@ -95,34 +95,37 @@ public class VS implements CommandExecutor{
 	
 	public void cmdList(CommandSender sender, int page){
     	final String listPrefix = ChatColor.RED + " • ";
+    	final String baseColor = ConfigManager.getBaseColor();
+    	final String trimColor = ConfigManager.getTrimColor();
+    	final String descColor = ConfigManager.getDescriptionColor();
     	
     	List<String> cmds = new ArrayList<String>();
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + ChatColor.LIGHT_PURPLE + " - buy items.");
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + ChatColor.LIGHT_PURPLE + " - sell items.");
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.LIGHT_PURPLE + " - remove item from shop.");
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/find " + ChatColor.BLUE + "<item> " + ChatColor.GRAY + "[page] " + ChatColor.LIGHT_PURPLE + " - find offers for the item.");
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.LIGHT_PURPLE + " - browse offers.");
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + ChatColor.LIGHT_PURPLE + " - view transaction log.");
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs" + ChatColor.LIGHT_PURPLE + " - Virtual Shop's technical commands.");
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + ChatColor.LIGHT_PURPLE + " - Turn buy confirmations on/off.");
-        cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + ChatColor.LIGHT_PURPLE + " - Turn sell confirmations on/off.");
+        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + descColor + " - buy items.");
+        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + descColor + " - sell items.");
+        cmds.add(listPrefix + trimColor + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + descColor + " - remove item from shop.");
+        cmds.add(listPrefix + trimColor + "/find " + ChatColor.BLUE + "<item> " + ChatColor.GRAY + "[page] " + descColor + " - find offers for the item.");
+        cmds.add(listPrefix + trimColor + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + descColor + " - browse offers.");
+        cmds.add(listPrefix + trimColor + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + descColor + " - view transaction log.");
+        cmds.add(listPrefix + trimColor + "/vs" + descColor + " - Virtual Shop's technical commands.");
+        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Turn buy confirmations on/off.");
+        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Turn sell confirmations on/off.");
         
         PageList<String> commands = new PageList<>(cmds, 7);
         
         List<String> finalMsg = new ArrayList<String>();
-        finalMsg.add(ChatColor.LIGHT_PURPLE + "------------------- " + Chatty.getPrefix() + ChatColor.DARK_PURPLE + " -------------------");
-        finalMsg.add(ChatColor.DARK_PURPLE + "              Command List - <Required> [Optional]");
+        finalMsg.add(baseColor + "------------------- " + ChatManager.getPrefix() + trimColor + " -------------------");
+        finalMsg.add(trimColor + "              Command List - <Required> [Optional]");
         
         try {
 			for(String s : commands.getPage(page)){
 				finalMsg.add(s);
 			}
 		} catch (BadLocationException e) {
-			Chatty.sendError(sender, "Page does not exist");
+			ChatManager.sendError(sender, "Page does not exist");
 			return;
 		}
         
-        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
+        finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");
         
         for(String s : finalMsg)
         	sender.sendMessage(s);
@@ -131,32 +134,35 @@ public class VS implements CommandExecutor{
 	
 	public void vsList(CommandSender sender, int page){
 		final String listPrefix = ChatColor.RED + " • ";
+		final String baseColor = ConfigManager.getBaseColor();
+    	final String trimColor = ConfigManager.getTrimColor();
+    	final String descColor = ConfigManager.getDescriptionColor();
 		
 		List<String> cmds = new ArrayList<String>();
-		cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/shop " + ChatColor.GRAY + "[page]" + ChatColor.LIGHT_PURPLE + " - View merchant commands.");
-		cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs help " + ChatColor.GRAY + "[page]" + ChatColor.LIGHT_PURPLE + " - VirtualShop's technical commands.");
-		cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs version" + ChatColor.LIGHT_PURPLE + " - View plugin's version.");
+		cmds.add(listPrefix + trimColor + "/shop " + ChatColor.GRAY + "[page]" + descColor + " - View merchant commands.");
+		cmds.add(listPrefix + trimColor + "/vs help " + ChatColor.GRAY + "[page]" + descColor + " - VirtualShop's technical commands.");
+		cmds.add(listPrefix + trimColor + "/vs version" + descColor + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.access.admin")){
-			cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs formatmarket " + ChatColor.BLUE + "[item]" + ChatColor.LIGHT_PURPLE + " - Reprice all items who's market price exceeds the set limit.");
-			cmds.add(listPrefix + ChatColor.DARK_PURPLE + "/vs reload" + ChatColor.LIGHT_PURPLE + " - Reload the plugin's configuration.");
+			cmds.add(listPrefix + trimColor + "/vs formatmarket " + ChatColor.BLUE + "[item]" + descColor + " - Reprice all items who's market price exceeds the set limit.");
+			cmds.add(listPrefix + trimColor + "/vs reload" + descColor + " - Reload the plugin's configuration.");
 		}
 		
 		PageList<String> commands = new PageList<>(cmds, 7);
 		
 		List<String> finalMsg = new ArrayList<String>();
-		finalMsg.add(ChatColor.LIGHT_PURPLE + "------------------- " + Chatty.getPrefix() + ChatColor.DARK_PURPLE + " -------------------");
-        finalMsg.add(ChatColor.DARK_PURPLE + "              Command List - <Required> [Optional]");
+		finalMsg.add(baseColor + "------------------- " + ChatManager.getPrefix() + trimColor + " -------------------");
+        finalMsg.add(trimColor + "              Command List - <Required> [Optional]");
 		
         try {
 			for(String s : commands.getPage(page)){
 				finalMsg.add(s);
 			}
 		} catch (BadLocationException e) {
-			Chatty.sendError(sender, "Page does not exist");
+			ChatManager.sendError(sender, "Page does not exist");
 			return;
 		}
         
-        finalMsg.add(ChatColor.LIGHT_PURPLE + "-" + ChatColor.DARK_PURPLE + "Oo" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + ChatColor.DARK_PURPLE + " •_____" + ChatColor.LIGHT_PURPLE + "__________" + ChatColor.DARK_PURPLE + "oO" + ChatColor.LIGHT_PURPLE + "-");
+        finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");
         
         for(String s : finalMsg)
         	sender.sendMessage(s);
@@ -167,7 +173,7 @@ public class VS implements CommandExecutor{
 	public void formatMarket(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshop.access.admin")){
-			Chatty.noPermissions(sender);
+			ChatManager.noPermissions(sender);
             return;
 		}
 		
@@ -179,16 +185,16 @@ public class VS implements CommandExecutor{
 			}
 		}
 		if(amt == 0)
-			Chatty.sendSuccess(sender, ChatColor.GREEN + "All listings are already correctly formatted!");
+			ChatManager.sendSuccess(sender, "All listings are already correctly formatted!");
 		else
-			Chatty.sendSuccess(sender, ChatColor.GREEN + "Successfully formatted " + amt + " listings.");
+			ChatManager.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void formatMarket(CommandSender sender, String itm){
 		
 		if(!sender.hasPermission("virtualshop.access.admin")){
-			Chatty.noPermissions(sender);
+			ChatManager.noPermissions(sender);
             return;
 		}
 		
@@ -200,7 +206,7 @@ public class VS implements CommandExecutor{
 			itm = ItemDb.reverseLookup(item);
 		}
 		if(item == null){
-			Chatty.wrongItem(sender, itm);
+			ChatManager.wrongItem(sender, itm);
 			return;
 		}
 		for(Offer o : DatabaseManager.getAllOffers()){
@@ -211,22 +217,22 @@ public class VS implements CommandExecutor{
 			}
 		}
 		if(amt == 0)
-			Chatty.sendSuccess(sender, ChatColor.GREEN + "All listings are already correctly formatted!");
+			ChatManager.sendSuccess(sender, "All listings are already correctly formatted!");
 		else
-			Chatty.sendSuccess(sender, ChatColor.GREEN + "Successfully formatted " + amt + " listings.");
+			ChatManager.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
 	}
 	
 	public void cmdReload(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshop.access.admin")){
-			Chatty.noPermissions(sender);
+			ChatManager.noPermissions(sender);
             return;
 		}
 		
 		ConfigManager.loadConfig(plugin);
-		Chatty.initialize(plugin);
+		ChatManager.initialize(plugin);
 		
-		Chatty.sendSuccess(sender, ChatColor.GREEN + "Configuration successfully reloaded.");
+		ChatManager.sendSuccess(sender, "Configuration successfully reloaded.");
 	}
 	
 	public void cmdVersion(CommandSender sender){

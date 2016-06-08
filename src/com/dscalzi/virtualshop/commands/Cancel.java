@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.Chatty;
+import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
@@ -29,28 +29,28 @@ public class Cancel implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!(sender instanceof Player)){
-            Chatty.denyConsole(sender);
+            ChatManager.denyConsole(sender);
             return true;
         }
 		if(!sender.hasPermission("virtualshop.cancel")){
-            Chatty.noPermissions(sender);
+            ChatManager.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			Chatty.denyBeta(sender);
+			ChatManager.denyBeta(sender);
 			return true;
 		}
 		Player player = (Player)sender;
 		if(!ConfigManager.getAllowedWorlds().contains(player.getWorld().getName())){
-			Chatty.invalidWorld(sender, command.getName(), player.getWorld());
+			ChatManager.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
 		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
-        	Chatty.invalidGamemode(sender, command.getName(), player.getGameMode());
+        	ChatManager.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
 		if(args.length < 2){
-            Chatty.sendError(sender, "Proper usage is /cancel <amount> <item>");
+            ChatManager.sendError(sender, "Proper usage is /cancel <amount> <item>");
             return true;
         }
 		
@@ -65,7 +65,7 @@ public class Cancel implements CommandExecutor{
         
 		if(item==null)
 		{
-			Chatty.wrongItem(player, args[1]);
+			ChatManager.wrongItem(player, args[1]);
 			return;
 		}
 		
@@ -76,7 +76,7 @@ public class Cancel implements CommandExecutor{
         }
 		if(total == 0)
 		{
-			Chatty.sendError(player,"You do not have any " + args[1] + " for sale.");
+			ChatManager.sendError(player,"You do not have any " + args[1] + " for sale.");
 			return;
 		}
 		
@@ -87,11 +87,11 @@ public class Cancel implements CommandExecutor{
         	try{
         		cancelAmt = Integer.parseInt(args[0]);
         		if(cancelAmt < 1){
-        			Chatty.numberFormat(player);
+        			ChatManager.numberFormat(player);
             		return;
         		}
         	} catch (NumberFormatException e){
-        		Chatty.numberFormat(player);
+        		ChatManager.numberFormat(player);
         		return;
         	}
 		}
@@ -128,7 +128,7 @@ public class Cancel implements CommandExecutor{
         	Offer o = new Offer(player.getName(),item,oPrice);
         	DatabaseManager.addOffer(o);
         }
-        Chatty.sendSuccess(player, "Removed " + Chatty.formatAmount(cancelAmt) + " " + Chatty.formatItem(args[1]));
+        ChatManager.sendSuccess(player, "Removed " + ChatManager.formatAmount(cancelAmt) + " " + ChatManager.formatItem(args[1]));
 
 
     }

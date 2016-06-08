@@ -35,7 +35,7 @@ public class VirtualShop extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
         }
         ConfigManager.initialize(this);
-		Chatty.initialize(this);
+		ChatManager.initialize(this);
         DatabaseManager.initialize();
         try {
             ItemDb.load(this.getDataFolder(),"items.csv");
