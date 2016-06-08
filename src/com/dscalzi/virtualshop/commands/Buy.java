@@ -29,12 +29,14 @@ public class Buy implements CommandExecutor{
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final DatabaseManager dbm;
 	private Map<Player, TransactionData> confirmations;
 	
 	public Buy(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.dbm = DatabaseManager.getInstance();
 		this.confirmations = new HashMap<Player, TransactionData>();
 	}
 	
@@ -89,7 +91,7 @@ public class Buy implements CommandExecutor{
 	}
 	
 	private void execute(Player player, String[] args){
-		if(!DatabaseManager.getBuyToggle(player.getName())){
+		if(!dbm.getBuyToggle(player.getName())){
 			if(this.validateData(player, args)){
 				this.finalizeTransaction(player, confirmations.get(player));
 				return;
@@ -129,7 +131,7 @@ public class Buy implements CommandExecutor{
         	maxprice = configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData());
         }
 		//Check for listings
-		List<Offer> offers = DatabaseManager.getItemOffers(item);
+		List<Offer> offers = dbm.getItemOffers(item);
         if(offers.size()==0) {
             cm.sendError(player,"There is no " + cm.formatItem(args[1])+ " for sale.");
             return false;
@@ -220,11 +222,11 @@ public class Buy implements CommandExecutor{
             	cm.sendSuccess(o.seller, cm.formatSeller(player.getName()) + " just bought " + cm.formatAmount(canbuy) + " " + cm.formatItem(args[1]) + " for " + cm.formatPrice(cost));
             	int left = o.item.getAmount() - canbuy;
             	if(left < 1) 
-            		DatabaseManager.deleteItem(o.id);
+            		dbm.deleteItem(o.id);
             	else 
-            		DatabaseManager.updateQuantity(o.id, left);
+            		dbm.updateQuantity(o.id, left);
             	Transaction t = new Transaction(o.seller, player.getName(), o.item.getTypeId(), o.item.getDurability(), canbuy, cost);
-            	DatabaseManager.logTransaction(t);
+            	dbm.logTransaction(t);
             }
             if(bought >= amount) 
             	break;
@@ -287,14 +289,14 @@ public class Buy implements CommandExecutor{
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
 			cm.sendSuccess(player, "Buy confirmations turned on. To undo this /buy confirm toggle off");
-			DatabaseManager.updateBuyToggle(player.getName(), true);
+			dbm.updateBuyToggle(player.getName(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Buy confirmations turned off. To undo this /buy confirm toggle on");
 			confirmations.remove(player);
-			DatabaseManager.updateBuyToggle(player.getName(), false);
+			dbm.updateBuyToggle(player.getName(), false);
 			return;
 		}
 		cm.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");

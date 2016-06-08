@@ -29,6 +29,7 @@ public class Sell implements CommandExecutor{
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final DatabaseManager dbm;
 	private Map<Player, ListingData> confirmations;
 	
 	/**
@@ -39,6 +40,7 @@ public class Sell implements CommandExecutor{
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.dbm = DatabaseManager.getInstance();
 		this.confirmations = new HashMap<Player, ListingData>();
 	}
 	
@@ -102,7 +104,7 @@ public class Sell implements CommandExecutor{
 	 * @param args - Initial arguments returned by onCommand
 	 */
 	private void execute(Player player, String[] args){
-		if(!DatabaseManager.getSellToggle(player.getName())){
+		if(!dbm.getSellToggle(player.getName())){
 			if(this.validateData(player, args)){
 				this.createListing(player, confirmations.get(player));
 				return;
@@ -167,7 +169,7 @@ public class Sell implements CommandExecutor{
 		//Database checks
 		int currentlyListed = 0;
 		double oldPrice = -1;
-        for(Offer o: DatabaseManager.getSellerOffers(player.getName(),item)){
+        for(Offer o: dbm.getSellerOffers(player.getName(),item)){
         	currentlyListed += o.item.getAmount();
         	oldPrice = o.price;
         }
@@ -189,10 +191,10 @@ public class Sell implements CommandExecutor{
 		double price = data.getPrice();
 		InventoryManager im = new InventoryManager(player);
 		im.remove(item, true, true);
-        DatabaseManager.removeSellerOffers(player,item);
+        dbm.removeSellerOffers(player,item);
         item.setAmount(item.getAmount() + data.getCurrentListings());
         Offer o = new Offer(player.getName(),item,price);
-		DatabaseManager.addOffer(o);
+		dbm.addOffer(o);
 		confirmations.remove(player);
         if(configM.broadcastOffers())
         {
@@ -242,14 +244,14 @@ public class Sell implements CommandExecutor{
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
 			cm.sendSuccess(player, "Sell confirmations turned on. To undo this /sell confirm toggle off");
-			DatabaseManager.updateSellToggle(player.getName(), true);
+			dbm.updateSellToggle(player.getName(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Sell confirmations turned off. To undo this /sell confirm toggle on");
 			confirmations.remove(player);
-			DatabaseManager.updateSellToggle(player.getName(), false);
+			dbm.updateSellToggle(player.getName(), false);
 			return;
 		}
 		cm.sendMessage(player, "You may turn sell confirmations on or off using /sell confirm toggle <on/off>");

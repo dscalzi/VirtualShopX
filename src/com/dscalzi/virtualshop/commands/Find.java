@@ -26,11 +26,13 @@ public class Find implements CommandExecutor{
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final DatabaseManager dbm;
 	
 	public Find(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.dbm = DatabaseManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -64,7 +66,7 @@ public class Find implements CommandExecutor{
     		return;
     	}
     	
-    	List<Offer> offers = DatabaseManager.getPrices(item);
+    	List<Offer> offers = dbm.getPrices(item);
     	if(offers.size() == 0){
     		cm.sendError(sender, "No one is selling " + cm.formatItem(args[0]));
             return;

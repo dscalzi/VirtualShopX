@@ -25,11 +25,13 @@ public class VS implements CommandExecutor{
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final DatabaseManager dbm;
 	
 	public VS(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.dbm = DatabaseManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -182,9 +184,9 @@ public class VS implements CommandExecutor{
 		}
 		
 		int amt = 0;
-		for(Offer o : DatabaseManager.getAllOffers()){
+		for(Offer o : dbm.getAllOffers()){
 			if(o.price > configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData())){
-				DatabaseManager.updatePrice(o.id, configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
+				dbm.updatePrice(o.id, configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
 				++amt;
 			}
 		}
@@ -213,10 +215,10 @@ public class VS implements CommandExecutor{
 			cm.wrongItem(sender, itm);
 			return;
 		}
-		for(Offer o : DatabaseManager.getAllOffers()){
+		for(Offer o : dbm.getAllOffers()){
 			boolean isSameItem = ItemDb.reverseLookup(item).equalsIgnoreCase(ItemDb.reverseLookup(o.item));
 			if(o.price > configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()) && isSameItem){
-				DatabaseManager.updatePrice(o.id, configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
+				dbm.updatePrice(o.id, configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
 				++amt;
 			}
 		}

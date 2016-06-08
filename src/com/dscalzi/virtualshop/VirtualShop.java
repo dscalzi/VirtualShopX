@@ -25,7 +25,7 @@ public class VirtualShop extends JavaPlugin {
     public static final boolean BETA = false;
     
     public void onDisable(){
-        DatabaseManager.close();
+        DatabaseManager.getInstance().close();
     }
 
     public void onEnable(){
@@ -37,7 +37,7 @@ public class VirtualShop extends JavaPlugin {
         }
         ConfigManager.initialize(this);
 		ChatManager.initialize(this);
-        DatabaseManager.initialize();
+        DatabaseManager.initialize(this);
         try {
             ItemDb.load(this.getDataFolder(),"items.csv");
         } catch (IOException e) {

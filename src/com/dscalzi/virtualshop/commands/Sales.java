@@ -24,11 +24,13 @@ public class Sales implements CommandExecutor{
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final DatabaseManager dbm;
 	
 	public Sales(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.dbm = DatabaseManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -63,7 +65,7 @@ public class Sales implements CommandExecutor{
         OfflinePlayer target;
         int start = 1;
         List<Transaction> transactions;
-        transactions = DatabaseManager.getTransactions();
+        transactions = dbm.getTransactions();
         String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + configM.getServerName() + " " + trimColor + ChatColor.BOLD + " >";
         //If /sales args, check to see if it's a number
         if(args.length>0)  
@@ -77,7 +79,7 @@ public class Sales implements CommandExecutor{
 			if(start < 0) 
 				start = 1;
 			try{
-				transactions = DatabaseManager.getTransactions(search);
+				transactions = dbm.getTransactions(search);
 			} catch (NullPointerException e){
 				cm.noTransactions(sender, target.getName());
 			}

@@ -24,11 +24,13 @@ public class Stock implements CommandExecutor{
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final DatabaseManager dbm;
 	
 	public Stock(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.dbm = DatabaseManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -64,7 +66,7 @@ public class Stock implements CommandExecutor{
         OfflinePlayer target;
         int start = 1;
         List<Offer> offers;
-        offers = DatabaseManager.getBestPrices();
+        offers = dbm.getBestPrices();
         String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "I" + baseColor + "tem " + ChatColor.BOLD + "S" + baseColor + "tock ◄► " + configM.getServerName() + " " + trimColor + ChatColor.BOLD + " >";;
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
@@ -76,7 +78,7 @@ public class Stock implements CommandExecutor{
 			if(start < 0) 
 				start = 1;
 			try{
-				offers = DatabaseManager.searchBySeller(seller);
+				offers = dbm.searchBySeller(seller);
 			} catch (NullPointerException e){
 				cm.noStock(sender, target.getName());
 			}

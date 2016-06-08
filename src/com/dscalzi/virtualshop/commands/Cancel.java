@@ -21,11 +21,13 @@ public class Cancel implements CommandExecutor{
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final DatabaseManager dbm;
 	
 	public Cancel(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.dbm = DatabaseManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -74,7 +76,7 @@ public class Cancel implements CommandExecutor{
 		}
 		
         int total = 0;
-        for(Offer o: DatabaseManager.getSellerOffers(player.getName(),item))
+        for(Offer o: dbm.getSellerOffers(player.getName(),item))
         {
             total += o.item.getAmount();
         }
@@ -121,16 +123,16 @@ public class Cancel implements CommandExecutor{
         }
         int a = 0;
         double oPrice = 0;
-        for(Offer o: DatabaseManager.getSellerOffers(player.getName(),item)){
+        for(Offer o: dbm.getSellerOffers(player.getName(),item)){
         	a += o.item.getAmount();
         	oPrice += o.price;
         }
-        DatabaseManager.removeSellerOffers(player,item);
+        dbm.removeSellerOffers(player,item);
         a -= cancelAmt;
         if(a > 0){
         	item.setAmount(a);
         	Offer o = new Offer(player.getName(),item,oPrice);
-        	DatabaseManager.addOffer(o);
+        	dbm.addOffer(o);
         }
         cm.sendSuccess(player, "Removed " + cm.formatAmount(cancelAmt) + " " + cm.formatItem(args[1]));
 
