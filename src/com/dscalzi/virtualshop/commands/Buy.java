@@ -7,8 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
@@ -27,10 +27,12 @@ import java.util.Map;
 public class Buy implements CommandExecutor{
 
 	private VirtualShop plugin;
+	private final ChatManager cm;
 	private Map<Player, TransactionData> confirmations;
 	
 	public Buy(VirtualShop plugin){
 		this.plugin = plugin;
+		this.cm = ChatManager.getInstance();
 		this.confirmations = new HashMap<Player, TransactionData>();
 	}
 	
@@ -39,24 +41,24 @@ public class Buy implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!(sender instanceof Player)){
-			ChatManager.denyConsole(sender);
+			cm.denyConsole(sender);
 			return true;
 		}
 		if(!sender.hasPermission("virtualshop.buy")){
-            ChatManager.noPermissions(sender);
+            cm.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			ChatManager.denyBeta(sender);
+			cm.denyBeta(sender);
 			return true;
 		}
 		Player player = (Player)sender;
 		if(!ConfigManager.getAllowedWorlds().contains(player.getWorld().getName())){
-			ChatManager.invalidWorld(sender, command.getName(), player.getWorld());
+			cm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
 		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
-        	ChatManager.invalidGamemode(sender, command.getName(), player.getGameMode());
+        	cm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
 		if(args.length > 0){
@@ -76,7 +78,7 @@ public class Buy implements CommandExecutor{
 			}
 		}
 		if(args.length < 2){
-			ChatManager.sendError(sender, "Proper usage is /buy <amount> <item> [maxprice]");
+			cm.sendError(sender, "Proper usage is /buy <amount> <item> [maxprice]");
 			return true;
 		}
 		
@@ -93,7 +95,7 @@ public class Buy implements CommandExecutor{
 			return;
 		}
 		if(this.validateData(player, args))
-			ChatManager.buyConfirmation(player, confirmations.get(player));
+			cm.buyConfirmation(player, confirmations.get(player));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -104,21 +106,21 @@ public class Buy implements CommandExecutor{
 		double maxprice;
 		//Validate data
 		if(amount < 1)		{
-			ChatManager.numberFormat(player);
+			cm.numberFormat(player);
 			return false;
 		}
 		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
-			ChatManager.numberFormat(player);
+			cm.numberFormat(player);
 			return false;
 		}
 		if(item==null){
-			ChatManager.wrongItem(player, args[1]);
+			cm.wrongItem(player, args[1]);
 			return false;
 		}
         if(args.length > 2){
         	maxprice = Numbers.parseDouble(args[2]);
         	if(maxprice < 0){
-        		ChatManager.numberFormat(player);
+        		cm.numberFormat(player);
         		return false;
         	}
         } else {
@@ -127,7 +129,7 @@ public class Buy implements CommandExecutor{
 		//Check for listings
 		List<Offer> offers = DatabaseManager.getItemOffers(item);
         if(offers.size()==0) {
-            ChatManager.sendError(player,"There is no " + ChatManager.formatItem(args[1])+ " for sale.");
+            cm.sendError(player,"There is no " + cm.formatItem(args[1])+ " for sale.");
             return false;
         }
         
@@ -200,12 +202,12 @@ public class Buy implements CommandExecutor{
                 amount = bought+canbuy;
                 tooHigh = true;
                 if(canbuy < 1){
-                	ChatManager.sendError(player, ChatColor.RED + "Ran out of money!");
+                	cm.sendError(player, ChatColor.RED + "Ran out of money!");
                 	canContinue = false;
 					break;
                 } else {
                 	if(!finalize)
-                		ChatManager.sendError(player, ChatColor.RED + "You only have enough money for " + ChatManager.formatAmount(bought+canbuy) + " " + ChatManager.formatItem(args[1]) + ChatColor.RED + ".");
+                		cm.sendError(player, ChatColor.RED + "You only have enough money for " + cm.formatAmount(bought+canbuy) + " " + cm.formatItem(args[1]) + ChatColor.RED + ".");
                 }
             }
             bought += canbuy;
@@ -213,7 +215,7 @@ public class Buy implements CommandExecutor{
             if(finalize){
             	VirtualShop.econ.withdrawPlayer(player.getName(), cost);
             	VirtualShop.econ.depositPlayer(o.seller, cost);
-            	ChatManager.sendSuccess(o.seller, ChatManager.formatSeller(player.getName()) + " just bought " + ChatManager.formatAmount(canbuy) + " " + ChatManager.formatItem(args[1]) + " for " + ChatManager.formatPrice(cost));
+            	cm.sendSuccess(o.seller, cm.formatSeller(player.getName()) + " just bought " + cm.formatAmount(canbuy) + " " + cm.formatItem(args[1]) + " for " + cm.formatPrice(cost));
             	int left = o.item.getAmount() - canbuy;
             	if(left < 1) 
             		DatabaseManager.deleteItem(o.id);
@@ -229,11 +231,11 @@ public class Buy implements CommandExecutor{
         }
         if(!tooHigh && !finalize){
         	if(bought == 0){
-            	ChatManager.sendError(player,"There is no " + ChatManager.formatItem(args[1]) + " for sale.");
+            	cm.sendError(player,"There is no " + cm.formatItem(args[1]) + " for sale.");
             	canContinue = false;
             }
         	if(bought < amount && bought > 0)
-        		ChatManager.sendError(player, ChatColor.RED + "There's only " + ChatManager.formatAmount(bought) + " " + ChatManager.formatItem(args[1]) + ChatColor.RED + " for sale.");
+        		cm.sendError(player, ChatColor.RED + "There's only " + cm.formatAmount(bought) + " " + cm.formatItem(args[1]) + ChatColor.RED + " for sale.");
         }
         item.setAmount(bought);
         if(finalize){
@@ -244,18 +246,18 @@ public class Buy implements CommandExecutor{
         	if(bought > 0) im.addItem(item);
         }
         if(tooHigh && bought == 0 && args.length > 2 && !anyLessThanMax){
-        	ChatManager.sendError(player,"No one is selling " + ChatManager.formatItem(args[1]) + " cheaper than " + ChatManager.formatPrice(maxprice));
+        	cm.sendError(player,"No one is selling " + cm.formatItem(args[1]) + " cheaper than " + cm.formatPrice(maxprice));
         	canContinue = false;
         }else{
         	if(finalize)
-        		ChatManager.sendSuccess(player,"Managed to buy " + ChatManager.formatAmount(bought) + " " + ChatManager.formatItem(args[1]) + " for " + ChatManager.formatPrice(spent));
+        		cm.sendSuccess(player,"Managed to buy " + cm.formatAmount(bought) + " " + cm.formatItem(args[1]) + " for " + cm.formatPrice(spent));
         }
         return new TransactionData(bought, item, spent, maxprice, offers, System.currentTimeMillis(), args, canContinue);
 	}
 	
 	private void confirm(Player player){
 		if(!confirmations.containsKey(player)){
-			ChatManager.sendError(player, "Nothing to confirm!");
+			cm.sendError(player, "Nothing to confirm!");
 			return;
 		}
 		TransactionData initialData = confirmations.get(player);
@@ -263,12 +265,12 @@ public class Buy implements CommandExecutor{
 		TransactionData currentData = confirmations.get(player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
 		if(timeElapsed > 15000){
-			ChatManager.sendError(player, "Transaction expired, please try again!");
+			cm.sendError(player, "Transaction expired, please try again!");
 			confirmations.remove(player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
-			ChatManager.sendError(player, "Data changed, please try again!");
+			cm.sendError(player, "Data changed, please try again!");
 			confirmations.remove(player);
 			return;
 		}
@@ -277,22 +279,22 @@ public class Buy implements CommandExecutor{
 	
 	private void toggleConfirmations(Player player, String[] args){
 		if(args.length < 3){
-			ChatManager.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");
+			cm.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");
 			return;
 		}
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
-			ChatManager.sendSuccess(player, "Buy confirmations turned on. To undo this /buy confirm toggle off");
+			cm.sendSuccess(player, "Buy confirmations turned on. To undo this /buy confirm toggle off");
 			DatabaseManager.updateBuyToggle(player.getName(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
-			ChatManager.sendSuccess(player, "Buy confirmations turned off. To undo this /buy confirm toggle on");
+			cm.sendSuccess(player, "Buy confirmations turned off. To undo this /buy confirm toggle on");
 			confirmations.remove(player);
 			DatabaseManager.updateBuyToggle(player.getName(), false);
 			return;
 		}
-		ChatManager.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");
+		cm.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");
 	}
 }

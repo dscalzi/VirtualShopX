@@ -7,8 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
@@ -19,9 +19,11 @@ public class Cancel implements CommandExecutor{
 
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
+	private final ChatManager cm;
 	
 	public Cancel(VirtualShop plugin){
 		this.plugin = plugin;
+		this.cm = ChatManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -29,28 +31,28 @@ public class Cancel implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!(sender instanceof Player)){
-            ChatManager.denyConsole(sender);
+            cm.denyConsole(sender);
             return true;
         }
 		if(!sender.hasPermission("virtualshop.cancel")){
-            ChatManager.noPermissions(sender);
+            cm.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			ChatManager.denyBeta(sender);
+			cm.denyBeta(sender);
 			return true;
 		}
 		Player player = (Player)sender;
 		if(!ConfigManager.getAllowedWorlds().contains(player.getWorld().getName())){
-			ChatManager.invalidWorld(sender, command.getName(), player.getWorld());
+			cm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
 		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
-        	ChatManager.invalidGamemode(sender, command.getName(), player.getGameMode());
+        	cm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
 		if(args.length < 2){
-            ChatManager.sendError(sender, "Proper usage is /cancel <amount> <item>");
+            cm.sendError(sender, "Proper usage is /cancel <amount> <item>");
             return true;
         }
 		
@@ -65,7 +67,7 @@ public class Cancel implements CommandExecutor{
         
 		if(item==null)
 		{
-			ChatManager.wrongItem(player, args[1]);
+			cm.wrongItem(player, args[1]);
 			return;
 		}
 		
@@ -76,7 +78,7 @@ public class Cancel implements CommandExecutor{
         }
 		if(total == 0)
 		{
-			ChatManager.sendError(player,"You do not have any " + args[1] + " for sale.");
+			cm.sendError(player,"You do not have any " + args[1] + " for sale.");
 			return;
 		}
 		
@@ -87,11 +89,11 @@ public class Cancel implements CommandExecutor{
         	try{
         		cancelAmt = Integer.parseInt(args[0]);
         		if(cancelAmt < 1){
-        			ChatManager.numberFormat(player);
+        			cm.numberFormat(player);
             		return;
         		}
         	} catch (NumberFormatException e){
-        		ChatManager.numberFormat(player);
+        		cm.numberFormat(player);
         		return;
         	}
 		}
@@ -128,7 +130,7 @@ public class Cancel implements CommandExecutor{
         	Offer o = new Offer(player.getName(),item,oPrice);
         	DatabaseManager.addOffer(o);
         }
-        ChatManager.sendSuccess(player, "Removed " + ChatManager.formatAmount(cancelAmt) + " " + ChatManager.formatItem(args[1]));
+        cm.sendSuccess(player, "Removed " + cm.formatAmount(cancelAmt) + " " + cm.formatItem(args[1]));
 
 
     }

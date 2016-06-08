@@ -10,8 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.ListingData;
@@ -27,6 +27,7 @@ public class Sell implements CommandExecutor{
 	
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
+	private final ChatManager cm;
 	private Map<Player, ListingData> confirmations;
 	
 	/**
@@ -35,6 +36,7 @@ public class Sell implements CommandExecutor{
 	 */
 	public Sell(VirtualShop plugin){
 		this.plugin = plugin;
+		this.cm = ChatManager.getInstance();
 		this.confirmations = new HashMap<Player, ListingData>();
 	}
 	
@@ -43,24 +45,24 @@ public class Sell implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!(sender instanceof Player)){
-            ChatManager.denyConsole(sender);
+            cm.denyConsole(sender);
             return true;
         }
 		if(!sender.hasPermission("virtualshop.sell")){
-            ChatManager.noPermissions(sender);
+            cm.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			ChatManager.denyBeta(sender);
+			cm.denyBeta(sender);
 			return true;
 		}
 		Player player = (Player)sender;
 		if(!ConfigManager.getAllowedWorlds().contains(player.getWorld().getName())){
-			ChatManager.invalidWorld(sender, command.getName(), player.getWorld());
+			cm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
 		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
-        	ChatManager.invalidGamemode(sender, command.getName(), player.getGameMode());
+        	cm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
 		if(args.length > 0){
@@ -80,7 +82,7 @@ public class Sell implements CommandExecutor{
 			}
 		}
 		if(args.length < 3){
-			ChatManager.sendError(sender, "Proper usage is /sell <amount> <item> <price>");
+			cm.sendError(sender, "Proper usage is /sell <amount> <item> <price>");
 			return true;
 		}
 		if(this.confirmations.containsKey(player))
@@ -106,7 +108,7 @@ public class Sell implements CommandExecutor{
 			return;
 		}
 		if(this.validateData(player, args))
-			ChatManager.sellConfirmation(player, confirmations.get(player));
+			cm.sellConfirmation(player, confirmations.get(player));
 	}
 	
 	/**
@@ -126,7 +128,7 @@ public class Sell implements CommandExecutor{
 		InventoryManager im = new InventoryManager(player);
 		//Validate Data
 		if(amount < 0 || price < 0){
-			ChatManager.numberFormat(player);
+			cm.numberFormat(player);
 			return false;
 		}
 		if(args[1].equalsIgnoreCase("hand")){
@@ -134,7 +136,7 @@ public class Sell implements CommandExecutor{
 			args[1] = ItemDb.reverseLookup(item);
 		}
 		if(item==null){
-			ChatManager.wrongItem(player, args[1]);
+			cm.wrongItem(player, args[1]);
 			return false;
 		}
 		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
@@ -150,14 +152,14 @@ public class Sell implements CommandExecutor{
         	item.setAmount(total);
         }
 		if(price > ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			ChatManager.priceTooHigh(player, args[1], ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+			cm.priceTooHigh(player, args[1], ConfigManager.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return false;
 		}
 		if(!im.contains(item,true,true)){
 			if(item.getAmount() == 0)
-        		ChatManager.sendError(player, "You do not have any " + ChatManager.formatItem(args[1]));
+        		cm.sendError(player, "You do not have any " + cm.formatItem(args[1]));
 			else
-				ChatManager.sendError(player, "You do not have " + ChatManager.formatAmount(item.getAmount()) + " " + ChatManager.formatItem(args[1]));
+				cm.sendError(player, "You do not have " + cm.formatAmount(item.getAmount()) + " " + cm.formatItem(args[1]));
 			return false;
 		}
 		//Database checks
@@ -192,7 +194,7 @@ public class Sell implements CommandExecutor{
 		confirmations.remove(player);
         if(ConfigManager.broadcastOffers())
         {
-			ChatManager.broadcastOffer(o);
+			cm.broadcastOffer(o);
 			return;
 		}
 	}
@@ -204,7 +206,7 @@ public class Sell implements CommandExecutor{
 	 */
 	private void confirm(Player player){
 		if(!confirmations.containsKey(player)){
-			ChatManager.sendError(player, "Nothing to confirm!");
+			cm.sendError(player, "Nothing to confirm!");
 			return;
 		}
 		ListingData initialData = confirmations.get(player);
@@ -212,12 +214,12 @@ public class Sell implements CommandExecutor{
 		ListingData currentData = confirmations.get(player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
 		if(timeElapsed > 15000){
-			ChatManager.sendError(player, "Transaction expired, please try again!");
+			cm.sendError(player, "Transaction expired, please try again!");
 			confirmations.remove(player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
-			ChatManager.sendError(player, "Data changed, please try again!");
+			cm.sendError(player, "Data changed, please try again!");
 			confirmations.remove(player);
 			return;
 		}
@@ -232,22 +234,22 @@ public class Sell implements CommandExecutor{
 	 */
 	private void toggleConfirmations(Player player, String[] args){
 		if(args.length < 3){
-			ChatManager.sendMessage(player, "You may turn sell confirmations on or off using /sell confirm toggle <on/off>");
+			cm.sendMessage(player, "You may turn sell confirmations on or off using /sell confirm toggle <on/off>");
 			return;
 		}
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
-			ChatManager.sendSuccess(player, "Sell confirmations turned on. To undo this /sell confirm toggle off");
+			cm.sendSuccess(player, "Sell confirmations turned on. To undo this /sell confirm toggle off");
 			DatabaseManager.updateSellToggle(player.getName(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
-			ChatManager.sendSuccess(player, "Sell confirmations turned off. To undo this /sell confirm toggle on");
+			cm.sendSuccess(player, "Sell confirmations turned off. To undo this /sell confirm toggle on");
 			confirmations.remove(player);
 			DatabaseManager.updateSellToggle(player.getName(), false);
 			return;
 		}
-		ChatManager.sendMessage(player, "You may turn sell confirmations on or off using /sell confirm toggle <on/off>");
+		cm.sendMessage(player, "You may turn sell confirmations on or off using /sell confirm toggle <on/off>");
 	}
 }

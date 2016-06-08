@@ -6,8 +6,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
@@ -24,9 +24,11 @@ public class Find implements CommandExecutor{
 	
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
+	private final ChatManager cm;
 	
 	public Find(VirtualShop plugin){
 		this.plugin = plugin;
+		this.cm = ChatManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -34,15 +36,15 @@ public class Find implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!sender.hasPermission("virtualshop.find")){
-            ChatManager.noPermissions(sender);
+            cm.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			ChatManager.denyBeta(sender);
+			cm.denyBeta(sender);
 			return true;
 		}
 		if(args.length < 1){
-			ChatManager.sendError(sender, "You need to specify the item.");
+			cm.sendError(sender, "You need to specify the item.");
 			return true;
 		}
 		
@@ -56,13 +58,13 @@ public class Find implements CommandExecutor{
     	
     	ItemStack item = ItemDb.get(args[0], 0);
     	if(item == null){
-    		ChatManager.wrongItem(sender, args[0]);
+    		cm.wrongItem(sender, args[0]);
     		return;
     	}
     	
     	List<Offer> offers = DatabaseManager.getPrices(item);
     	if(offers.size() == 0){
-    		ChatManager.sendError(sender, "No one is selling " + ChatManager.formatItem(args[0]) + ".");
+    		cm.sendError(sender, "No one is selling " + cm.formatItem(args[0]) + ".");
             return;
     	}
     	
@@ -85,10 +87,10 @@ public class Find implements CommandExecutor{
         
         try {
 			for(Offer o : listings.getPage(requestedPage)){
-				finalMsg.add(ChatManager.formatOffer(o));
+				finalMsg.add(cm.formatOffer(o));
 			}
 		} catch (BadLocationException e) {
-			ChatManager.sendError(sender, "Page does not exist");
+			cm.sendError(sender, "Page does not exist");
 			return;
 		}
         finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + requestedPage + " of " + listings.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");

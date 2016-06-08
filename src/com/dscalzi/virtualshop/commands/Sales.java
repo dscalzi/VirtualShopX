@@ -6,8 +6,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Transaction;
@@ -22,31 +22,33 @@ import javax.swing.text.BadLocationException;
 public class Sales implements CommandExecutor{
 	
 	private VirtualShop plugin;
+	private final ChatManager cm;
 	
 	public Sales(VirtualShop plugin){
 		this.plugin = plugin;
+		this.cm = ChatManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("virtualshop.sales")){
-            ChatManager.noPermissions(sender);
+            cm.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			ChatManager.denyBeta(sender);
+			cm.denyBeta(sender);
 			return true;
 		}
 		if(args.length > 0 && args[0].contains("'")){
-        	ChatManager.noTransactions(sender, args[0]);
+        	cm.noTransactions(sender, args[0]);
         	return true;
         }
 		
 		try{
 			this.execute(sender, args);
     	} catch (LinkageError e){
-    		ChatManager.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
+    		cm.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
     	}
 		return true;
 	}
@@ -75,10 +77,10 @@ public class Sales implements CommandExecutor{
 			try{
 				transactions = DatabaseManager.getTransactions(search);
 			} catch (NullPointerException e){
-				ChatManager.noTransactions(sender, target.getName());
+				cm.noTransactions(sender, target.getName());
 			}
             if(transactions.size() < 1){
-            	ChatManager.noTransactions(sender, target.getName());
+            	cm.noTransactions(sender, target.getName());
             	return;
             }
             for(Transaction t : transactions){
@@ -110,13 +112,13 @@ public class Sales implements CommandExecutor{
         
         try {
 			for(Transaction t : sales.getPage(start)){
-			    finalMsg.add(ChatManager.formatTransaction(t));
+			    finalMsg.add(cm.formatTransaction(t));
 			}
 		} catch (BadLocationException e) {
 			if(start == 1)
-				ChatManager.noTransactions(sender, ConfigManager.getServerName());
+				cm.noTransactions(sender, ConfigManager.getServerName());
 			else
-				ChatManager.sendError(sender, "Page does not exist");
+				cm.sendError(sender, "Page does not exist");
 			return;
 		}
 

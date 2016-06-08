@@ -12,8 +12,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
@@ -23,9 +23,11 @@ import com.dscalzi.virtualshop.util.PageList;
 public class VS implements CommandExecutor{
 
 	private VirtualShop plugin;
+	private final ChatManager cm;
 	
 	public VS(VirtualShop plugin){
 		this.plugin = plugin;
+		this.cm = ChatManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -33,7 +35,7 @@ public class VS implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			ChatManager.denyBeta(sender);
+			cm.denyBeta(sender);
 			return true;
 		}
 		
@@ -45,7 +47,7 @@ public class VS implements CommandExecutor{
     				this.cmdList(sender, page);
     				return true;
     			} catch (NumberFormatException e){
-    				ChatManager.sendError(sender, "Page does not exist");
+    				cm.sendError(sender, "Page does not exist");
 					return true;
     			}
 			}
@@ -62,7 +64,7 @@ public class VS implements CommandExecutor{
 		    				this.vsList(sender, page);
 		    				return true;
 		    			} catch (NumberFormatException e){
-		    				ChatManager.sendError(sender, "Page does not exist");
+		    				cm.sendError(sender, "Page does not exist");
 							return true;
 		    			}
 					}
@@ -113,7 +115,7 @@ public class VS implements CommandExecutor{
         PageList<String> commands = new PageList<>(cmds, 7);
         
         List<String> finalMsg = new ArrayList<String>();
-        finalMsg.add(baseColor + "------------------- " + ChatManager.getPrefix() + trimColor + " -------------------");
+        finalMsg.add(baseColor + "------------------- " + cm.getPrefix() + trimColor + " -------------------");
         finalMsg.add(trimColor + "              Command List - <Required> [Optional]");
         
         try {
@@ -121,7 +123,7 @@ public class VS implements CommandExecutor{
 				finalMsg.add(s);
 			}
 		} catch (BadLocationException e) {
-			ChatManager.sendError(sender, "Page does not exist");
+			cm.sendError(sender, "Page does not exist");
 			return;
 		}
         
@@ -150,7 +152,7 @@ public class VS implements CommandExecutor{
 		PageList<String> commands = new PageList<>(cmds, 7);
 		
 		List<String> finalMsg = new ArrayList<String>();
-		finalMsg.add(baseColor + "------------------- " + ChatManager.getPrefix() + trimColor + " -------------------");
+		finalMsg.add(baseColor + "------------------- " + cm.getPrefix() + trimColor + " -------------------");
         finalMsg.add(trimColor + "              Command List - <Required> [Optional]");
 		
         try {
@@ -158,7 +160,7 @@ public class VS implements CommandExecutor{
 				finalMsg.add(s);
 			}
 		} catch (BadLocationException e) {
-			ChatManager.sendError(sender, "Page does not exist");
+			cm.sendError(sender, "Page does not exist");
 			return;
 		}
         
@@ -173,7 +175,7 @@ public class VS implements CommandExecutor{
 	public void formatMarket(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshop.access.admin")){
-			ChatManager.noPermissions(sender);
+			cm.noPermissions(sender);
             return;
 		}
 		
@@ -185,16 +187,16 @@ public class VS implements CommandExecutor{
 			}
 		}
 		if(amt == 0)
-			ChatManager.sendSuccess(sender, "All listings are already correctly formatted!");
+			cm.sendSuccess(sender, "All listings are already correctly formatted!");
 		else
-			ChatManager.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
+			cm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void formatMarket(CommandSender sender, String itm){
 		
 		if(!sender.hasPermission("virtualshop.access.admin")){
-			ChatManager.noPermissions(sender);
+			cm.noPermissions(sender);
             return;
 		}
 		
@@ -206,7 +208,7 @@ public class VS implements CommandExecutor{
 			itm = ItemDb.reverseLookup(item);
 		}
 		if(item == null){
-			ChatManager.wrongItem(sender, itm);
+			cm.wrongItem(sender, itm);
 			return;
 		}
 		for(Offer o : DatabaseManager.getAllOffers()){
@@ -217,25 +219,25 @@ public class VS implements CommandExecutor{
 			}
 		}
 		if(amt == 0)
-			ChatManager.sendSuccess(sender, "All listings are already correctly formatted!");
+			cm.sendSuccess(sender, "All listings are already correctly formatted!");
 		else
-			ChatManager.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
+			cm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
 	}
 	
 	public void cmdReload(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshop.access.admin")){
-			ChatManager.noPermissions(sender);
+			cm.noPermissions(sender);
             return;
 		}
 		
 		ConfigManager.loadConfig(plugin);
-		ChatManager.initialize(plugin);
+		ChatManager.reload();
 		
-		ChatManager.sendSuccess(sender, "Configuration successfully reloaded.");
+		cm.sendSuccess(sender, "Configuration successfully reloaded.");
 	}
 	
 	public void cmdVersion(CommandSender sender){
-		sender.sendMessage(ConfigManager.getPrefix() + " " + ConfigManager.getColor() + "Virtual Shop version " + plugin.getDescription().getVersion());
+		ChatManager.getInstance().sendMessage(sender, "Virtual Shop version " + plugin.getDescription().getVersion());
 	}
 }

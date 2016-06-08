@@ -6,8 +6,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import com.dscalzi.virtualshop.ChatManager;
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
@@ -22,9 +22,11 @@ import javax.swing.text.BadLocationException;
 public class Stock implements CommandExecutor{
 	
 	private VirtualShop plugin;
+	private final ChatManager cm;
 	
 	public Stock(VirtualShop plugin){
 		this.plugin = plugin;
+		this.cm = ChatManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -32,22 +34,22 @@ public class Stock implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!sender.hasPermission("virtualshop.stock")){
-            ChatManager.noPermissions(sender);
+            cm.noPermissions(sender);
             return true;
         }
 		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			ChatManager.denyBeta(sender);
+			cm.denyBeta(sender);
 			return true;
 		}
 		if(args.length > 0 && args[0].contains("'")){
-        	ChatManager.noStock(sender, args[0]);
+        	cm.noStock(sender, args[0]);
         	return true;
         }
 		
 		try{
 			this.execute(sender, args);
     	} catch (LinkageError e){
-    		ChatManager.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
+    		cm.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
     	}
 		return true;
 	}
@@ -74,10 +76,10 @@ public class Stock implements CommandExecutor{
 			try{
 				offers = DatabaseManager.searchBySeller(seller);
 			} catch (NullPointerException e){
-				ChatManager.noStock(sender, target.getName());
+				cm.noStock(sender, target.getName());
 			}
             if(offers.size() < 1){
-            	ChatManager.noStock(sender, target.getName());
+            	cm.noStock(sender, target.getName());
             	return;
             }
             for(Offer o : offers){
@@ -105,13 +107,13 @@ public class Stock implements CommandExecutor{
         
         try {
 			for(Offer o : stock.getPage(start)){
-				finalMsg.add(ChatManager.formatOffer(o));
+				finalMsg.add(cm.formatOffer(o));
 			}
 		} catch (BadLocationException e) {
 			if(start == 1)
-				ChatManager.sendError(sender, "There are no items on the market");
+				cm.sendError(sender, "There are no items on the market");
 			else
-				ChatManager.sendError(sender, "Page does not exist");
+				cm.sendError(sender, "Page does not exist");
 			return;
 		}
         
