@@ -185,8 +185,8 @@ public class VS implements CommandExecutor{
 		
 		int amt = 0;
 		for(Offer o : dbm.getAllOffers()){
-			if(o.price > configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData())){
-				dbm.updatePrice(o.id, configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
+			if(o.getPrice() > configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData())){
+				dbm.updatePrice(o.getId(), configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
 				++amt;
 			}
 		}
@@ -216,9 +216,9 @@ public class VS implements CommandExecutor{
 			return;
 		}
 		for(Offer o : dbm.getAllOffers()){
-			boolean isSameItem = ItemDb.reverseLookup(item).equalsIgnoreCase(ItemDb.reverseLookup(o.item));
-			if(o.price > configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()) && isSameItem){
-				dbm.updatePrice(o.id, configM.getMaxPrice(o.item.getData().getItemTypeId(), o.item.getData().getData()));
+			boolean isSameItem = ItemDb.reverseLookup(item).equalsIgnoreCase(ItemDb.reverseLookup(o.getItem()));
+			if(o.getPrice() > configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()) && isSameItem){
+				dbm.updatePrice(o.getId(), configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
 				++amt;
 			}
 		}

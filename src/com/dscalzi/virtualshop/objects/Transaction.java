@@ -10,10 +10,10 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class Transaction
 {
-    public String seller;
-    public String buyer;
-    public ItemStack item;
-    public double cost;
+    private String seller;
+    private String buyer;
+    private ItemStack item;
+    private double cost;
 
     public Transaction(String seller, String buyer, int id, int damage, int amount, double cost)
     {
@@ -23,7 +23,7 @@ public class Transaction
         this.cost = cost;
     }
 
-    public static List<Transaction> listTransactions(ResultSet result)
+	public static List<Transaction> listTransactions(ResultSet result)
     {
         List<Transaction> ret = new ArrayList<Transaction>();
         try {
@@ -37,5 +37,12 @@ public class Transaction
         return ret;
     }
 
+	public String getSeller() {	return seller; }
+
+	public String getBuyer() { return buyer; }
+
+	public ItemStack getItem() { return item; }
+
+	public double getCost() { return cost; }
 
 }

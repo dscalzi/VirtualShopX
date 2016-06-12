@@ -88,12 +88,12 @@ public class Sales implements CommandExecutor{
             	return;
             }
             for(Transaction t : transactions){
-            	if(t.seller.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + t.seller + trimColor + ChatColor.BOLD + " >";
+            	if(t.getSeller().toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
+            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + t.getSeller() + trimColor + ChatColor.BOLD + " >";
             		break;
             	}
-            	else if(t.buyer.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + t.buyer + trimColor + ChatColor.BOLD + " >";
+            	else if(t.getBuyer().toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
+            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + t.getBuyer() + trimColor + ChatColor.BOLD + " >";
             		break;
             	}
             }

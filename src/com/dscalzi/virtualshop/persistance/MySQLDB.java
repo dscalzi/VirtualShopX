@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 
-public class MySQLDB implements com.dscalzi.virtualshop.persistance.Database
+public class MySQLDB implements Database
 {
     private MySQL db;
     private final ChatManager cm = ChatManager.getInstance();

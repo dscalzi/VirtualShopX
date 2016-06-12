@@ -70,7 +70,7 @@ public class DatabaseManager {
 
     public void addOffer(Offer offer){
 			@SuppressWarnings("deprecation")
-			String query = "insert into vshop_stock(seller,item,amount,price,damage) values('" +offer.seller +"',"+ offer.item.getType().getId() + ","+offer.item.getAmount() +","+offer.price+"," + offer.item.getDurability()+")";
+			String query = "insert into vshop_stock(seller,item,amount,price,damage) values('" +offer.getSeller() +"',"+ offer.getItem().getType().getId() + ","+offer.getItem().getAmount() +","+offer.getPrice()+"," + offer.getItem().getDurability()+")";
 			this.database.query(query);
 	}
     
@@ -186,7 +186,7 @@ public class DatabaseManager {
     
     public void logTransaction(Transaction transaction) {
 		@SuppressWarnings("deprecation")
-		String query = "insert into vshop_transactions(seller,buyer,item,amount,cost,damage) values('" +transaction.seller +"','"+ transaction.buyer + "'," + transaction.item.getTypeId() + ","+ transaction.item.getAmount() +","+transaction.cost+","+transaction.item.getDurability()+")";
+		String query = "insert into vshop_transactions(seller,buyer,item,amount,cost,damage) values('" +transaction.getSeller() +"','"+ transaction.getBuyer() + "'," + transaction.getItem().getTypeId() + ","+ transaction.getItem().getAmount() +","+transaction.getCost()+","+transaction.getItem().getDurability()+")";
 		this.database.query(query);
 	}
 

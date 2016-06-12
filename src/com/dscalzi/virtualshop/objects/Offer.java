@@ -10,12 +10,12 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class Offer
 {
-    public ItemStack item;
-    public double price;
-    public String seller;
-    public int id;
+    private ItemStack item;
+    private double price;
+    private String seller;
+    private int id;
 
-    public Offer(String seller, int id, short damage, double price, int amount){
+	public Offer(String seller, int id, short damage, double price, int amount){
         this.item = new ItemStack(id,amount,damage);
         this.seller = seller;
         this.price = price;
@@ -32,7 +32,7 @@ public class Offer
         try {
             while(result.next()){
                 Offer o = new Offer(result.getString("seller"), result.getInt("item"), (short)result.getInt("damage"),result.getDouble("price"),result.getInt("amount"));
-                o.id = result.getInt("id");
+                o.setId(result.getInt("id"));
                 ret.add(o);
             }
         } catch (SQLException e) {
@@ -46,12 +46,28 @@ public class Offer
     	Offer other = (Offer)obj;
     	if(other == this)
     		return true;
-    	if(!this.item.equals(other.item))
+    	if(!this.getItem().equals(other.getItem()))
     		return false;
-    	if(this.price != other.price)
+    	if(this.getPrice() != other.getPrice())
     		return false;
-    	if(!this.seller.equals(other.seller))
+    	if(!this.getSeller().equals(other.getSeller()))
     		return false;
     	return true;
     }
+    
+    public ItemStack getItem() { return item; }
+
+	public void setItem(ItemStack item) { this.item = item; }
+
+	public double getPrice() { return price; }
+
+	public void setPrice(double price) { this.price = price; }
+
+	public String getSeller() {	return seller; }
+
+	public void setSeller(String seller) { this.seller = seller; }
+
+	public int getId() { return id; }
+
+	protected void setId(int id) {	this.id = id;}
 }

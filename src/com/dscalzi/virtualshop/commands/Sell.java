@@ -170,8 +170,8 @@ public class Sell implements CommandExecutor{
 		int currentlyListed = 0;
 		double oldPrice = -1;
         for(Offer o: dbm.getSellerOffers(player.getName(),item)){
-        	currentlyListed += o.item.getAmount();
-        	oldPrice = o.price;
+        	currentlyListed += o.getItem().getAmount();
+        	oldPrice = o.getPrice();
         }
         
         //Submit data

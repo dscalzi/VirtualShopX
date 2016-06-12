@@ -78,7 +78,7 @@ public class Cancel implements CommandExecutor{
         int total = 0;
         for(Offer o: dbm.getSellerOffers(player.getName(),item))
         {
-            total += o.item.getAmount();
+            total += o.getItem().getAmount();
         }
 		if(total == 0)
 		{
@@ -124,8 +124,8 @@ public class Cancel implements CommandExecutor{
         int a = 0;
         double oPrice = 0;
         for(Offer o: dbm.getSellerOffers(player.getName(),item)){
-        	a += o.item.getAmount();
-        	oPrice += o.price;
+        	a += o.getItem().getAmount();
+        	oPrice += o.getPrice();
         }
         dbm.removeSellerOffers(player,item);
         a -= cancelAmt;

@@ -87,8 +87,8 @@ public class Stock implements CommandExecutor{
             	return;
             }
             for(Offer o : offers){
-            	if(o.seller.toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
-            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "I" + baseColor + "tem " + ChatColor.BOLD + "S" + baseColor + "tock ◄► " + o.seller + trimColor + ChatColor.BOLD + " >";
+            	if(o.getSeller().toLowerCase().indexOf(target.getName().toLowerCase()) != -1){
+            		header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "I" + baseColor + "tem " + ChatColor.BOLD + "S" + baseColor + "tock ◄► " + o.getSeller() + trimColor + ChatColor.BOLD + " >";
             		break;
             	}
             }

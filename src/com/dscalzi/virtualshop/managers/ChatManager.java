@@ -193,11 +193,11 @@ public class ChatManager {
 	}
 	
 	public String formatOffer(Offer o){
-        return formatSeller(o.seller) + ": " + formatAmount(o.item.getAmount()) + " " + formatItem(ItemDb.reverseLookup(o.item)) + " for " + formatPrice(o.price) + " each.";
+        return formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " " + formatItem(ItemDb.reverseLookup(o.getItem())) + " for " + formatPrice(o.getPrice()) + " each.";
     }
 	
 	public String formatTransaction(Transaction t){
-		return formatSeller(t.seller)+ " --> " + formatBuyer(t.buyer) + ": " + formatAmount(t.item.getAmount())+" " + formatItem(ItemDb.reverseLookup(t.item)) + " for "+ formatPrice(t.cost);
+		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(ItemDb.reverseLookup(t.getItem())) + " for "+ formatPrice(t.getCost());
 	}
 	
 	public static String capitalize(String s){

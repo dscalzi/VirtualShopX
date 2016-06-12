@@ -18,8 +18,6 @@ import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.ItemDb;
 import com.dscalzi.virtualshop.util.Numbers;
 
-import net.md_5.bungee.api.ChatColor;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +131,7 @@ public class Buy implements CommandExecutor{
 		//Check for listings
 		List<Offer> offers = dbm.getItemOffers(item);
         if(offers.size()==0) {
-            cm.sendError(player,"There is no " + cm.formatItem(args[1])+ " for sale.");
+            cm.sendError(player,"There is no " + cm.formatItem(args[1])+ configM.getErrorColor() + " for sale.");
             return false;
         }
         
@@ -185,47 +183,47 @@ public class Buy implements CommandExecutor{
         boolean anyLessThanMax = false;;
         
         for(Offer o: offers){
-            if(o.price > maxprice){
+            if(o.getPrice() > maxprice){
             	tooHigh = true;
             	continue;
             }
-            if(o.seller.equals(player.getName())) 
+            if(o.getSeller().equals(player.getName())) 
             	continue;
             
             int canbuy = amount-bought;
-            int stock = o.item.getAmount();
+            int stock = o.getItem().getAmount();
             if(canbuy > stock)
             	canbuy = stock;  
-            double cost = o.price * canbuy;
+            double cost = o.getPrice() * canbuy;
             anyLessThanMax = true;
             
             //Revise amounts if not enough money.
             if(!plugin.hasEnough(player.getName(), cost)){
-            	canbuy = (int)(VirtualShop.econ.getBalance(player.getName()) / o.price);
-                cost = canbuy*o.price;
+            	canbuy = (int)(VirtualShop.econ.getBalance(player.getName()) / o.getPrice());
+                cost = canbuy*o.getPrice();
                 amount = bought+canbuy;
                 tooHigh = true;
                 if(canbuy < 1){
-                	cm.sendError(player, ChatColor.RED + "Ran out of money!");
+                	cm.sendError(player, "Ran out of money!");
                 	canContinue = false;
 					break;
                 } else {
                 	if(!finalize)
-                		cm.sendError(player, ChatColor.RED + "You only have enough money for " + cm.formatAmount(bought+canbuy) + " " + cm.formatItem(args[1]) + ChatColor.RED + ".");
+                		cm.sendError(player, "You only have enough money for " + cm.formatAmount(bought+canbuy) + " " + cm.formatItem(args[1]) + configM.getErrorColor() + ".");
                 }
             }
             bought += canbuy;
             spent += cost;
             if(finalize){
             	VirtualShop.econ.withdrawPlayer(player.getName(), cost);
-            	VirtualShop.econ.depositPlayer(o.seller, cost);
-            	cm.sendSuccess(o.seller, cm.formatSeller(player.getName()) + " just bought " + cm.formatAmount(canbuy) + " " + cm.formatItem(args[1]) + " for " + cm.formatPrice(cost));
-            	int left = o.item.getAmount() - canbuy;
+            	VirtualShop.econ.depositPlayer(o.getSeller(), cost);
+            	cm.sendSuccess(o.getSeller(), cm.formatSeller(player.getName()) + configM.getSuccessColor() + " just bought " + cm.formatAmount(canbuy) + " " + cm.formatItem(args[1]) + configM.getSuccessColor() + " for " + cm.formatPrice(cost));
+            	int left = o.getItem().getAmount() - canbuy;
             	if(left < 1) 
-            		dbm.deleteItem(o.id);
+            		dbm.deleteItem(o.getId());
             	else 
-            		dbm.updateQuantity(o.id, left);
-            	Transaction t = new Transaction(o.seller, player.getName(), o.item.getTypeId(), o.item.getDurability(), canbuy, cost);
+            		dbm.updateQuantity(o.getId(), left);
+            	Transaction t = new Transaction(o.getSeller(), player.getName(), o.getItem().getTypeId(), o.getItem().getDurability(), canbuy, cost);
             	dbm.logTransaction(t);
             }
             if(bought >= amount) 
@@ -235,11 +233,11 @@ public class Buy implements CommandExecutor{
         }
         if(!tooHigh && !finalize){
         	if(bought == 0){
-            	cm.sendError(player,"There is no " + cm.formatItem(args[1]) + " for sale.");
+            	cm.sendError(player,"There is no " + cm.formatItem(args[1]) + configM.getErrorColor() + " for sale.");
             	canContinue = false;
             }
         	if(bought < amount && bought > 0)
-        		cm.sendError(player, ChatColor.RED + "There's only " + cm.formatAmount(bought) + " " + cm.formatItem(args[1]) + ChatColor.RED + " for sale.");
+        		cm.sendError(player, "There's only " + cm.formatAmount(bought) + " " + cm.formatItem(args[1]) + configM.getErrorColor() + " for sale.");
         }
         item.setAmount(bought);
         if(finalize){
@@ -250,11 +248,11 @@ public class Buy implements CommandExecutor{
         	if(bought > 0) im.addItem(item);
         }
         if(tooHigh && bought == 0 && args.length > 2 && !anyLessThanMax){
-        	cm.sendError(player,"No one is selling " + cm.formatItem(args[1]) + " cheaper than " + cm.formatPrice(maxprice));
+        	cm.sendError(player,"No one is selling " + cm.formatItem(args[1]) + configM.getErrorColor() + " cheaper than " + cm.formatPrice(maxprice));
         	canContinue = false;
         }else{
         	if(finalize)
-        		cm.sendSuccess(player,"Managed to buy " + cm.formatAmount(bought) + " " + cm.formatItem(args[1]) + " for " + cm.formatPrice(spent));
+        		cm.sendSuccess(player,"Managed to buy " + cm.formatAmount(bought) + " " + cm.formatItem(args[1]) + configM.getSuccessColor() + " for " + cm.formatPrice(spent));
         }
         return new TransactionData(bought, item, spent, maxprice, offers, System.currentTimeMillis(), args, canContinue);
 	}
