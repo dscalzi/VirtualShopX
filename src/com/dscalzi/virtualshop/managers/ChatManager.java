@@ -22,7 +22,6 @@ public class ChatManager {
 	private static ChatManager instance;
 	
 	private VirtualShop plugin;
-	private Logger logger;
 	private String prefix;
     private String color;
     private String eColor;
@@ -31,7 +30,6 @@ public class ChatManager {
 	
 	private ChatManager(Plugin plugin){
 		this.plugin = (VirtualShop)plugin;
-		this.logger = Logger.getLogger("minecraft");
 		this.configM = ConfigManager.getInstance();
 		this.assignVars();
 		
@@ -65,7 +63,7 @@ public class ChatManager {
 	/* Message distribution */
 	
 	public void logInfo(String message){
-		logger.info(message);
+		plugin.getLogger().info(message);
 	}
 	
 	public void sendMessage(CommandSender sender, String message){
@@ -99,7 +97,7 @@ public class ChatManager {
 	/* Accessors */
 	
 	public Logger getLogger(){
-        return this.logger;
+        return plugin.getLogger();
     }
 	
 	public String getPrefix(){
@@ -117,7 +115,7 @@ public class ChatManager {
 	}
 	
 	public void denyBeta(CommandSender sender){
-		sendError(sender, "VIRTUAL MARKET IS CURRENTLY RESTRICTED FOR BETA TESTING!");
+		sendError(sender, "Virtual Shop is currently restricted for beta testing. If you think this is a mistake contact the server administrators.!");
 	}
 	
 	public void wrongItem(CommandSender sender, String item){
@@ -138,6 +136,18 @@ public class ChatManager {
 	
 	public void invalidWorld(CommandSender sender, String cmd, World world){
 		sendError(sender, "You cannot " + cmd + " in " + world.getName() + "!");
+	}
+	
+	public void invalidConfirmation(CommandSender sender){
+		sendError(sender, "Nothing to confirm!");
+	}
+	
+	public void invalidConfirmData(CommandSender sender){
+		sendError(sender, "Transaction data changed, please try again!");
+	}
+	
+	public void confirmationExpired(CommandSender sender){
+		sendError(sender, "Transaction expired, please try again!");
 	}
 	
 	public void noPermissions(CommandSender sender){

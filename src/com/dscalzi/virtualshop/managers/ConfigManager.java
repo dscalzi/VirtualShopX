@@ -58,35 +58,35 @@ public class ConfigManager {
 	/* Configuration Accessors */
 	
 	public String getPrefix(){
-    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.msg_prefix")) + getColor();
+    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.msg_prefix")) + getColor()).trim();
     }
     
     public String getServerName(){
-    	return this.config.getString("chat_settings.details.server_name");
+    	return (this.config.getString("chat_settings.details.server_name")).trim();
     }
     
     public String getColor(){
-    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.message_color"));
+    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.message_color"))).trim();
     }
     
     public String getBaseColor(){
-    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.base_color"));
+    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.base_color"))).trim();
     }
     
     public String getTrimColor(){
-    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.trim_color"));
+    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.trim_color"))).trim();
     }
     
     public String getDescriptionColor(){
-    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.description_color"));
+    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.description_color"))).trim();
     }
     
     public String getErrorColor(){
-    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.error_color"));
+    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.error_color"))).trim();
     }
     
     public String getSuccessColor(){
-    	return ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.success_color"));
+    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.success_color"))).trim();
     }
     
 	public boolean broadcastOffers(){

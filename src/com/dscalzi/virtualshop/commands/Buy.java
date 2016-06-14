@@ -24,6 +24,7 @@ import java.util.Map;
 
 public class Buy implements CommandExecutor{
 
+	@SuppressWarnings("unused")
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
@@ -198,7 +199,7 @@ public class Buy implements CommandExecutor{
             anyLessThanMax = true;
             
             //Revise amounts if not enough money.
-            if(!plugin.hasEnough(player.getName(), cost)){
+            if(!VirtualShop.hasEnough(player.getName(), cost)){
             	canbuy = (int)(VirtualShop.econ.getBalance(player.getName()) / o.getPrice());
                 cost = canbuy*o.getPrice();
                 amount = bought+canbuy;
@@ -259,7 +260,7 @@ public class Buy implements CommandExecutor{
 	
 	private void confirm(Player player){
 		if(!confirmations.containsKey(player)){
-			cm.sendError(player, "Nothing to confirm!");
+			cm.invalidConfirmation(player);
 			return;
 		}
 		TransactionData initialData = confirmations.get(player);
@@ -267,12 +268,12 @@ public class Buy implements CommandExecutor{
 		TransactionData currentData = confirmations.get(player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
 		if(timeElapsed > 15000){
-			cm.sendError(player, "Transaction expired, please try again!");
+			cm.confirmationExpired(player);
 			confirmations.remove(player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
-			cm.sendError(player, "Data changed, please try again!");
+			cm.invalidConfirmData(player);
 			confirmations.remove(player);
 			return;
 		}

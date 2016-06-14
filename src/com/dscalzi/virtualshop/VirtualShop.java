@@ -29,9 +29,7 @@ public class VirtualShop extends JavaPlugin {
     }
 
     public void onEnable(){
-        if (this.setupEconomy()){
-            
-        } else {
+        if (!this.setupEconomy()){
             this.getLogger().severe("Vault not found. Shutting down!");
             this.getServer().getPluginManager().disablePlugin(this);
         }
@@ -41,13 +39,14 @@ public class VirtualShop extends JavaPlugin {
         try {
             ItemDb.load(this.getDataFolder(),"items.csv");
         } catch (IOException e) {
+        	this.getLogger().severe("Reference file 'items.csv' not found. Shutting down!");
             this.getPluginLoader().disablePlugin(this);
             return;
         }
         this.registerCommands();
     }
     
-    public boolean setupEconomy(){
+    private boolean setupEconomy(){
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
         }
@@ -59,7 +58,7 @@ public class VirtualShop extends JavaPlugin {
         return econ != null;
     }
     
-    public void registerCommands(){
+    private void registerCommands(){
     	this.getCommand("buy").setExecutor(new Buy(this));
     	this.getCommand("cancel").setExecutor(new Cancel(this));
     	this.getCommand("find").setExecutor(new Find(this));
@@ -70,7 +69,7 @@ public class VirtualShop extends JavaPlugin {
     	this.getCommand("vs").setExecutor(new VS(this));
     }
     
-    public boolean hasEnough(String playerName, double money){
+    public static boolean hasEnough(String playerName, double money){
         double balance = econ.getBalance(playerName) - money;
         if (balance > 0){
             return true;

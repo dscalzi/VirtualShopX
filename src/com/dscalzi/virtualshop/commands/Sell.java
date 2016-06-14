@@ -210,7 +210,7 @@ public class Sell implements CommandExecutor{
 	 */
 	private void confirm(Player player){
 		if(!confirmations.containsKey(player)){
-			cm.sendError(player, "Nothing to confirm!");
+			cm.invalidConfirmation(player);
 			return;
 		}
 		ListingData initialData = confirmations.get(player);
@@ -218,12 +218,12 @@ public class Sell implements CommandExecutor{
 		ListingData currentData = confirmations.get(player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
 		if(timeElapsed > 15000){
-			cm.sendError(player, "Transaction expired, please try again!");
+			cm.confirmationExpired(player);
 			confirmations.remove(player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
-			cm.sendError(player, "Data changed, please try again!");
+			cm.invalidConfirmData(player);
 			confirmations.remove(player);
 			return;
 		}

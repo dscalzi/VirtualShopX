@@ -66,7 +66,7 @@ public class Sales implements CommandExecutor{
         int start = 1;
         List<Transaction> transactions;
         transactions = dbm.getTransactions();
-        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + configM.getServerName() + " " + trimColor + ChatColor.BOLD + " >";
+        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + configM.getServerName() + trimColor + ChatColor.BOLD + " >";
         //If /sales args, check to see if it's a number
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
