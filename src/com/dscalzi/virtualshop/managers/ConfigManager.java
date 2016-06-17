@@ -3,6 +3,7 @@ package com.dscalzi.virtualshop.managers;
 import java.io.File;
 import java.util.List;
 
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -87,6 +88,20 @@ public class ConfigManager {
     
     public String getSuccessColor(){
     	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.success_color"))).trim();
+    }
+    
+    public int getPackSpacing(){
+    	
+    	String selected = this.config.getString("chat_settings.resoucepacks.selected_pack");
+    	if(this.config.contains("chat_settings.resoucepacks.supported_packs." + selected + ".sizing"))
+    		return this.config.getInt("chat_settings.resoucepacks.supported_packs." + selected + ".sizing");
+		else
+			try {
+				throw new InvalidConfigurationException("Resource pack not correctly defined!");
+			} catch (InvalidConfigurationException e) {
+				e.printStackTrace();
+				return 70;
+			}
     }
     
 	public boolean broadcastOffers(){

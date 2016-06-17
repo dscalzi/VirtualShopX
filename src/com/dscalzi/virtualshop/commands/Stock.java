@@ -94,20 +94,9 @@ public class Stock implements CommandExecutor{
             }
         }
         
-        int charCount = 74;
-        charCount -= header.length()-1;
-        if(charCount % 2 == 0)
-        	charCount -= 1;
-        String left = baseColor + "";
-        String right = trimColor + "";
-        for(int i=0; i<charCount/2-1; ++i)
-        	left += "-";
-        for(int i=0; i<charCount/2-1; ++i)
-        	right += "-";
-        
         PageList<Offer> stock = new PageList<>(offers, 7);
         List<String> finalMsg = new ArrayList<String>();
-        finalMsg.add(left + header + right);
+        finalMsg.add(cm.formatHeaderLength(header, this.getClass()));
         
         try {
 			for(Offer o : stock.getPage(start)){

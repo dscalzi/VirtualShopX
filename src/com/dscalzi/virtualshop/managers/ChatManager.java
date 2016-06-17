@@ -5,11 +5,13 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
@@ -115,7 +117,7 @@ public class ChatManager {
 	}
 	
 	public void denyBeta(CommandSender sender){
-		sendError(sender, "Virtual Shop is currently restricted for beta testing. If you think this is a mistake contact the server administrators.!");
+		sendError(sender, "Virtual Shop is currently restricted for beta testing. If you think this is a mistake contact the server administrators.");
 	}
 	
 	public void wrongItem(CommandSender sender, String item){
@@ -209,6 +211,17 @@ public class ChatManager {
 	public String formatTransaction(Transaction t){
 		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(ItemDb.reverseLookup(t.getItem())) + " for "+ formatPrice(t.getCost());
 	}
+	
+	public String formatHeaderLength(String header, Class<? extends CommandExecutor> clazz){
+		int textLength = configM.getPackSpacing()-header.length();
+		String left = ConfigManager.getInstance().getBaseColor() + "";
+        String right = ConfigManager.getInstance().getTrimColor() + "";
+        int halfLength = textLength/2;
+        for(int i=0; i<halfLength; ++i) left += "-";
+        for(int i=0; i<halfLength; ++i) right += "-";
+        if(header.length() % 2 == 0 && clazz == VS.class) right = right.substring(0, right.length()-1);
+        return left + header + right;
+    }
 	
 	public static String capitalize(String s){
 		if(s.length() < 1)

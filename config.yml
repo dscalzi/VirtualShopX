@@ -46,6 +46,9 @@ chat_settings:
   
   details:
     #Prefix that will be prepended to each Virtual Shop message.
+    #If the header on commands such as /find, stock, sell, vs, or shop
+    #is too long after changing this, you may need to adjust the pack
+    #sizing below.
     msg_prefix: '&5[&dOShop&5]&e'
 
     #The name of the server, will be used in several messages.
@@ -68,6 +71,34 @@ chat_settings:
 
     #The color of success messages.
     success_color: '&a'
+
+  #-----------------------------------------------
+  # VirtualShop automatically centers some listing 
+  # messages to make the UI nicer. This can only be
+  # optimized to one resouce pack because the font
+  # is different in almost every one. YOU SHOULD ONLY
+  # CHANGE THIS IF YOUR SERVER HAS A RESOUCE PACK OTHER
+  # THAN DEFAULT or if the header on /find, stock, sell,
+  # vs, and shop is not properly centered after modifying
+  # the msg_prefix value above.
+  #
+  # In order to change this, add the pack you're using
+  # to the list below using the following syntax:
+  #
+  # packid:           //The pack id will be used in the selected_pack field.
+  #   sizing: number  //Experiment with this until you are satisfied
+  #
+  # Working examples below.
+  # **Note that the sizing is variable to the msg_prefix above. Adjust the value as necessary.
+  resoucepacks:
+    supported_packs:
+      default:
+        sizing: 70
+      atherys:
+        sizing: 100
+  
+    #Specify a pack id from the supported_packs list.
+    selected_pack: default
 
 #----------------[Item Settings]----------------
 # Configure item properties such as restrictions.

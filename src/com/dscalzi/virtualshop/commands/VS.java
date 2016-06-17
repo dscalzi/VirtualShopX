@@ -119,7 +119,7 @@ public class VS implements CommandExecutor{
         PageList<String> commands = new PageList<>(cmds, 7);
         
         List<String> finalMsg = new ArrayList<String>();
-        finalMsg.add(baseColor + "------------------- " + cm.getPrefix() + trimColor + " -------------------");
+        finalMsg.add(cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass()));
         finalMsg.add(trimColor + "              Command List - <Required> [Optional]");
         
         try {
@@ -156,7 +156,7 @@ public class VS implements CommandExecutor{
 		PageList<String> commands = new PageList<>(cmds, 7);
 		
 		List<String> finalMsg = new ArrayList<String>();
-		finalMsg.add(baseColor + "------------------- " + cm.getPrefix() + trimColor + " -------------------");
+		finalMsg.add(cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass()));
         finalMsg.add(trimColor + "              Command List - <Required> [Optional]");
 		
         try {
