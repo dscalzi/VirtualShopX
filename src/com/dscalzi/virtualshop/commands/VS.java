@@ -19,6 +19,7 @@ import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDb;
 import com.dscalzi.virtualshop.util.PageList;
+import com.dscalzi.vsreloader.PluginUtil;
 
 public class VS implements CommandExecutor{
 
@@ -87,6 +88,10 @@ public class VS implements CommandExecutor{
 					this.cmdReload(sender);
 					return true;
 				}
+				if(args[0].equalsIgnoreCase("reloadconfig")){
+					this.cmdReloadConfig(sender);
+					return true;
+				}
 				if(args[0].equalsIgnoreCase("version")){
 					this.cmdVersion(sender);
 					return true;
@@ -150,7 +155,8 @@ public class VS implements CommandExecutor{
 		cmds.add(listPrefix + trimColor + "/vs version" + descColor + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.access.admin")){
 			cmds.add(listPrefix + trimColor + "/vs formatmarket " + ChatColor.BLUE + "[item]" + descColor + " - Reprice all items who's market price exceeds the set limit.");
-			cmds.add(listPrefix + trimColor + "/vs reload" + descColor + " - Reload the plugin's configuration.");
+			cmds.add(listPrefix + trimColor + "/vs reload" + descColor + " - Reload the entire plugin's jar file.");
+			cmds.add(listPrefix + trimColor + "/vs reloadconfig" + descColor + " - Reload the plugin's configuration.");
 		}
 		
 		PageList<String> commands = new PageList<>(cmds, 7);
@@ -234,11 +240,30 @@ public class VS implements CommandExecutor{
 			cm.noPermissions(sender);
             return;
 		}
+		/*
+		PluginUtil p = new PluginUtil();
+		p.reloadPlugin(sender, plugin.getName(), true);*/
+		if(plugin.getServer().getPluginManager().getPlugin("VSReloader") == null){
+			cm.sendError(sender, "VS Reloader not found, reloading config instead.");
+			cmdReloadConfig(sender);
+			return;
+		}
+		PluginUtil.reload(plugin);
+		cm.sendSuccess(sender, "Plugin successfully reloaded.");
+	}
+	
+	public void cmdReloadConfig(CommandSender sender){
+		
+		if(!sender.hasPermission("virtualshop.access.admin")){
+			cm.noPermissions(sender);
+            return;
+		}
 		
 		ConfigManager.reload();
 		ChatManager.reload();
 		
 		cm.sendSuccess(sender, "Configuration successfully reloaded.");
+		
 	}
 	
 	public void cmdVersion(CommandSender sender){

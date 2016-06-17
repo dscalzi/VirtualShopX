@@ -42,5 +42,5 @@
             <version>LATEST</version>
 			<scope>provided</scope>
     </dependency>
-</dependencies>
+  </dependencies>
 </project>

@@ -12,5 +12,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.7.0_80"/>
+	<classpathentry kind="lib" path="depend/VSReloader.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

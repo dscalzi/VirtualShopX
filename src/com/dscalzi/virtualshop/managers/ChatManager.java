@@ -11,6 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.commands.Find;
+import com.dscalzi.virtualshop.commands.Sales;
+import com.dscalzi.virtualshop.commands.Stock;
 import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
@@ -213,13 +216,19 @@ public class ChatManager {
 	}
 	
 	public String formatHeaderLength(String header, Class<? extends CommandExecutor> clazz){
-		int textLength = configM.getPackSpacing()-header.length();
+		int length = header.length();
+		if(clazz == VS.class) length = ChatColor.stripColor(header).length()+18;
+		if(clazz == Find.class)	length = ChatColor.stripColor(header).length()+17;
+		if(clazz == Stock.class) length = ChatColor.stripColor(header).length()+17;
+		if(clazz == Sales.class) length = ChatColor.stripColor(header).length()+18;
+		int textLength = configM.getPackSpacing()-length;
 		String left = ConfigManager.getInstance().getBaseColor() + "";
         String right = ConfigManager.getInstance().getTrimColor() + "";
         int halfLength = textLength/2;
         for(int i=0; i<halfLength; ++i) left += "-";
         for(int i=0; i<halfLength; ++i) right += "-";
-        if(header.length() % 2 == 0 && clazz == VS.class) right = right.substring(0, right.length()-1);
+        if(header.length() % 2 == 0) right = right.substring(0, right.length()-1);
+        if(header.length() % 2 == 1 && clazz == Find.class) right = right.substring(0, right.length()-1);
         return left + header + right;
     }
 	
