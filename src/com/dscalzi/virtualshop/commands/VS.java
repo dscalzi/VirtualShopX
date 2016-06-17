@@ -240,9 +240,6 @@ public class VS implements CommandExecutor{
 			cm.noPermissions(sender);
             return;
 		}
-		/*
-		PluginUtil p = new PluginUtil();
-		p.reloadPlugin(sender, plugin.getName(), true);*/
 		if(plugin.getServer().getPluginManager().getPlugin("VSReloader") == null){
 			cm.sendError(sender, "VS Reloader not found, reloading config instead.");
 			cmdReloadConfig(sender);
