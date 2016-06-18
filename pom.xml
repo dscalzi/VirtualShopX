@@ -2,9 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dscalzi</groupId>
   <artifactId>VirtualShopOC</artifactId>
-  <version>OC 1.9.4-R0.2</version>
-  <name>VirtualShop OC</name>
-  <description>VirtualShop configured for use on ObsidianCraft</description>
+  <version>AvSoft 1.10-R0.1-SNAPSHOT</version>
+  <name>VirtualShop</name>
+  <description>VirtualShop Minecraft Plugin</description>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
@@ -33,7 +33,7 @@
 	<dependency>
            <groupId>org.spigotmc</groupId>
            <artifactId>spigot-api</artifactId>
-           <version>1.9.4-R0.1-SNAPSHOT</version>
+           <version>1.10-R0.1-SNAPSHOT</version>
            <scope>provided</scope>
     </dependency>
 	<dependency>
@@ -41,6 +41,12 @@
             <artifactId>VaultAPI</artifactId>
             <version>LATEST</version>
 			<scope>provided</scope>
+    </dependency>
+	<!-- http://mvnrepository.com/artifact/commons-io/commons-io -->
+    <dependency>
+       <groupId>commons-io</groupId>
+       <artifactId>commons-io</artifactId>
+       <version>2.4</version>
     </dependency>
   </dependencies>
 </project>

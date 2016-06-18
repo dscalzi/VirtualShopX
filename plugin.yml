@@ -2,7 +2,7 @@ author: Daniel Scalzi
 description: Allows players to buy and sell goods on a VirtualShop.
 main: com.dscalzi.virtualshop.VirtualShop
 name: VirtualShop
-version: OC 1.9.4-R0.2
+version: AvSoft 1.10-R0.1-SNAPSHOT
 depend: [Vault]
 commands:
     buy:

@@ -1,19 +1,9 @@
 package com.dscalzi.virtualshop;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-
 import net.milkbowl.vault.economy.Economy;
 
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.InvalidDescriptionException;
-import org.bukkit.plugin.InvalidPluginException;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.UnknownDependencyException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.dscalzi.virtualshop.commands.Buy;
@@ -27,6 +17,7 @@ import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.Reloader;
 
 @SuppressWarnings("deprecation")
 public class VirtualShop extends JavaPlugin {
@@ -36,6 +27,7 @@ public class VirtualShop extends JavaPlugin {
     
     public void onDisable(){
         DatabaseManager.getInstance().close();
+        System.gc();
     }
 
     public void onEnable(){
@@ -47,6 +39,7 @@ public class VirtualShop extends JavaPlugin {
         ConfigManager.initialize(this);
 		ChatManager.initialize(this);
         DatabaseManager.initialize(this);
+        Reloader.initialize(this);
         try {
             ItemDb.load(this.getDataFolder(),"items.csv");
         } catch (IOException e) {
@@ -54,7 +47,6 @@ public class VirtualShop extends JavaPlugin {
             this.getPluginLoader().disablePlugin(this);
             return;
         }
-        this.loadVSReloader();
         this.registerCommands();
     }
     
@@ -88,34 +80,5 @@ public class VirtualShop extends JavaPlugin {
         } else {
             return false;
         }
-    }
-    
-    private void loadVSReloader(){
-    	File pluginDir = new File("plugins");
-        if (!pluginDir.isDirectory()){
-            getLogger().severe("Plugin direcroty not found.");
-            return;
-        }
-        InputStream in = this.getClass().getResourceAsStream("/depend/VSReloader.jar");
-    	File dest = new File(pluginDir + "/VSReloader.jar");
-        if(dest.exists()){
-        	return;
-        }
-    	
-        try {
-        	getLogger().info("Saving VSReloader.jar");
-			Files.copy(in, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException | NullPointerException e) {
-			getLogger().severe("Error ocurred while saving VSReloader");
-			return;
-		}
-        
-		try {
-			Plugin target = Bukkit.getPluginManager().loadPlugin(dest);
-			target.onLoad();
-	        Bukkit.getPluginManager().enablePlugin(target);
-		} catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e) {
-			getLogger().severe("Could not enable VSReloader.");
-		}
     }
 }
