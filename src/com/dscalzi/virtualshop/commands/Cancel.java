@@ -119,8 +119,14 @@ public class Cancel implements CommandExecutor{
     	}
         new InventoryManager(player).addItem(item);
         if(openNum < cancelAmt){
-        	item.setAmount(cancelAmt-openNum);
-        	player.getWorld().dropItem(player.getLocation(), item);
+        	int dropAmount = cancelAmt-openNum;
+        	while(dropAmount > 0){
+        		int amtToDrop = 64;
+        		if(dropAmount < 64) amtToDrop = dropAmount;
+        		item.setAmount(amtToDrop);
+        		player.getWorld().dropItem(player.getLocation(), item);
+        		dropAmount -= amtToDrop;
+        	}
         }
         int a = 0;
         double oPrice = 0;

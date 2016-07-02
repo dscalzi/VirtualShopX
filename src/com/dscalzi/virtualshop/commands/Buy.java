@@ -243,12 +243,17 @@ public class Buy implements CommandExecutor{
         }
         item.setAmount(bought);
         if(finalize){
-        	if(openNum < bought){
-        		item.setAmount(bought-openNum);
-        		player.getWorld().dropItem(player.getLocation(), item);
-        		item.setAmount(openNum);
-        	}
         	if(bought > 0) im.addItem(item);
+        	if(openNum < bought){
+        		int dropAmount = bought-openNum;
+            	while(dropAmount > 0){
+            		int amtToDrop = 64;
+            		if(dropAmount < 64) amtToDrop = dropAmount;
+            		item.setAmount(amtToDrop);
+            		player.getWorld().dropItem(player.getLocation(), item);
+            		dropAmount -= amtToDrop;
+            	}
+        	}
         }
         if(tooHigh && bought == 0 && args.length > 2 && !anyLessThanMax){
         	cm.sendError(player,"No one is selling " + cm.formatItem(args[1]) + configM.getErrorColor() + " cheaper than " + cm.formatPrice(maxprice));
