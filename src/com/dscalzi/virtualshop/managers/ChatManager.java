@@ -192,7 +192,7 @@ public class ChatManager {
 	}
 
 	public String formatAmount(Integer amount){
-		return ChatColor.GOLD + amount.toString() + this.color;
+		return ChatColor.GOLD + configM.getLocalization().formatAmt(amount) + this.color;
 	}
 
 	public String formatItem(String item){
@@ -200,7 +200,7 @@ public class ChatManager {
 	}
 
 	public String formatPrice(double price){
-		return ChatColor.YELLOW + VirtualShop.econ.format(price) + this.color;
+		return ChatColor.YELLOW + configM.getLocalization().formatPrice(price) + this.color;
 	}
 
 	public String formatBuyer(String buyer){

@@ -8,6 +8,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.util.Localization;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -64,6 +65,16 @@ public class ConfigManager {
     
     public String getServerName(){
     	return (this.config.getString("chat_settings.details.server_name")).trim();
+    }
+    
+    public Localization getLocalization(){
+    	String setting = (this.config.getString("chat_settings.details.localization")).trim();
+    	for(Localization lc : Localization.values()){
+    		if(lc.toString().equalsIgnoreCase(setting))
+    			return lc;
+    	}
+    	//Default to US if invalid value is given.
+    	return Localization.US;
     }
     
     public String getColor(){

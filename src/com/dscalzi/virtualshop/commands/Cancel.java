@@ -108,11 +108,12 @@ public class Cancel implements CommandExecutor{
         item.setAmount(cancelAmt);
         ItemStack[] inv = player.getInventory().getContents();
         int openNum = 0;
-        for(int i=0; i<inv.length; ++i){
+        //Adjusting length, in 1.9+ .getContents includes armor. We only want inventory.
+        for(int i=0; i<inv.length-5; ++i){
     		if(inv[i] == null){
     			openNum += 64;
     			continue;
-    		} else if(inv[i].getType() == item.getType()){
+    		} else if(inv[i].getType() == item.getType() && inv[i].getData() == inv[i].getData()){
     			openNum += (64-inv[i].getAmount());
     		}
     	}

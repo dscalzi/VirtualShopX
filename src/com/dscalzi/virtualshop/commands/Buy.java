@@ -168,7 +168,8 @@ public class Buy implements CommandExecutor{
 		int openNum = 0;
 		if(finalize){
 			ItemStack[] inv = player.getInventory().getContents();
-        	for(int i=0; i<inv.length; ++i){
+			//Adjusting length, in 1.9+ .getContents includes armor. We only want inventory.
+        	for(int i=0; i<inv.length-5; ++i){
         		if(inv[i] == null){
         			openNum += 64;
         			continue;
@@ -245,6 +246,7 @@ public class Buy implements CommandExecutor{
         	if(openNum < bought){
         		item.setAmount(bought-openNum);
         		player.getWorld().dropItem(player.getLocation(), item);
+        		item.setAmount(openNum);
         	}
         	if(bought > 0) im.addItem(item);
         }

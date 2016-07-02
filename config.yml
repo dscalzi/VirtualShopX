@@ -54,6 +54,10 @@ chat_settings:
     #The name of the server, will be used in several messages.
     server_name: ObsidianCraft
 
+    #Localization for number formating. The two supported values are 'US' and 'EU'.
+    #US Format: 1,000.00 | EU Format: 1.000,00 | Symbols are handled by your economy plugin.
+    localization: 'US'
+
     #This is the base color of the Virtual Shop interface. Usually lighter.
     base_color: '&d'
 
