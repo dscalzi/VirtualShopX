@@ -49,7 +49,7 @@
 		<artifactId>VSReloader</artifactId>
 		<version>LATEST</version>
 		<scope>system</scope>
-		<systemPath>${project.basedir}/depend/VSReloader.jar</systemPath>
+		<systemPath>${basedir}/depend/VSReloader.jar</systemPath>
 	</dependency>
 	<dependency>
         <groupId>net.milkbowl.vault</groupId>
