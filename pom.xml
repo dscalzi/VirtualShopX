@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dscalzi</groupId>
   <artifactId>VirtualShop</artifactId>
-  <version>AvSoft 1.10-R0.1-SNAPSHOT</version>
+  <version>AvSoft 1.10.2-R0.1-SNAPSHOT</version>
   <name>VirtualShop</name>
   <description>VirtualShop Minecraft Plugin</description>
   <build>
@@ -12,8 +12,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.3</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
     </plugins>
@@ -31,16 +31,29 @@
   <dependencies>
 	<!--Spigot API-->
 	<dependency>
-           <groupId>org.spigotmc</groupId>
-           <artifactId>spigot-api</artifactId>
-           <version>1.10-R0.1-SNAPSHOT</version>
-           <scope>provided</scope>
+        <groupId>org.spigotmc</groupId>
+        <artifactId>spigot-api</artifactId>
+        <version>1.10.2-R0.1-SNAPSHOT</version>
+        <scope>provided</scope>
     </dependency>
 	<dependency>
-            <groupId>net.milkbowl.vault</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>LATEST</version>
-			<scope>provided</scope>
+		<groupId>org.spigotmc</groupId>
+		<artifactId>spigot-api</artifactId>
+		<version>1.10.2-R0.1-SNAPSHOT</version>
+		<classifier>javadoc</classifier>
+	</dependency>
+	<dependency>
+		<groupId>com.dscalzi</groupId>
+		<artifactId>VSReloader</artifactId>
+		<version>LATEST</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/depend/VSReloader.jar</systemPath>
+	</dependency>
+	<dependency>
+        <groupId>net.milkbowl.vault</groupId>
+        <artifactId>VaultAPI</artifactId>
+        <version>LATEST</version>
+		<scope>provided</scope>
     </dependency>
 	<!-- http://mvnrepository.com/artifact/commons-io/commons-io -->
     <dependency>

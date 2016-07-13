@@ -15,6 +15,7 @@ public final class UUIDManager {
 	private static boolean initialized;
 	private static UUIDManager instance;
 	
+	@SuppressWarnings("unused")
 	private VirtualShop plugin;
 	
 	private UUIDManager(Plugin plugin){

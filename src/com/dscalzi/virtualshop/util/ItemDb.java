@@ -100,7 +100,7 @@ public class ItemDb
 	private static ItemStack get(String id) throws Exception
 	{
 		ItemStack retval = new ItemStack(getUnsafe(id));
-		retval.setDurability(durabilities.containsKey(id) ? durabilities.get(id) : 0);
+		retval.setDurability(durabilities.containsKey(id) ? durabilities.get(id) : (short)0);
 		if (items.containsValue(retval.getTypeId())) return retval;
 		throw new Exception("Unknown item numeric: " + retval);
 	}
