@@ -16,6 +16,7 @@ import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.util.ItemDb;
 import com.dscalzi.virtualshop.util.Reloader;
 
@@ -26,16 +27,17 @@ public class VirtualShop extends JavaPlugin {
     public static final boolean BETA = false;
     
     public void onDisable(){
+    	if(ConfigManager.getInstance().uuidSyncOnDisable()) this.syncNameToUUID();
         DatabaseManager.getInstance().close();
         System.gc();
     }
 
     public void onEnable(){
-    	this.getLogger().info("Working?");
         if (!this.setupEconomy()){
             this.getLogger().severe("Vault not found. Shutting down!");
             this.getServer().getPluginManager().disablePlugin(this);
         }
+        UUIDManager.initialize(this);
         ConfigManager.initialize(this);
 		ChatManager.initialize(this);
         DatabaseManager.initialize(this);
@@ -48,6 +50,7 @@ public class VirtualShop extends JavaPlugin {
             return;
         }
         this.registerCommands();
+        if(ConfigManager.getInstance().uuidSyncOnEnable()) this.syncNameToUUID();
     }
     
     private boolean setupEconomy(){
@@ -71,6 +74,13 @@ public class VirtualShop extends JavaPlugin {
     	this.getCommand("sell").setExecutor(new Sell(this));
     	this.getCommand("stock").setExecutor(new Stock(this));
     	this.getCommand("vs").setExecutor(new VS(this));
+    }
+    
+    private void syncNameToUUID(){
+    	this.getLogger().info("Syncing account data..");
+    	int result = DatabaseManager.getInstance().syncNameToUUID();
+    	if(result > 0) this.getLogger().info("Done! Successfully synced " + result + ((result == 1) ? " account." : " accounts."));
+    	else this.getLogger().info("All accounts are already synced!");
     }
     
     public static boolean hasEnough(String playerName, double money){

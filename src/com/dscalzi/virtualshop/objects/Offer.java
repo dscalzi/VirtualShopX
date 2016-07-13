@@ -2,10 +2,13 @@ package com.dscalzi.virtualshop.objects;
 
 import org.bukkit.inventory.ItemStack;
 
+import com.dscalzi.virtualshop.managers.UUIDManager;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 public class Offer
@@ -28,10 +31,11 @@ public class Offer
     }
 
     public static List<Offer> listOffers(ResultSet result){
+    	UUIDManager uuidm = UUIDManager.getInstance();
         List<Offer> ret = new ArrayList<Offer>();
         try {
             while(result.next()){
-                Offer o = new Offer(result.getString("seller"), result.getInt("item"), (short)result.getInt("damage"),result.getDouble("price"),result.getInt("amount"));
+                Offer o = new Offer(uuidm.playerFromUUID(UUID.fromString(result.getString("uuid"))).getName(), result.getInt("item"), (short)result.getInt("damage"),result.getDouble("price"),result.getInt("amount"));
                 o.setId(result.getInt("id"));
                 ret.add(o);
             }

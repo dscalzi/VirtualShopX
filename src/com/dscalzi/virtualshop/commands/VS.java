@@ -2,6 +2,8 @@ package com.dscalzi.virtualshop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import javax.swing.text.BadLocationException;
 
@@ -20,6 +22,8 @@ import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDb;
 import com.dscalzi.virtualshop.util.PageList;
 import com.dscalzi.vsreloader.PluginUtil;
+
+import javafx.util.Pair;
 
 public class VS implements CommandExecutor{
 
@@ -84,6 +88,18 @@ public class VS implements CommandExecutor{
 					this.formatMarket(sender);
 					return true;
 				}
+				if(args[0].equalsIgnoreCase("uuidnamesync")){
+					if(args.length > 1){
+						this.cmdUUIDNameSync(sender, Optional.of(args[1]));
+						return true;
+					}
+					this.cmdUUIDNameSync(sender, Optional.empty());
+					return true;
+				}
+				if(args[0].equalsIgnoreCase("update2uuid")){
+					this.cmdupdateuuid(sender);
+					return true;
+				}
 				if(args[0].equalsIgnoreCase("reload")){
 					this.cmdReload(sender);
 					return true;
@@ -102,6 +118,16 @@ public class VS implements CommandExecutor{
 		}
 		
 		return true;
+	}
+	
+	public void cmdupdateuuid(CommandSender sender){
+		try{
+			Pair<Integer, Integer> sfs = dbm.updateDatabase();
+			cm.sendSuccess(sender, "Database updated. " + sfs.getKey() + " successful, " + sfs.getValue() + " failed.");
+		} catch(Exception ex){
+			ex.printStackTrace();
+			cm.sendError(sender, "FAILED");
+		}
 	}
 	
 	public void cmdList(CommandSender sender, int page){
@@ -157,9 +183,10 @@ public class VS implements CommandExecutor{
 			cmds.add(listPrefix + trimColor + "/vs formatmarket " + ChatColor.BLUE + "[item]" + descColor + " - Reprice all items who's market price exceeds the set limit.");
 			cmds.add(listPrefix + trimColor + "/vs reload" + descColor + " - Reload the entire plugin's jar file.");
 			cmds.add(listPrefix + trimColor + "/vs reloadconfig" + descColor + " - Reload the plugin's configuration.");
+			cmds.add(listPrefix + trimColor + "/vs uuidnamesync [uuid]" + descColor + " - Syncs the name entries in the database with the UUID of the corresponding account.");
 		}
 		
-		PageList<String> commands = new PageList<>(cmds, 7);
+		PageList<String> commands = new PageList<>(cmds, 6);
 		
 		List<String> finalMsg = new ArrayList<String>();
 		finalMsg.add(cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass()));
@@ -232,6 +259,34 @@ public class VS implements CommandExecutor{
 			cm.sendSuccess(sender, "All listings are already correctly formatted!");
 		else
 			cm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
+	}
+	
+	public void cmdUUIDNameSync(CommandSender sender, Optional<String> uuid){
+		
+		if(!sender.hasPermission("virtualshop.access.admin")){
+			cm.noPermissions(sender);
+            return;
+		}
+		
+		if(uuid.isPresent()){
+			UUID target;
+			try {
+				target = UUID.fromString(uuid.get());
+			} catch(IllegalArgumentException e){
+				cm.sendError(sender, "Invalid UUID format.");
+				return;
+			}
+			Pair<Boolean, Integer> response = dbm.syncNameToUUID(target);
+			if(response.getKey()) cm.sendSuccess(sender, "The account associated with the specified UUID has been synced.");
+			else if(response.getValue() == 1) cm.sendError(sender, "The account associated with the specified UUID is already synced.");
+			else if(response.getValue() == 404) cm.sendError(sender, "The account associated with the specified UUID was not found in the database.");
+			else cm.sendError(sender, "There was an error while querying the database.");
+		} else {
+			int updated = dbm.syncNameToUUID();
+			if(updated > 0) cm.sendSuccess(sender, "Successfully synced " + updated + ((updated == 1) ? " account." : " accounts."));
+			else cm.sendSuccess(sender, "All account names and UUIDs are already synced!");
+		}
+		
 	}
 	
 	public void cmdReload(CommandSender sender){

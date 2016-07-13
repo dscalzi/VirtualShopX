@@ -21,7 +21,7 @@ import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.objects.TransactionData;
 import com.dscalzi.virtualshop.util.ItemDb;
 
-public class ChatManager {
+public final class ChatManager {
 
 	private static boolean initialized;
 	private static ChatManager instance;

@@ -1,6 +1,7 @@
 package com.dscalzi.virtualshop.managers;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -12,7 +13,7 @@ import com.dscalzi.virtualshop.util.Localization;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class ConfigManager {
+public final class ConfigManager {
 
 	private static boolean initialized;
 	private static ConfigManager instance;
@@ -164,7 +165,15 @@ public class ConfigManager {
 	}
 
 	public int mySQLport(){
-		return this.config.getInt("MySQL.port", 3306);
+		return this.config.getInt("database_settings.MySQL.port", 3306);
+	}
+	
+	public boolean uuidSyncOnEnable(){
+		return this.config.getBoolean("database_settings.UUID_name_syncs.on_startup", false);
+	}
+	
+	public boolean uuidSyncOnDisable(){
+		return this.config.getBoolean("database_settings.UUID_name_syncs.on_shutdown", false);
 	}
 	
 	public double getVersion(){
