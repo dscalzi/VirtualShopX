@@ -42,6 +42,8 @@
 		<version>1.10.2-R0.1-SNAPSHOT</version>
 		<classifier>javadoc</classifier>
 	</dependency>
+	<!-- Using a project system scope because this dependency needs to -->
+	<!-- be packaged and cloned on the target server's plugins folder. -->
 	<dependency>
 		<groupId>com.dscalzi</groupId>
 		<artifactId>VSReloader</artifactId>
