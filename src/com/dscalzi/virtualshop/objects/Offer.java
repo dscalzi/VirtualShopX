@@ -13,29 +13,30 @@ import java.util.UUID;
 @SuppressWarnings("deprecation")
 public class Offer
 {
+	private UUIDManager uuidm = UUIDManager.getInstance();
+	
+	private UUID sellerUUID;
     private ItemStack item;
     private double price;
-    private String seller;
     private int id;
 
-	public Offer(String seller, int id, short damage, double price, int amount){
+	public Offer(UUID sellerUUID, int id, short damage, double price, int amount){
         this.item = new ItemStack(id,amount,damage);
-        this.seller = seller;
+        this.sellerUUID = sellerUUID;
         this.price = price;
     }
 
-    public Offer(String seller, ItemStack item, double price){
-        this.seller = seller;
+    public Offer(UUID sellerUUID, ItemStack item, double price){
+        this.sellerUUID = sellerUUID;
         this.item = item;
         this.price = price;
     }
 
     public static List<Offer> listOffers(ResultSet result){
-    	UUIDManager uuidm = UUIDManager.getInstance();
         List<Offer> ret = new ArrayList<Offer>();
         try {
             while(result.next()){
-                Offer o = new Offer(uuidm.playerFromUUID(UUID.fromString(result.getString("uuid"))).getName(), result.getInt("item"), (short)result.getInt("damage"),result.getDouble("price"),result.getInt("amount"));
+                Offer o = new Offer(UUID.fromString(result.getString("uuid")), result.getInt("item"), (short)result.getInt("damage"),result.getDouble("price"),result.getInt("amount"));
                 o.setId(result.getInt("id"));
                 ret.add(o);
             }
@@ -54,7 +55,7 @@ public class Offer
     		return false;
     	if(this.getPrice() != other.getPrice())
     		return false;
-    	if(!this.getSeller().equals(other.getSeller()))
+    	if(!this.getSellerUUID().equals(other.getSellerUUID()))
     		return false;
     	return true;
     }
@@ -67,9 +68,12 @@ public class Offer
 
 	public void setPrice(double price) { this.price = price; }
 
-	public String getSeller() {	return seller; }
+	/* Retrieve seller name dynamically */
+	public String getSeller() {	return uuidm.getPlayerName(getSellerUUID()).get(); }
+	
+	public UUID getSellerUUID() {	return sellerUUID; }
 
-	public void setSeller(String seller) { this.seller = seller; }
+	public void setSellerUUID(UUID sellerUUID) { this.sellerUUID = sellerUUID; }
 
 	public int getId() { return id; }
 

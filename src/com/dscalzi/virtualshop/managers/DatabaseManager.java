@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -26,6 +25,7 @@ import javafx.util.Pair;
 
 public final class DatabaseManager {
 
+	private static final String DEFAULTNAME = "sync_required";
 	private static boolean initialized;
 	private static DatabaseManager instance;
 	
@@ -142,6 +142,7 @@ public final class DatabaseManager {
 		return new Pair<Boolean, Integer>(false, 1);
     }
     
+    @Deprecated
     public Pair<Integer, Integer> updateDatabase(){
     	
     	//Add columns
@@ -164,11 +165,12 @@ public final class DatabaseManager {
     	int f = 0;
     	
     	for(String n : names){
-    		UUID uuid = uuidm.uuidFromPlayerName(n);
-    		if(uuid == null) {
+    		Optional<UUID> uuidOpt = uuidm.getPlayerUUID(n);
+    		if(!uuidOpt.isPresent()) {
     			++f;
     			continue;
     		}
+    		UUID uuid = uuidOpt.get();
     		//Update toggles table
     		this.database.query("update vshop_toggles set uuid='" + uuid.toString() + "' where merchant='" + n + "'");
 			//Update stock table
@@ -188,8 +190,7 @@ public final class DatabaseManager {
     	return new Pair<Integer, Integer>(s,f);
     }
     
-    public boolean isPlayerInToggles(String merchant){
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(merchant);
+    public boolean isPlayerInToggles(UUID merchantUUID){
     	String query = "select * from vshop_toggles where uuid='" + merchantUUID.toString() + "'";
     	try {
     		ResultSet result = this.database.query(query);
@@ -208,16 +209,17 @@ public final class DatabaseManager {
 		}
     }
     
-    public void addPlayerToToggles(String merchant){
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(merchant);
+    public void addPlayerToToggles(UUID merchantUUID){
+    	String merchant = DatabaseManager.DEFAULTNAME;
+    	Optional<String> name = uuidm.getPlayerName(merchantUUID);
+    	if(name.isPresent()) merchant = name.get();
     	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,uuid) values('" + merchant + "',1,1,'" + merchantUUID.toString() + "')";
     	this.database.query(query);
     }
     
-    public void updateSellToggle(String merchant, boolean value){
-    	if(!isPlayerInToggles(merchant))
-    		addPlayerToToggles(merchant);
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(merchant);
+    public void updateSellToggle(UUID merchantUUID, boolean value){
+    	if(!isPlayerInToggles(merchantUUID))
+    		addPlayerToToggles(merchantUUID);
     	int dataval = 0;
     	if(value)
     		dataval = 1;
@@ -225,10 +227,9 @@ public final class DatabaseManager {
 		this.database.query(query);
     }
     
-    public void updateBuyToggle(String merchant, boolean value){
-    	if(!isPlayerInToggles(merchant))
-    		addPlayerToToggles(merchant);
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(merchant);
+    public void updateBuyToggle(UUID merchantUUID, boolean value){
+    	if(!isPlayerInToggles(merchantUUID))
+    		addPlayerToToggles(merchantUUID);
     	int dataval = 0;
     	if(value)
     		dataval = 1;
@@ -236,10 +237,9 @@ public final class DatabaseManager {
 		this.database.query(query);
     }
     
-    public boolean getSellToggle(String merchant){
-    	if(!isPlayerInToggles(merchant))
-    		addPlayerToToggles(merchant);
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(merchant);
+    public boolean getSellToggle(UUID merchantUUID){
+    	if(!isPlayerInToggles(merchantUUID))
+    		addPlayerToToggles(merchantUUID);
     	String query = "select * from vshop_toggles where uuid='" + merchantUUID.toString() + "'";
     	try {
     		ResultSet result = this.database.query(query);
@@ -251,10 +251,9 @@ public final class DatabaseManager {
 		}
     }
     
-    public boolean getBuyToggle(String merchant){
-    	if(!isPlayerInToggles(merchant))
-    		addPlayerToToggles(merchant);
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(merchant);
+    public boolean getBuyToggle(UUID merchantUUID){
+    	if(!isPlayerInToggles(merchantUUID))
+    		addPlayerToToggles(merchantUUID);
     	String query = "select * from vshop_toggles where uuid='" + merchantUUID.toString() + "'";
     	try {
     		ResultSet result = this.database.query(query);
@@ -268,7 +267,7 @@ public final class DatabaseManager {
     
     public void addOffer(Offer offer){
 		@SuppressWarnings("deprecation")
-		String query = "insert into vshop_stock(seller,item,amount,price,damage,uuid) values('" +offer.getSeller() +"',"+ offer.getItem().getType().getId() + ","+offer.getItem().getAmount() +","+offer.getPrice()+"," + offer.getItem().getDurability()+",'"+uuidm.uuidFromPlayerName(offer.getSeller()).toString()+"')";
+		String query = "insert into vshop_stock(seller,item,amount,price,damage,uuid) values('" +offer.getSeller() +"',"+ offer.getItem().getType().getId() + ","+offer.getItem().getAmount() +","+offer.getPrice()+"," + offer.getItem().getDurability()+",'"+offer.getSellerUUID().toString()+"')";
 		this.database.query(query);
     }
     
@@ -283,15 +282,13 @@ public final class DatabaseManager {
 		return Offer.listOffers(this.database.query(query));
 	}
 
-    public List<Offer> getSellerOffers(String merchant, ItemStack item) {
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(merchant);
+    public List<Offer> getSellerOffers(UUID merchantUUID, ItemStack item) {
 		@SuppressWarnings("deprecation")
 		String query = "select * from vshop_stock where uuid = '" + merchantUUID.toString() + "' and item =" + item.getTypeId() + " and damage=" + item.getDurability();
 		return Offer.listOffers(this.database.query(query));
 	}
 
-    public void removeSellerOffers(Player player, ItemStack item) {
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(player.getName());
+    public void removeSellerOffers(UUID merchantUUID, ItemStack item) {
 		@SuppressWarnings("deprecation")
 		String query = "delete from vshop_stock where uuid = '" + merchantUUID.toString() + "' and item =" + item.getTypeId() + " and damage = " + item.getDurability();
 		this.database.query(query);
@@ -314,7 +311,7 @@ public final class DatabaseManager {
     
     public void logTransaction(Transaction transaction) {
 		@SuppressWarnings("deprecation")
-		String query = "insert into vshop_transactions(seller,buyer,item,amount,cost,damage,buyer_uuid,seller_uuid) values('" +transaction.getSeller() +"','"+ transaction.getBuyer() + "'," + transaction.getItem().getTypeId() + ","+ transaction.getItem().getAmount() +","+transaction.getCost()+","+transaction.getItem().getDurability()+",'"+uuidm.uuidFromPlayerName(transaction.getBuyer())+"','"+uuidm.uuidFromPlayerName(transaction.getSeller())+"')";
+		String query = "insert into vshop_transactions(seller,buyer,item,amount,cost,damage,buyer_uuid,seller_uuid) values('" +transaction.getSeller() +"','"+ transaction.getBuyer() + "'," + transaction.getItem().getTypeId() + ","+ transaction.getItem().getAmount() +","+transaction.getCost()+","+transaction.getItem().getDurability()+",'"+transaction.getBuyerUUID().toString()+"','"+transaction.getSellerUUID().toString()+"')";
 		this.database.query(query);
 	}
 
@@ -325,8 +322,7 @@ public final class DatabaseManager {
 		return prices;
     }
 
-    public List<Offer> searchBySeller(String merchant) {
-    	UUID merchantUUID = uuidm.uuidFromPlayerName(merchant);
+    public List<Offer> searchBySeller(UUID merchantUUID) {
     	String query = "select * from vshop_stock where uuid like '%" + merchantUUID.toString() +  "%'";
     	ResultSet result = this.database.query(query);
 		List<Offer> prices = Offer.listOffers(result);
@@ -337,9 +333,8 @@ public final class DatabaseManager {
 		return Transaction.listTransactions(this.database.query("select * from vshop_transactions order by id desc"));
 	}
 
-	public List<Transaction> getTransactions(String search) {
-		UUID target = uuidm.uuidFromPlayerName(search);
-		return Transaction.listTransactions(this.database.query("select * from vshop_transactions where seller_uuid like '%" + target.toString() +"%' OR buyer_uuid like '%" + target.toString() +"%' order by id"));
+	public List<Transaction> getTransactions(UUID targetUUID) {
+		return Transaction.listTransactions(this.database.query("select * from vshop_transactions where seller_uuid like '%" + targetUUID.toString() +"%' OR buyer_uuid like '%" + targetUUID.toString() +"%' order by id"));
 	}
 
     public List<Offer> getPrices(ItemStack item) {

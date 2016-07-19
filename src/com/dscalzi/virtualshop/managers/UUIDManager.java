@@ -51,17 +51,20 @@ public final class UUIDManager {
 		return (currentName.equals(oldName)) ? Optional.empty() : Optional.of(currentName);
 	}
 	
-	public Optional<String> getNewPlayerName(UUID uuid, Player player){
-		return getNewPlayerName(uuid, player.getName());
+	public Optional<String> getPlayerName(UUID uuid){
+		String name = Bukkit.getOfflinePlayer(uuid).getName();
+		return (name == null) ? Optional.empty() : Optional.of(name);
 	}
 	
-	public OfflinePlayer playerFromUUID(UUID uuid){
-		return Bukkit.getOfflinePlayer(uuid);
+	public Optional<OfflinePlayer> getOfflinePlayer(UUID uuid){
+		OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
+		return (p == null) ? Optional.empty() : Optional.of(p);
 	}
 	
 	@SuppressWarnings("deprecation")
-	public UUID uuidFromPlayerName(String name){
-		return Bukkit.getOfflinePlayer(name).getUniqueId();
+	public Optional<UUID> getPlayerUUID(String name){
+		OfflinePlayer p = Bukkit.getOfflinePlayer(name);
+		return (p == null) ? Optional.empty() : Optional.of(p.getUniqueId());
 	}
 	
 }

@@ -43,6 +43,8 @@ public class Buy implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
+		/* Validating Sender conditions */
+		
 		if(!(sender instanceof Player)){
 			cm.denyConsole(sender);
 			return true;
@@ -80,6 +82,8 @@ public class Buy implements CommandExecutor{
 				return true;
 			}
 		}
+		
+		/* Too few arguments */
 		if(args.length < 2){
 			cm.sendError(sender, "Proper usage is /buy <amount> <item> [maxprice]");
 			return true;
@@ -90,7 +94,7 @@ public class Buy implements CommandExecutor{
 	}
 	
 	private void execute(Player player, String[] args){
-		if(!dbm.getBuyToggle(player.getName())){
+		if(!dbm.getBuyToggle(player.getUniqueId())){
 			if(this.validateData(player, args)){
 				this.finalizeTransaction(player, confirmations.get(player));
 				return;
@@ -225,7 +229,7 @@ public class Buy implements CommandExecutor{
             		dbm.deleteItem(o.getId());
             	else 
             		dbm.updateQuantity(o.getId(), left);
-            	Transaction t = new Transaction(o.getSeller(), player.getName(), o.getItem().getTypeId(), o.getItem().getDurability(), canbuy, cost);
+            	Transaction t = new Transaction(o.getSellerUUID(), player.getUniqueId(), o.getItem().getTypeId(), o.getItem().getDurability(), canbuy, cost);
             	dbm.logTransaction(t);
             }
             if(bought >= amount) 
@@ -295,14 +299,14 @@ public class Buy implements CommandExecutor{
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
 			cm.sendSuccess(player, "Buy confirmations turned on. To undo this /buy confirm toggle off");
-			dbm.updateBuyToggle(player.getName(), true);
+			dbm.updateBuyToggle(player.getUniqueId(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Buy confirmations turned off. To undo this /buy confirm toggle on");
 			confirmations.remove(player);
-			dbm.updateBuyToggle(player.getName(), false);
+			dbm.updateBuyToggle(player.getUniqueId(), false);
 			return;
 		}
 		cm.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");

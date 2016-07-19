@@ -13,25 +13,26 @@ import java.util.UUID;
 @SuppressWarnings("deprecation")
 public class Transaction
 {
-    private String seller;
-    private String buyer;
+	private UUIDManager uuidm = UUIDManager.getInstance();
+	
+    private UUID sellerUUID;
+    private UUID buyerUUID;
     private ItemStack item;
     private double cost;
 
-    public Transaction(String seller, String buyer, int id, int damage, int amount, double cost){
-        this.seller = seller;
-        this.buyer = buyer;
+    public Transaction(UUID sellerUUID, UUID buyerUUID, int id, int damage, int amount, double cost){
+        this.sellerUUID = sellerUUID;
+        this.buyerUUID = buyerUUID;
         this.item = new ItemStack(id,amount,(short)damage);
         this.cost = cost;
     }
 
 	public static List<Transaction> listTransactions(ResultSet result){
-		UUIDManager uuidm = UUIDManager.getInstance();
         List<Transaction> ret = new ArrayList<Transaction>();
         try {
             while(result.next())
             {
-                Transaction t = new Transaction(uuidm.playerFromUUID(UUID.fromString(result.getString("seller_uuid"))).getName(), uuidm.playerFromUUID(UUID.fromString(result.getString("buyer_uuid"))).getName(),result.getInt("item"), result.getInt("damage"),result.getInt("amount"),result.getDouble("cost"));
+                Transaction t = new Transaction(UUID.fromString(result.getString("seller_uuid")), UUID.fromString(result.getString("buyer_uuid")), result.getInt("item"), result.getInt("damage"), result.getInt("amount"), result.getDouble("cost"));
                 ret.add(t);
                 System.out.println(t.getBuyer());
             }
@@ -40,9 +41,13 @@ public class Transaction
         return ret;
     }
 
-	public String getSeller() {	return seller; }
+	public String getSeller() { return uuidm.getPlayerName(getSellerUUID()).get(); }
+	
+	public UUID getSellerUUID() {	return sellerUUID; }
+	
+	public String getBuyer() { return uuidm.getPlayerName(getBuyerUUID()).get(); }
 
-	public String getBuyer() { return buyer; }
+	public UUID getBuyerUUID() { return buyerUUID; }
 
 	public ItemStack getItem() { return item; }
 

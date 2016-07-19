@@ -72,13 +72,12 @@ public class Stock implements CommandExecutor{
         	start = Numbers.parseInteger(args[0]);
         if(start < 0){
         	target = plugin.getServer().getOfflinePlayer(args[0]);
-            String seller = args[0];
 			if(args.length > 1) 
 				start = Numbers.parseInteger(args[1]);
 			if(start < 0) 
 				start = 1;
 			try{
-				offers = dbm.searchBySeller(seller);
+				offers = dbm.searchBySeller(target.getUniqueId());
 			} catch (NullPointerException e){
 				cm.noStock(sender, target.getName());
 			}

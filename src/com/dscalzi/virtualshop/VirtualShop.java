@@ -37,11 +37,7 @@ public class VirtualShop extends JavaPlugin {
             this.getLogger().severe("Vault not found. Shutting down!");
             this.getServer().getPluginManager().disablePlugin(this);
         }
-        UUIDManager.initialize(this);
-        ConfigManager.initialize(this);
-		ChatManager.initialize(this);
-        DatabaseManager.initialize(this);
-        Reloader.initialize(this);
+        this.initializeManagers();
         try {
             ItemDb.load(this.getDataFolder(),"items.csv");
         } catch (IOException e) {
@@ -54,15 +50,19 @@ public class VirtualShop extends JavaPlugin {
     }
     
     private boolean setupEconomy(){
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
+        if (getServer().getPluginManager().getPlugin("Vault") == null) return false;
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
+        if (rsp == null) return false;
         econ = rsp.getProvider();
         return econ != null;
+    }
+    
+    private void initializeManagers(){
+    	UUIDManager.initialize(this);
+        ConfigManager.initialize(this);
+		ChatManager.initialize(this);
+        DatabaseManager.initialize(this);
+        Reloader.initialize(this);
     }
     
     private void registerCommands(){

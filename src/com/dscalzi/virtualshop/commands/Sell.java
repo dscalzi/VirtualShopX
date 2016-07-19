@@ -104,7 +104,7 @@ public class Sell implements CommandExecutor{
 	 * @param args - Initial arguments returned by onCommand
 	 */
 	private void execute(Player player, String[] args){
-		if(!dbm.getSellToggle(player.getName())){
+		if(!dbm.getSellToggle(player.getUniqueId())){
 			if(this.validateData(player, args)){
 				this.createListing(player, confirmations.get(player));
 				return;
@@ -169,7 +169,7 @@ public class Sell implements CommandExecutor{
 		//Database checks
 		int currentlyListed = 0;
 		double oldPrice = -1;
-        for(Offer o: dbm.getSellerOffers(player.getName(),item)){
+        for(Offer o: dbm.getSellerOffers(player.getUniqueId(),item)){
         	currentlyListed += o.getItem().getAmount();
         	oldPrice = o.getPrice();
         }
@@ -191,9 +191,9 @@ public class Sell implements CommandExecutor{
 		double price = data.getPrice();
 		InventoryManager im = new InventoryManager(player);
 		im.remove(item, true, true);
-        dbm.removeSellerOffers(player,item);
+        dbm.removeSellerOffers(player.getUniqueId(),item);
         item.setAmount(item.getAmount() + data.getCurrentListings());
-        Offer o = new Offer(player.getName(),item,price);
+        Offer o = new Offer(player.getUniqueId(),item,price);
 		dbm.addOffer(o);
 		confirmations.remove(player);
         if(configM.broadcastOffers())
@@ -244,14 +244,14 @@ public class Sell implements CommandExecutor{
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
 			cm.sendSuccess(player, "Sell confirmations turned on. To undo this /sell confirm toggle off");
-			dbm.updateSellToggle(player.getName(), true);
+			dbm.updateSellToggle(player.getUniqueId(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Sell confirmations turned off. To undo this /sell confirm toggle on");
 			confirmations.remove(player);
-			dbm.updateSellToggle(player.getName(), false);
+			dbm.updateSellToggle(player.getUniqueId(), false);
 			return;
 		}
 		cm.sendMessage(player, "You may turn sell confirmations on or off using /sell confirm toggle <on/off>");

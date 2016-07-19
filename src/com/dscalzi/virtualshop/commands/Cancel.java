@@ -76,7 +76,7 @@ public class Cancel implements CommandExecutor{
 		}
 		
         int total = 0;
-        for(Offer o: dbm.getSellerOffers(player.getName(),item))
+        for(Offer o: dbm.getSellerOffers(player.getUniqueId(),item))
         {
             total += o.getItem().getAmount();
         }
@@ -130,15 +130,15 @@ public class Cancel implements CommandExecutor{
         }
         int a = 0;
         double oPrice = 0;
-        for(Offer o: dbm.getSellerOffers(player.getName(),item)){
+        for(Offer o: dbm.getSellerOffers(player.getUniqueId(),item)){
         	a += o.getItem().getAmount();
         	oPrice += o.getPrice();
         }
-        dbm.removeSellerOffers(player,item);
+        dbm.removeSellerOffers(player.getUniqueId(),item);
         a -= cancelAmt;
         if(a > 0){
         	item.setAmount(a);
-        	Offer o = new Offer(player.getName(),item,oPrice);
+        	Offer o = new Offer(player.getUniqueId(),item,oPrice);
         	dbm.addOffer(o);
         }
         cm.sendSuccess(player, "Removed " + cm.formatAmount(cancelAmt) + " " + cm.formatItem(args[1]));

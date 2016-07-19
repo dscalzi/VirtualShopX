@@ -72,14 +72,13 @@ public class Sales implements CommandExecutor{
         	start = Numbers.parseInteger(args[0]);
         //If /sales args is not a number (String)
         if(start < 0){
-            String search = args[0];
             target = plugin.getServer().getOfflinePlayer(args[0]);
 			if(args.length > 1) 
 				start = Numbers.parseInteger(args[1]);
 			if(start < 0) 
 				start = 1;
 			try{
-				transactions = dbm.getTransactions(search);
+				transactions = dbm.getTransactions(target.getUniqueId());
 			} catch (NullPointerException e){
 				cm.noTransactions(sender, target.getName());
 			}
