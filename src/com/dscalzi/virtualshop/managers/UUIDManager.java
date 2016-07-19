@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
@@ -45,6 +44,26 @@ public final class UUIDManager {
 	}
 	
 	/* Utilities */
+	
+	public UUID formatFromInput(String uuid){
+		uuid = uuid.replaceAll("-", "");
+		return fromTrimmed(uuid);
+	}
+	
+	public UUID fromTrimmed(String trimmedUUID){
+		StringBuilder builder = new StringBuilder(trimmedUUID);
+		/* Backwards adding to avoid index ajustments */
+		try {
+			builder.insert(20, "-");
+			builder.insert(16, "-");
+			builder.insert(12, "-");
+			builder.insert(8, "-");
+		} catch (StringIndexOutOfBoundsException e){
+			return null;
+		}
+		
+		return UUID.fromString(builder.toString());
+	}
 	
 	public Optional<String> getNewPlayerName(UUID uuid, String oldName){
 		String currentName = Bukkit.getOfflinePlayer(uuid).getName();

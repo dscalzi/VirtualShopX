@@ -122,6 +122,7 @@ public class VS implements CommandExecutor{
 	
 	public void cmdupdateuuid(CommandSender sender){
 		try{
+			@SuppressWarnings("deprecation")
 			Pair<Integer, Integer> sfs = dbm.updateDatabase();
 			cm.sendSuccess(sender, "Database updated. " + sfs.getKey() + " successful, " + sfs.getValue() + " failed.");
 		} catch(Exception ex){

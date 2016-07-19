@@ -10,6 +10,7 @@ import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.util.Numbers;
 import com.dscalzi.virtualshop.util.PageList;
@@ -25,12 +26,14 @@ public class Sales implements CommandExecutor{
 	private final ChatManager cm;
 	private final ConfigManager configM;
 	private final DatabaseManager dbm;
+	private final UUIDManager uuidm;
 	
 	public Sales(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
+		this.uuidm = UUIDManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -72,7 +75,12 @@ public class Sales implements CommandExecutor{
         	start = Numbers.parseInteger(args[0]);
         //If /sales args is not a number (String)
         if(start < 0){
-            target = plugin.getServer().getOfflinePlayer(args[0]);
+        	//First try by UUID, if it fails try by player name.
+        	try {
+        		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
+        	} catch(IllegalArgumentException e){
+        		target = plugin.getServer().getOfflinePlayer(args[0]);
+        	}
 			if(args.length > 1) 
 				start = Numbers.parseInteger(args[1]);
 			if(start < 0) 
@@ -80,10 +88,10 @@ public class Sales implements CommandExecutor{
 			try{
 				transactions = dbm.getTransactions(target.getUniqueId());
 			} catch (NullPointerException e){
-				cm.noTransactions(sender, target.getName());
+				cm.noTransactions(sender, (target.getName() == null) ? args[0] : target.getName());
 			}
             if(transactions.size() < 1){
-            	cm.noTransactions(sender, target.getName());
+            	cm.noTransactions(sender, (target.getName() == null) ? args[0] : target.getName());
             	return;
             }
             for(Transaction t : transactions){

@@ -10,6 +10,7 @@ import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.Numbers;
 import com.dscalzi.virtualshop.util.PageList;
@@ -25,12 +26,14 @@ public class Stock implements CommandExecutor{
 	private final ChatManager cm;
 	private final ConfigManager configM;
 	private final DatabaseManager dbm;
+	private final UUIDManager uuidm;
 	
 	public Stock(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
+		this.uuidm = UUIDManager.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -71,7 +74,12 @@ public class Stock implements CommandExecutor{
         if(args.length>0)  
         	start = Numbers.parseInteger(args[0]);
         if(start < 0){
-        	target = plugin.getServer().getOfflinePlayer(args[0]);
+        	//First try by UUID, if it fails try by player name.
+        	try {
+        		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
+        	} catch(IllegalArgumentException e){
+        		target = plugin.getServer().getOfflinePlayer(args[0]);
+        	}
 			if(args.length > 1) 
 				start = Numbers.parseInteger(args[1]);
 			if(start < 0) 
@@ -79,10 +87,10 @@ public class Stock implements CommandExecutor{
 			try{
 				offers = dbm.searchBySeller(target.getUniqueId());
 			} catch (NullPointerException e){
-				cm.noStock(sender, target.getName());
+				cm.noStock(sender, (target.getName() == null) ? args[0] : target.getName());
 			}
             if(offers.size() < 1){
-            	cm.noStock(sender, target.getName());
+            	cm.noStock(sender, (target.getName() == null) ? args[0] : target.getName());
             	return;
             }
             for(Offer o : offers){
