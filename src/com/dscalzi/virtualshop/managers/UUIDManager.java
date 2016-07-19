@@ -45,21 +45,21 @@ public final class UUIDManager {
 	
 	/* Utilities */
 	
-	public UUID formatFromInput(String uuid){
+	public UUID formatFromInput(String uuid) throws IllegalArgumentException{
 		uuid = uuid.replaceAll("-", "");
 		return fromTrimmed(uuid);
 	}
 	
-	public UUID fromTrimmed(String trimmedUUID){
+	public UUID fromTrimmed(String trimmedUUID) throws IllegalArgumentException{
 		StringBuilder builder = new StringBuilder(trimmedUUID);
-		/* Backwards adding to avoid index ajustments */
+		/* Backwards adding to avoid index adjustments */
 		try {
 			builder.insert(20, "-");
 			builder.insert(16, "-");
 			builder.insert(12, "-");
 			builder.insert(8, "-");
 		} catch (StringIndexOutOfBoundsException e){
-			return null;
+			throw new IllegalArgumentException();
 		}
 		
 		return UUID.fromString(builder.toString());
