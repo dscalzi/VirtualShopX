@@ -46,12 +46,14 @@ public final class UUIDManager {
 	/* Utilities */
 	
 	public UUID formatFromInput(String uuid) throws IllegalArgumentException{
-		uuid = uuid.replaceAll("-", "");
-		return fromTrimmed(uuid);
+		if(uuid == null) throw new IllegalArgumentException();
+		uuid = uuid.trim();
+		return uuid.length() == 32 ? fromTrimmed(uuid.replaceAll("-", "")) : UUID.fromString(uuid);
 	}
 	
 	public UUID fromTrimmed(String trimmedUUID) throws IllegalArgumentException{
-		StringBuilder builder = new StringBuilder(trimmedUUID);
+		if(trimmedUUID == null) throw new IllegalArgumentException();
+		StringBuilder builder = new StringBuilder(trimmedUUID.trim());
 		/* Backwards adding to avoid index adjustments */
 		try {
 			builder.insert(20, "-");

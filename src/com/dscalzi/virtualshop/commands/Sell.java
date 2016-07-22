@@ -146,7 +146,7 @@ public class Sell implements CommandExecutor{
 		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
         	ItemStack[] inv = player.getInventory().getContents();
         	int total = 0;
-        	for(int i=0; i<inv.length; ++i){
+        	for(int i=0; i<inv.length-5; ++i){
         		if(inv[i] == null)
         			continue;
         		else if(ItemDb.reverseLookup(inv[i]).equals(ItemDb.reverseLookup(item)))

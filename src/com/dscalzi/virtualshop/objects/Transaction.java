@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings("deprecation")
@@ -41,11 +42,17 @@ public class Transaction
         return ret;
     }
 
-	public String getSeller() { return uuidm.getPlayerName(getSellerUUID()).get(); }
+	public String getSeller() { 
+		Optional<String> name = uuidm.getPlayerName(getSellerUUID());
+		return name.isPresent() ? name.get() : getSellerUUID().toString();
+	}
 	
 	public UUID getSellerUUID() {	return sellerUUID; }
 	
-	public String getBuyer() { return uuidm.getPlayerName(getBuyerUUID()).get(); }
+	public String getBuyer() { 
+		Optional<String> name = uuidm.getPlayerName(getBuyerUUID());
+		return name.isPresent() ? name.get() : getBuyerUUID().toString(); 
+	}
 
 	public UUID getBuyerUUID() { return buyerUUID; }
 

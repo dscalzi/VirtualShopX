@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings("deprecation")
@@ -69,7 +70,10 @@ public class Offer
 	public void setPrice(double price) { this.price = price; }
 
 	/* Retrieve seller name dynamically */
-	public String getSeller() {	return uuidm.getPlayerName(getSellerUUID()).get(); }
+	public String getSeller() {	
+		Optional<String> name = uuidm.getPlayerName(getSellerUUID());
+		return name.isPresent() ? name.get() : getSellerUUID().toString(); 
+	}
 	
 	public UUID getSellerUUID() {	return sellerUUID; }
 
