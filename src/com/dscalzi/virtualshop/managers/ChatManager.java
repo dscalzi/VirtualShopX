@@ -19,7 +19,7 @@ import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.objects.TransactionData;
-import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.ItemDB;
 
 public final class ChatManager {
 
@@ -32,10 +32,12 @@ public final class ChatManager {
     private String eColor;
     private String sColor;
     private final ConfigManager configM;
+    private final ItemDB idb;
 	
 	private ChatManager(Plugin plugin){
 		this.plugin = (VirtualShop)plugin;
 		this.configM = ConfigManager.getInstance();
+		this.idb = ItemDB.getInstance();
 		this.assignVars();
 		
 		logInfo(plugin.getDescription().getName() + " is loading.");
@@ -169,9 +171,9 @@ public final class ChatManager {
 	
 	public void sellConfirmation(Player player, ListingData data){
     	if(data.getCurrentListings() < 1)
-    		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
+    		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
     	else{
-    		String common = "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " to your current listing";
+    		String common = "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " to your current listing";
     		if(data.getOldPrice() == data.getPrice())
     			sendMessage(player, common + ". Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
     		if(data.getOldPrice() > data.getPrice())
@@ -182,7 +184,7 @@ public final class ChatManager {
     }
     
     public void buyConfirmation(Player player, TransactionData data){
-    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(ItemDb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /buy confirm" + this.color + " within 15 seconds to complete the transaction.");
+    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /buy confirm" + this.color + " within 15 seconds to complete the transaction.");
     }
 	
 	/* Formatting */
@@ -208,11 +210,11 @@ public final class ChatManager {
 	}
 	
 	public String formatOffer(Offer o){
-        return formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " " + formatItem(ItemDb.reverseLookup(o.getItem())) + " for " + formatPrice(o.getPrice()) + " each.";
+        return formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " " + formatItem(idb.reverseLookup(o.getItem())) + " for " + formatPrice(o.getPrice()) + " each.";
     }
 	
 	public String formatTransaction(Transaction t){
-		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(ItemDb.reverseLookup(t.getItem())) + " for "+ formatPrice(t.getCost());
+		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(idb.reverseLookup(t.getItem())) + " for "+ formatPrice(t.getCost());
 	}
 	
 	public String formatHeaderLength(String header, Class<? extends CommandExecutor> clazz){

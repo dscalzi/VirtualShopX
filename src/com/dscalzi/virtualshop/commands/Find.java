@@ -11,7 +11,7 @@ import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
-import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Numbers;
 import com.dscalzi.virtualshop.util.PageList;
 
@@ -27,12 +27,14 @@ public class Find implements CommandExecutor{
 	private final ChatManager cm;
 	private final ConfigManager configM;
 	private final DatabaseManager dbm;
+	private final ItemDB idb;
 	
 	public Find(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
+		this.idb = ItemDB.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -60,7 +62,7 @@ public class Find implements CommandExecutor{
     	final String baseColor = configM.getBaseColor();
     	final String trimColor = configM.getTrimColor();
     	
-    	ItemStack item = ItemDb.get(args[0], 0);
+    	ItemStack item = idb.get(args[0], 0);
     	if(item == null){
     		cm.wrongItem(sender, args[0]);
     		return;

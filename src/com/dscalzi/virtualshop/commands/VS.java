@@ -19,7 +19,7 @@ import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
-import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.PageList;
 import com.dscalzi.vsreloader.PluginUtil;
 
@@ -31,12 +31,14 @@ public class VS implements CommandExecutor{
 	private final ChatManager cm;
 	private final ConfigManager configM;
 	private final DatabaseManager dbm;
+	final ItemDB idb;
 	
 	public VS(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
+		this.idb = ItemDB.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -78,6 +80,10 @@ public class VS implements CommandExecutor{
 		    			}
 					}
 					this.vsList(sender, 1);
+					return true;
+				}
+				if(args[0].equalsIgnoreCase("lookup")){
+					this.cmdLookup(sender, args);
 					return true;
 				}
 				if(args[0].equalsIgnoreCase("formatmarket")){
@@ -138,15 +144,15 @@ public class VS implements CommandExecutor{
     	final String descColor = configM.getDescriptionColor();
     	
     	List<String> cmds = new ArrayList<String>();
-        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + descColor + " - buy items.");
-        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + descColor + " - sell items.");
-        cmds.add(listPrefix + trimColor + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + descColor + " - remove item from shop.");
-        cmds.add(listPrefix + trimColor + "/find " + ChatColor.BLUE + "<item> " + ChatColor.GRAY + "[page] " + descColor + " - find offers for the item.");
-        cmds.add(listPrefix + trimColor + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + descColor + " - browse offers.");
-        cmds.add(listPrefix + trimColor + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + descColor + " - view transaction log.");
+        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + descColor + " - Buy items.");
+        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + descColor + " - Sell items.");
+        cmds.add(listPrefix + trimColor + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + descColor + " - Remove item from shop.");
+        cmds.add(listPrefix + trimColor + "/find " + ChatColor.BLUE + "<item> " + ChatColor.GRAY + "[page] " + descColor + " - Find offers for the item.");
+        cmds.add(listPrefix + trimColor + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + descColor + " - Browse offers.");
+        cmds.add(listPrefix + trimColor + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + descColor + " - View transaction log.");
         cmds.add(listPrefix + trimColor + "/vs" + descColor + " - Virtual Shop's technical commands.");
-        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Turn buy confirmations on/off.");
-        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Turn sell confirmations on/off.");
+        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle buy confirmations.");
+        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle sell confirmations.");
         
         PageList<String> commands = new PageList<>(cmds, 7);
         
@@ -179,12 +185,13 @@ public class VS implements CommandExecutor{
 		List<String> cmds = new ArrayList<String>();
 		cmds.add(listPrefix + trimColor + "/shop " + ChatColor.GRAY + "[page]" + descColor + " - View merchant commands.");
 		cmds.add(listPrefix + trimColor + "/vs help " + ChatColor.GRAY + "[page]" + descColor + " - VirtualShop's technical commands.");
+		cmds.add(listPrefix + trimColor + "/vs lookup " + ChatColor.BLUE + "[item id]" + descColor + " - Browse item name information.");
 		cmds.add(listPrefix + trimColor + "/vs version" + descColor + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.access.admin")){
 			cmds.add(listPrefix + trimColor + "/vs formatmarket " + ChatColor.BLUE + "[item]" + descColor + " - Reprice all items who's market price exceeds the set limit.");
 			cmds.add(listPrefix + trimColor + "/vs reload" + descColor + " - Reload the entire plugin's jar file.");
 			cmds.add(listPrefix + trimColor + "/vs reloadconfig" + descColor + " - Reload the plugin's configuration.");
-			cmds.add(listPrefix + trimColor + "/vs uuidnamesync [uuid]" + descColor + " - Syncs the name entries in the database with the UUID of the corresponding account.");
+			cmds.add(listPrefix + trimColor + "/vs uuidnamesync [uuid]" + descColor + " - Syncs database names with uuids.");
 		}
 		
 		PageList<String> commands = new PageList<>(cmds, 6);
@@ -207,6 +214,47 @@ public class VS implements CommandExecutor{
         for(String s : finalMsg)
         	sender.sendMessage(s);
         
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void cmdLookup(CommandSender sender, String[] args){
+		final String baseColor = configM.getBaseColor();
+    	//final String trimColor = configM.getTrimColor();
+    	
+		ItemStack target = null;
+		
+		//Zero arguments grabs player's hand.
+		if(args.length == 1){
+			if(!(sender instanceof Player)){
+				cm.sendError(sender, "You must specify an item!");
+				return;
+			}
+			Player p = (Player)sender;
+			target = p.getInventory().getItemInMainHand();
+			if(target == null){
+				cm.sendError(sender, "Lookup failed. You are not holding an item nor did you specify one.");
+				return;
+			}
+		}
+		
+		//One or more arguments grabs the item specified.
+		if(args.length > 1){
+			target = idb.get(args[1], 0);
+			if(target == null){
+	    		cm.sendError(sender, "Lookup failed. Could not find " + args[1] + " in the database.");
+	    		return;
+	    	}
+		}
+		
+		//Final check for security.
+		if(target == null){
+			cm.sendError(sender, "Lookup failed, internal error has occurred.");
+			return;
+		}
+		
+		String topLine = cm.formatHeaderLength(cm.formatItem(target.getType().toString()).toUpperCase() + baseColor + " - " + cm.formatItem(target.getTypeId() + ":" + target.getData().getData()), VS.class);
+		sender.sendMessage(topLine);
+		
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -239,18 +287,18 @@ public class VS implements CommandExecutor{
 		}
 		
 		int amt = 0;
-		ItemStack item = ItemDb.get(itm, 0);
+		ItemStack item = idb.get(itm, 0);
 		if(itm.equalsIgnoreCase("hand") && sender instanceof Player){
 			Player player = (Player)sender;
 			item = new ItemStack(player.getItemInHand().getType(), 0, player.getItemInHand().getDurability());
-			itm = ItemDb.reverseLookup(item);
+			itm = idb.reverseLookup(item);
 		}
 		if(item == null){
 			cm.wrongItem(sender, itm);
 			return;
 		}
 		for(Offer o : dbm.getAllOffers()){
-			boolean isSameItem = ItemDb.reverseLookup(item).equalsIgnoreCase(ItemDb.reverseLookup(o.getItem()));
+			boolean isSameItem = idb.reverseLookup(item).equalsIgnoreCase(idb.reverseLookup(o.getItem()));
 			if(o.getPrice() > configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()) && isSameItem){
 				dbm.updatePrice(o.getId(), configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
 				++amt;

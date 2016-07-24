@@ -16,7 +16,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.UnknownDependencyException;
 
-public class Reloader {
+public final class Reloader {
 
 	private static boolean initialized;
 	private static Reloader instance;
@@ -61,13 +61,12 @@ public class Reloader {
         try {
         	plugin.getLogger().info("Saving VSReloader.jar");
 			Files.copy(in, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			in.close();
 		} catch (IOException | NullPointerException e) {
-			try { in.close(); } catch (IOException e1) {}
 			plugin.getLogger().severe("Error ocurred while saving VSReloader");
 			return;
+		} finally {
+			try { in.close(); } catch (IOException e) {}
 		}
-        try { in.close(); } catch (IOException e) {}
         enableVSR(dest);
     }
 	

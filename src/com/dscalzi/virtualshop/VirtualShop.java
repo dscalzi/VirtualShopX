@@ -17,7 +17,7 @@ import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.managers.UUIDManager;
-import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Reloader;
 
 @SuppressWarnings("deprecation")
@@ -37,14 +37,14 @@ public class VirtualShop extends JavaPlugin {
             this.getLogger().severe("Vault not found. Shutting down!");
             this.getServer().getPluginManager().disablePlugin(this);
         }
-        this.initializeManagers();
         try {
-            ItemDb.load(this.getDataFolder(),"items.csv");
-        } catch (IOException e) {
-        	this.getLogger().severe("Reference file 'items.csv' not found. Shutting down!");
+			ItemDB.initialize(this);
+		} catch (IOException e) {
+			this.getLogger().severe("Reference file 'items.csv' not found. Shutting down!");
             this.getPluginLoader().disablePlugin(this);
             return;
-        }
+		}
+        this.initializeManagers();
         this.registerCommands();
         if(ConfigManager.getInstance().uuidSyncOnEnable()) this.syncNameToUUID();
     }

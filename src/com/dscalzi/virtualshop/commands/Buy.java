@@ -15,7 +15,7 @@ import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.objects.TransactionData;
 import com.dscalzi.virtualshop.util.InventoryManager;
-import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Numbers;
 
 import java.util.HashMap;
@@ -29,6 +29,7 @@ public class Buy implements CommandExecutor{
 	private final ChatManager cm;
 	private final ConfigManager configM;
 	private final DatabaseManager dbm;
+	private final ItemDB idb;
 	private Map<Player, TransactionData> confirmations;
 	
 	public Buy(VirtualShop plugin){
@@ -36,6 +37,7 @@ public class Buy implements CommandExecutor{
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
+		this.idb = ItemDB.getInstance();
 		this.confirmations = new HashMap<Player, TransactionData>();
 	}
 	
@@ -109,7 +111,7 @@ public class Buy implements CommandExecutor{
 	private boolean validateData(Player player, String[] args){
 		//Set data
 		int amount = Numbers.parseInteger(args[0]);
-		ItemStack item = ItemDb.get(args[1], 0);
+		ItemStack item = idb.get(args[1], 0);
 		double maxprice;
 		//Validate data
 		if(amount < 1)		{

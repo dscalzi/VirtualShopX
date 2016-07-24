@@ -13,7 +13,7 @@ import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.InventoryManager;
-import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.ItemDB;
 
 public class Cancel implements CommandExecutor{
 
@@ -22,12 +22,15 @@ public class Cancel implements CommandExecutor{
 	private final ChatManager cm;
 	private final ConfigManager configM;
 	private final DatabaseManager dbm;
+	private final ItemDB idb;
+	
 	
 	public Cancel(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
+		this.idb = ItemDB.getInstance();
 	}
 	
 	@SuppressWarnings("unused")
@@ -66,7 +69,7 @@ public class Cancel implements CommandExecutor{
 	
     public void execute(Player player, String[] args){
         
-        ItemStack item = ItemDb.get(args[1], 0);
+        ItemStack item = idb.get(args[1], 0);
         int cancelAmt = 0;
         
 		if(item==null)

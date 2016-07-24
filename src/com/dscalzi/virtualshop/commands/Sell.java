@@ -17,7 +17,7 @@ import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.InventoryManager;
-import com.dscalzi.virtualshop.util.ItemDb;
+import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Numbers;
 
 /**
@@ -30,6 +30,7 @@ public class Sell implements CommandExecutor{
 	private final ChatManager cm;
 	private final ConfigManager configM;
 	private final DatabaseManager dbm;
+	private final ItemDB idb;
 	private Map<Player, ListingData> confirmations;
 	
 	/**
@@ -41,6 +42,7 @@ public class Sell implements CommandExecutor{
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
+		this.idb = ItemDB.getInstance();
 		this.confirmations = new HashMap<Player, ListingData>();
 	}
 	
@@ -127,7 +129,7 @@ public class Sell implements CommandExecutor{
 	private boolean validateData(Player player, String[] args){
 		//Set Data
 		int amount = Numbers.parseInteger(args[0]);
-		ItemStack item = ItemDb.get(args[1], amount);
+		ItemStack item = idb.get(args[1], amount);
 		double price = Numbers.parseDouble(args[2]);
 		InventoryManager im = new InventoryManager(player);
 		//Validate Data
@@ -137,7 +139,7 @@ public class Sell implements CommandExecutor{
 		}
 		if(args[1].equalsIgnoreCase("hand")){
 			item = new ItemStack(player.getItemInHand().getType(),amount, player.getItemInHand().getDurability());
-			args[1] = ItemDb.reverseLookup(item);
+			args[1] = idb.reverseLookup(item);
 		}
 		if(item==null){
 			cm.wrongItem(player, args[1]);
@@ -149,8 +151,9 @@ public class Sell implements CommandExecutor{
         	for(int i=0; i<inv.length-5; ++i){
         		if(inv[i] == null)
         			continue;
-        		else if(ItemDb.reverseLookup(inv[i]).equals(ItemDb.reverseLookup(item)))
+        		else if(idb.reverseLookup(inv[i]).equals(idb.reverseLookup(item))){
         			total += inv[i].getAmount();
+        		}
         	}
         	amount = total;
         	item.setAmount(total);
