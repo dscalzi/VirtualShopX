@@ -127,6 +127,12 @@ public class VS implements CommandExecutor{
 	}
 	
 	public void cmdupdateuuid(CommandSender sender){
+		
+		if(!sender.hasPermission("virtualshop.access.admin")){
+			cm.noPermissions(sender);
+            return;
+		}
+		
 		try{
 			@SuppressWarnings("deprecation")
 			Pair<Integer, Integer> sfs = dbm.updateDatabase();
@@ -185,7 +191,7 @@ public class VS implements CommandExecutor{
 		List<String> cmds = new ArrayList<String>();
 		cmds.add(listPrefix + trimColor + "/shop " + ChatColor.GRAY + "[page]" + descColor + " - View merchant commands.");
 		cmds.add(listPrefix + trimColor + "/vs help " + ChatColor.GRAY + "[page]" + descColor + " - VirtualShop's technical commands.");
-		cmds.add(listPrefix + trimColor + "/vs lookup " + ChatColor.BLUE + "[item id]" + descColor + " - Browse item name information.");
+		cmds.add(listPrefix + trimColor + "/vs lookup " + ChatColor.BLUE + "[item]" + descColor + " - Browse item name information.");
 		cmds.add(listPrefix + trimColor + "/vs version" + descColor + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.access.admin")){
 			cmds.add(listPrefix + trimColor + "/vs formatmarket " + ChatColor.BLUE + "[item]" + descColor + " - Reprice all items who's market price exceeds the set limit.");
@@ -219,31 +225,35 @@ public class VS implements CommandExecutor{
 	@SuppressWarnings("deprecation")
 	public void cmdLookup(CommandSender sender, String[] args){
 		final String baseColor = configM.getBaseColor();
-    	//final String trimColor = configM.getTrimColor();
+    	final String trimColor = configM.getTrimColor();
     	
 		ItemStack target = null;
 		
-		//Zero arguments grabs player's hand.
-		if(args.length == 1){
+		//Hand
+		if(args.length == 1 || (args.length > 1 && (args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand") || args[1].equalsIgnoreCase("offhand")))){
 			if(!(sender instanceof Player)){
 				cm.sendError(sender, "You must specify an item!");
 				return;
 			}
 			Player p = (Player)sender;
-			target = p.getInventory().getItemInMainHand();
+			if(args.length > 1 && args[1].equalsIgnoreCase("offhand")) target = p.getInventory().getItemInOffHand();
+			else target = p.getInventory().getItemInMainHand();
+			
 			if(target == null){
 				cm.sendError(sender, "Lookup failed. You are not holding an item nor did you specify one.");
 				return;
 			}
 		}
 		
-		//One or more arguments grabs the item specified.
-		if(args.length > 1){
+		if(args.length > 1 && target == null){
 			target = idb.get(args[1], 0);
 			if(target == null){
-	    		cm.sendError(sender, "Lookup failed. Could not find " + args[1] + " in the database.");
-	    		return;
-	    	}
+				target = idb.unsafeLookup(args[1]);
+				if(target == null){
+					cm.sendError(sender, "Lookup failed. Could not find " + args[1] + " in the database.");
+					return;
+				}
+			}
 		}
 		
 		//Final check for security.
@@ -252,8 +262,29 @@ public class VS implements CommandExecutor{
 			return;
 		}
 		
-		String topLine = cm.formatHeaderLength(cm.formatItem(target.getType().toString()).toUpperCase() + baseColor + " - " + cm.formatItem(target.getTypeId() + ":" + target.getData().getData()), VS.class);
+		//Blocked items.
+		if(target.getTypeId() == 440){
+			cm.sendError(sender, "The vs does not yet support this item. Try again soon!");
+			return;
+		}
+		
+		List<String> aliases = idb.getAliases(target);
+		String formattedAliasList;
+		
+		
+		if(aliases.size() < 1){
+			formattedAliasList = configM.getErrorColor() + "Could not find this item in the database. It's either damaged, not included in the VS, or from a recent update!";
+			//return;
+		} else {
+			formattedAliasList = trimColor + "Viable Names: " + aliases.toString();
+			formattedAliasList = formattedAliasList.replaceAll("\\[", trimColor + "\\[" + baseColor);
+			//formattedAliasList = formattedAliasList.replaceAll(",", trimColor + "," + baseColor);
+			formattedAliasList = formattedAliasList.replaceAll("\\]", trimColor + "\\]" + baseColor);
+		}
+		
+		String topLine = cm.getPrefix() + " " + cm.formatItem(target.getType().toString()).toUpperCase() + trimColor + " - " + cm.formatItem(target.getTypeId() + ":" + target.getData().getData());
 		sender.sendMessage(topLine);
+		sender.sendMessage(baseColor + formattedAliasList);
 		
 	}
 	

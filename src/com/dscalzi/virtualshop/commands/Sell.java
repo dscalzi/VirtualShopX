@@ -9,6 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
@@ -131,14 +132,17 @@ public class Sell implements CommandExecutor{
 		int amount = Numbers.parseInteger(args[0]);
 		ItemStack item = idb.get(args[1], amount);
 		double price = Numbers.parseDouble(args[2]);
-		InventoryManager im = new InventoryManager(player);
+		PlayerInventory im = player.getInventory();
 		//Validate Data
 		if(amount < 0 || price < 0){
 			cm.numberFormat(player);
 			return false;
 		}
-		if(args[1].equalsIgnoreCase("hand")){
-			item = new ItemStack(player.getItemInHand().getType(),amount, player.getItemInHand().getDurability());
+		if(args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand")){
+			item = new ItemStack(im.getItemInMainHand().getType(),amount, im.getItemInMainHand().getDurability());
+			args[1] = idb.reverseLookup(item);
+		} else if(args[1].equalsIgnoreCase("offhand")){
+			item = new ItemStack(im.getItemInOffHand().getType(),amount, im.getItemInOffHand().getDurability());
 			args[1] = idb.reverseLookup(item);
 		}
 		if(item==null){
@@ -146,7 +150,7 @@ public class Sell implements CommandExecutor{
 			return false;
 		}
 		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
-        	ItemStack[] inv = player.getInventory().getContents();
+        	ItemStack[] inv = im.getContents();
         	int total = 0;
         	for(int i=0; i<inv.length-5; ++i){
         		if(inv[i] == null)
@@ -155,6 +159,9 @@ public class Sell implements CommandExecutor{
         			total += inv[i].getAmount();
         		}
         	}
+        	if(idb.reverseLookup(im.getItemInOffHand()).equals(idb.reverseLookup(item))){
+        		total += im.getItemInOffHand().getAmount();
+        	}
         	amount = total;
         	item.setAmount(total);
         }
@@ -162,7 +169,9 @@ public class Sell implements CommandExecutor{
 			cm.priceTooHigh(player, args[1], configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return false;
 		}
-		if(!im.contains(item,true,true)){
+		ItemStack temp = new ItemStack(item);
+		temp.setAmount(item.getAmount()-im.getItemInOffHand().getAmount());
+		if(!im.contains(temp) && im.getItemInOffHand().getAmount()+item.getAmount() == amount){
 			if(item.getAmount() == 0)
         		cm.sendError(player, "You do not have any " + cm.formatItem(args[1]));
 			else
@@ -194,6 +203,7 @@ public class Sell implements CommandExecutor{
 		double price = data.getPrice();
 		InventoryManager im = new InventoryManager(player);
 		im.remove(item, true, true);
+		if(player.getInventory().getItemInOffHand().isSimilar(item)) player.getInventory().setItemInOffHand(null);
         dbm.removeSellerOffers(player.getUniqueId(),item);
         item.setAmount(item.getAmount() + data.getCurrentListings());
         Offer o = new Offer(player.getUniqueId(),item,price);

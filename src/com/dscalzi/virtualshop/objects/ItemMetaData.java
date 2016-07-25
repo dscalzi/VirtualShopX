@@ -1,5 +1,7 @@
 package com.dscalzi.virtualshop.objects;
 
+import java.util.Comparator;
+
 /**
  * Utility class to store ItemStack meta data.
  * No validation will be done in this class.
@@ -7,7 +9,7 @@ package com.dscalzi.virtualshop.objects;
  * @author Daniel Scalzi
  *
  */
-public class ItemMetaData {
+public class ItemMetaData implements Comparator<ItemMetaData>, Comparable<ItemMetaData>{
 
 	private int itemID;
 	//For potions
@@ -62,5 +64,15 @@ public class ItemMetaData {
 		if (itemID != other.itemID)
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(ItemMetaData o) {			
+		return (this.getTypeID() - o.getTypeID() == 0) ? (this.getData() - o.getData()) : (this.getTypeID() - o.getTypeID());
+	}
+
+	@Override
+	public int compare(ItemMetaData o1, ItemMetaData o2) {
+		return (o1.getTypeID() - o2.getTypeID() == 0) ? (o1.getData() - o2.getData()) : (o1.getTypeID() - o2.getTypeID());
 	}
 }

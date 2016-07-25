@@ -7,9 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -28,8 +33,8 @@ public final class ItemDB {
 	
 	private ItemDB(Plugin plugin) throws IOException{
 		this.plugin = (VirtualShop)plugin;
-		items = new HashMap<String, ItemMetaData>();
-		reverse = new HashMap<ItemMetaData, String>();
+		items = new LinkedHashMap<String, ItemMetaData>();
+		reverse = new LinkedHashMap<ItemMetaData, String>();
 		this.load();
 	}
 	
@@ -59,16 +64,15 @@ public final class ItemDB {
 					
 					ItemMetaData meta = new ItemMetaData(Integer.parseInt(parts[1]), Short.parseShort(parts[2]));
 					
+					if(items.containsKey(parts[0])) items.remove(parts[0]);
 					items.put(parts[0], meta);
 					if(parts.length > 2 && !reverse.containsKey(meta)) reverse.put(meta, parts[0]);
-					if(parts[0].equals("andesite")) System.out.println(meta);
 				} catch (Exception ex){
 					plugin.getLogger().warning("Error parsing items.csv on line " + i);
 				}
 			}
 		} finally {
 			rx.close();
-			System.out.println(items.values().size());
 		}
 	}
 	
@@ -118,23 +122,50 @@ public final class ItemDB {
 	
 	public String reverseLookup(ItemStack item)	{
 		ItemMetaData data = new ItemMetaData(item.getTypeId(), item.getDurability());
-		System.out.println(data);
 		if(reverse.containsKey(data)) {
-			System.out.println(reverse.get(data));
 			return reverse.get(data);
 		}
 		return item.getType().name().toLowerCase();
 	}
 	
-	/*
+	/**
+	 * Will not reference the database as this method is intended for items
+	 * that could not be found in our database.
+	 */
+	public ItemStack unsafeLookup(String id){
+		
+		ItemMetaData data = null;
+		
+		try{
+			data = ItemMetaData.parseItemMetaData(id);
+		} catch (IllegalArgumentException e){
+			//Not an ID, try name.
+			for(Material m : Material.values()){
+				if(m.toString().equalsIgnoreCase(id)){
+					return new ItemStack(m);
+				}
+			}
+			return null;
+		}
+		
+		return new ItemStack(data.getTypeID(), data.getData());
+	}
+	
 	public List<String> getAliases(ItemStack item){
 		List<String> ret = new ArrayList<String>();
+		int typeID = item.getTypeId();
+		int data = item.getDurability();
 		
-		for(Map.Entry<String, Integer> entry : items.entrySet()){
-			
+		Iterator<Entry<String, ItemMetaData>> it = items.entrySet().iterator();
+		while(it.hasNext()){
+			Entry<String, ItemMetaData> entry = it.next();
+			ItemMetaData meta = entry.getValue();
+			if(typeID != meta.getTypeID()) continue;
+			if(data != meta.getData()) continue;
+			ret.add(entry.getKey());
 		}
 		
 		return ret;
-	}*/
+	}
 	
 }
