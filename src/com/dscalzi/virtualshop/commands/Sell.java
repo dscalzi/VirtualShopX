@@ -17,8 +17,8 @@ import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
-import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.ItemDB;
+import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.Numbers;
 
 /**
@@ -133,16 +133,19 @@ public class Sell implements CommandExecutor{
 		ItemStack item = idb.get(args[1], amount);
 		double price = Numbers.parseDouble(args[2]);
 		PlayerInventory im = player.getInventory();
+		InventoryManager invM = new InventoryManager(player);
 		//Validate Data
 		if(amount < 0 || price < 0){
 			cm.numberFormat(player);
 			return false;
 		}
 		if(args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand")){
-			item = new ItemStack(im.getItemInMainHand().getType(),amount, im.getItemInMainHand().getDurability());
+			item = new ItemStack(im.getItemInMainHand());
+			item.setAmount(amount);
 			args[1] = idb.reverseLookup(item);
 		} else if(args[1].equalsIgnoreCase("offhand")){
-			item = new ItemStack(im.getItemInOffHand().getType(),amount, im.getItemInOffHand().getDurability());
+			item = new ItemStack(im.getItemInOffHand());
+			item.setAmount(amount);
 			args[1] = idb.reverseLookup(item);
 		}
 		if(item==null){
@@ -155,11 +158,11 @@ public class Sell implements CommandExecutor{
         	for(int i=0; i<inv.length-5; ++i){
         		if(inv[i] == null)
         			continue;
-        		else if(idb.reverseLookup(inv[i]).equals(idb.reverseLookup(item))){
+        		else if(inv[i].isSimilar(item)){
         			total += inv[i].getAmount();
         		}
         	}
-        	if(idb.reverseLookup(im.getItemInOffHand()).equals(idb.reverseLookup(item))){
+        	if(im.getItemInOffHand().isSimilar(item)){
         		total += im.getItemInOffHand().getAmount();
         	}
         	amount = total;
@@ -169,11 +172,10 @@ public class Sell implements CommandExecutor{
 			cm.priceTooHigh(player, args[1], configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return false;
 		}
-		ItemStack temp = new ItemStack(item);
-		temp.setAmount(item.getAmount()-im.getItemInOffHand().getAmount());
-		if(!im.contains(temp) && im.getItemInOffHand().getAmount()+item.getAmount() == amount){
+		
+		if(!(invM.contains(item))){
 			if(item.getAmount() == 0)
-        		cm.sendError(player, "You do not have any " + cm.formatItem(args[1]));
+				cm.sendError(player, "You do not have any " + cm.formatItem(args[1]));
 			else
 				cm.sendError(player, "You do not have " + cm.formatAmount(item.getAmount()) + " " + cm.formatItem(args[1]));
 			return false;
@@ -202,8 +204,7 @@ public class Sell implements CommandExecutor{
 		ItemStack item = data.getItem();
 		double price = data.getPrice();
 		InventoryManager im = new InventoryManager(player);
-		im.remove(item, true, true);
-		if(player.getInventory().getItemInOffHand().isSimilar(item)) player.getInventory().setItemInOffHand(null);
+		im.removeItem(item);
         dbm.removeSellerOffers(player.getUniqueId(),item);
         item.setAmount(item.getAmount() + data.getCurrentListings());
         Offer o = new Offer(player.getUniqueId(),item,price);

@@ -12,8 +12,8 @@ import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
-import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.ItemDB;
+import com.dscalzi.virtualshop.util.InventoryManager;
 
 public class Cancel implements CommandExecutor{
 
@@ -110,27 +110,7 @@ public class Cancel implements CommandExecutor{
 		
         item.setAmount(cancelAmt);
         ItemStack[] inv = player.getInventory().getContents();
-        int openNum = 0;
-        //Adjusting length, in 1.9+ .getContents includes armor. We only want inventory.
-        for(int i=0; i<inv.length-5; ++i){
-    		if(inv[i] == null){
-    			openNum += 64;
-    			continue;
-    		} else if(inv[i].getType() == item.getType() && inv[i].getData() == inv[i].getData()){
-    			openNum += (64-inv[i].getAmount());
-    		}
-    	}
         new InventoryManager(player).addItem(item);
-        if(openNum < cancelAmt){
-        	int dropAmount = cancelAmt-openNum;
-        	while(dropAmount > 0){
-        		int amtToDrop = 64;
-        		if(dropAmount < 64) amtToDrop = dropAmount;
-        		item.setAmount(amtToDrop);
-        		player.getWorld().dropItem(player.getLocation(), item);
-        		dropAmount -= amtToDrop;
-        	}
-        }
         int a = 0;
         double oPrice = 0;
         for(Offer o: dbm.getSellerOffers(player.getUniqueId(),item)){

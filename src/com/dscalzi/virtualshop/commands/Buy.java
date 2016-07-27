@@ -14,8 +14,8 @@ import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.objects.TransactionData;
-import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.ItemDB;
+import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.Numbers;
 
 import java.util.HashMap;
@@ -171,20 +171,6 @@ public class Buy implements CommandExecutor{
 		List<Offer> offers = data.getOffers();
 		InventoryManager im = new InventoryManager(player);
 		
-		int openNum = 0;
-		if(finalize){
-			ItemStack[] inv = player.getInventory().getContents();
-			//Adjusting length, in 1.9+ .getContents includes armor. We only want inventory.
-        	for(int i=0; i<inv.length-5; ++i){
-        		if(inv[i] == null){
-        			openNum += 64;
-        			continue;
-        		} else if(inv[i].getType() == item.getType()){
-        			openNum += (64-inv[i].getAmount());
-        		}
-        	}
-		}
-		
         int bought = 0;
         double spent = 0;
         boolean tooHigh = false;
@@ -250,16 +236,6 @@ public class Buy implements CommandExecutor{
         item.setAmount(bought);
         if(finalize){
         	if(bought > 0) im.addItem(item);
-        	if(openNum < bought){
-        		int dropAmount = bought-openNum;
-            	while(dropAmount > 0){
-            		int amtToDrop = 64;
-            		if(dropAmount < 64) amtToDrop = dropAmount;
-            		item.setAmount(amtToDrop);
-            		player.getWorld().dropItem(player.getLocation(), item);
-            		dropAmount -= amtToDrop;
-            	}
-        	}
         }
         if(tooHigh && bought == 0 && args.length > 2 && !anyLessThanMax){
         	cm.sendError(player,"No one is selling " + cm.formatItem(args[1]) + configM.getErrorColor() + " cheaper than " + cm.formatPrice(maxprice));

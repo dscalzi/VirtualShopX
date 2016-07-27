@@ -98,6 +98,7 @@ public final class ItemDB {
 	public ItemStack get(String id, int quantity){
 		ItemStack target = getUnsafe(id);
 		if(target == null) return null;
+		target.setAmount(quantity);
 		if (items.containsValue(new ItemMetaData(target.getTypeId(), target.getDurability()))) return target;
 		return null;
 	}
