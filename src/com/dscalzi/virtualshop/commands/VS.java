@@ -51,15 +51,18 @@ public class VS implements CommandExecutor{
 		}
 		
 		String cmd = command.getName();
-		if(cmd.equalsIgnoreCase("shop")){
+		if(cmd.equalsIgnoreCase("shop") || (cmd.equals("vs") && args.length > 0 && args[0].equalsIgnoreCase("shop"))){
 			if(args.length > 0){
 				try{
-    				int page = Integer.parseInt(args[0]);
+    				int page = (args[0].equalsIgnoreCase("shop") ? Integer.parseInt(args[1]) : Integer.parseInt(args[0]));
     				this.cmdList(sender, page);
     				return true;
     			} catch (NumberFormatException e){
     				cm.sendError(sender, "Page does not exist");
 					return true;
+    			} catch (ArrayIndexOutOfBoundsException e){
+    				this.cmdList(sender, 1);
+    				return true;
     			}
 			}
 			this.cmdList(sender, 1);
@@ -80,6 +83,10 @@ public class VS implements CommandExecutor{
 		    			}
 					}
 					this.vsList(sender, 1);
+					return true;
+				}
+				if(args[0].matches("^(?iu)(buy|sell|cancel|find|stock|sales)")){
+					this.redirectCommand(sender, args);
 					return true;
 				}
 				if(args[0].equalsIgnoreCase("lookup")){
@@ -369,6 +376,16 @@ public class VS implements CommandExecutor{
 		
 	}
 	
+	private void redirectCommand(CommandSender sender, String[] args){
+		if(args.length > 0){
+			CommandExecutor exec = plugin.getCommand(args[0]).getExecutor();
+			if(exec == null) throw new IllegalArgumentException();
+			String[] newArgs = new String[args.length-1];
+			System.arraycopy(args, 1, newArgs, 0, newArgs.length);
+			exec.onCommand(sender, null, "vs " + args[0], newArgs);
+		}
+	}
+	
 	public void cmdReload(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshop.access.admin")){
@@ -380,7 +397,10 @@ public class VS implements CommandExecutor{
 			cmdReloadConfig(sender);
 			return;
 		}
-		PluginUtil.reload(plugin);
+		Runnable r = () -> {
+			PluginUtil.reload(plugin);
+		};
+		r.run();
 		cm.sendSuccess(sender, "Plugin successfully reloaded.");
 	}
 	

@@ -109,7 +109,6 @@ public class Cancel implements CommandExecutor{
 			cancelAmt = total;
 		
         item.setAmount(cancelAmt);
-        ItemStack[] inv = player.getInventory().getContents();
         new InventoryManager(player).addItem(item);
         int a = 0;
         double oPrice = 0;

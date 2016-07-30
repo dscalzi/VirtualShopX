@@ -35,7 +35,6 @@ public class Transaction
             {
                 Transaction t = new Transaction(UUID.fromString(result.getString("seller_uuid")), UUID.fromString(result.getString("buyer_uuid")), result.getInt("item"), result.getInt("damage"), result.getInt("amount"), result.getDouble("cost"));
                 ret.add(t);
-                System.out.println(t.getBuyer());
             }
         } catch (SQLException e) {
         }

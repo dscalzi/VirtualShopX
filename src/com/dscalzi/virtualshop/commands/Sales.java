@@ -5,7 +5,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
@@ -53,7 +52,16 @@ public class Sales implements CommandExecutor{
         }
 		
 		try{
-			this.execute(sender, args);
+			execute(sender, args);
+			/*
+			new BukkitRunnable(){
+				
+				@Override
+				public void run(){
+					execute(sender, args);
+				}
+	        }.runTaskAsynchronously(plugin);
+	        */
     	} catch (LinkageError e){
     		cm.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
     	}
@@ -67,7 +75,7 @@ public class Sales implements CommandExecutor{
     	
         OfflinePlayer target;
         int start = 1;
-        List<Transaction> transactions;
+        List<Transaction> transactions = null;
         transactions = dbm.getTransactions();
         String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + configM.getServerName() + trimColor + ChatColor.BOLD + " >";
         //If /sales args, check to see if it's a number

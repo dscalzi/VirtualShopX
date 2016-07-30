@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -141,10 +142,18 @@ public class Sell implements CommandExecutor{
 		}
 		if(args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand")){
 			item = new ItemStack(im.getItemInMainHand());
+			if(item.getType() == Material.AIR){
+				cm.holdingNothing(player);
+				return false;
+			}
 			item.setAmount(amount);
 			args[1] = idb.reverseLookup(item);
 		} else if(args[1].equalsIgnoreCase("offhand")){
 			item = new ItemStack(im.getItemInOffHand());
+			if(item.getType() == Material.AIR){
+				cm.holdingNothing(player);
+				return false;
+			}
 			item.setAmount(amount);
 			args[1] = idb.reverseLookup(item);
 		}

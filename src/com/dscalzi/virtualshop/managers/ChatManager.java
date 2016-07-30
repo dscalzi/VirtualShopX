@@ -129,6 +129,10 @@ public final class ChatManager {
 		sendError(sender, "What is " + item + "?");
 	}
 	
+	public void holdingNothing(CommandSender sender){
+		sendError(sender, "You are not holding anything!");
+	}
+	
 	public void priceTooHigh(CommandSender sender, String item, long priceLimit){
     	sendError(sender, "Woah, you're selling your " + formatItem(item) + this.eColor + " for a rather high price. To avoid scamming, we've set the limit for that item to $" + priceLimit);
     }

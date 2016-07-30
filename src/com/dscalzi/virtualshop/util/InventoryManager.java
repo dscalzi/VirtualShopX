@@ -75,6 +75,8 @@ public class InventoryManager {
     	    }
     	}
 		
+		if(dropAmount == 0) return;
+		
 		if(_inv.getItemInOffHand().isSimilar(item)){
 			if(_inv.getItemInOffHand().getAmount() < 64){
 				ItemStack offhand = _inv.getItemInOffHand();
