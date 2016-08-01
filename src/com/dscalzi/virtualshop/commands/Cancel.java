@@ -41,7 +41,7 @@ public class Cancel implements CommandExecutor{
             cm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.cancel")){
+		if(!sender.hasPermission("virtualshop.merchant.cancel")){
             cm.noPermissions(sender);
             return true;
         }

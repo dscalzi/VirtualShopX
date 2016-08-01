@@ -162,7 +162,7 @@ public final class ChatManager {
 	}
 	
 	public void noPermissions(CommandSender sender){
-		sendError(sender, "You do not have permission to do this");
+		sendError(sender, "You do not have permission to do this.");
 	}
 	
 	public void noTransactions(CommandSender sender, String name){

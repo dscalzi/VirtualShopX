@@ -56,7 +56,7 @@ public class Sell implements CommandExecutor{
             cm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.sell")){
+		if(!sender.hasPermission("virtualshop.merchant.sell")){
             cm.noPermissions(sender);
             return true;
         }

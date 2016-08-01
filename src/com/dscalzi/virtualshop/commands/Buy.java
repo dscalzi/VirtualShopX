@@ -51,7 +51,7 @@ public class Buy implements CommandExecutor{
 			cm.denyConsole(sender);
 			return true;
 		}
-		if(!sender.hasPermission("virtualshop.buy")){
+		if(!sender.hasPermission("virtualshop.merchant.buy")){
             cm.noPermissions(sender);
             return true;
         }

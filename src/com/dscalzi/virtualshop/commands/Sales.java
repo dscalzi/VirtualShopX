@@ -38,7 +38,7 @@ public class Sales implements CommandExecutor{
 	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!sender.hasPermission("virtualshop.sales")){
+		if(!sender.hasPermission("virtualshop.merchant.sales")){
             cm.noPermissions(sender);
             return true;
         }

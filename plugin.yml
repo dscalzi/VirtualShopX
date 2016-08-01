@@ -4,53 +4,74 @@ main: com.dscalzi.virtualshop.VirtualShop
 name: VirtualShop
 version: AvSoft 1.10.2-R0.1-SNAPSHOT
 depend: [Vault]
+loadbefore: [VSReloader]
 commands:
     buy:
         description: Buy goods for sale on the VirtualShop.
-        usage: /buy <amount> <item> [maxprice]
+        usage: /<command> <amount> <item> [maxprice]
     sell:
         description: Put goods up for sale on the VirtualShop.
-        usage: /sell <amount> <item> <price> | /sell <amount> hand <price>
+        usage: /<command> <amount> <item> <price> | /<command> <amount> [hand/mainhand/offhand] <price>
     cancel:
         description: Removes items from VirtualShop.
-        usage: /cancel <item>
+        usage: /<command> <item>
     find:
         description: Find offers for an item.
-        usage: /price <item>
+        usage: /<command> <item>
     stock:
         description: List items for sale.
-        usage: /stock [player] [page]
+        usage: /<command> [player] [page]
     sales:
         description: See sales that have been made.
-        usage: /sales [player] [page]
+        usage: /<command> [player] [page]
     shop:
         description: Displays help.
-        usage: /shop
+        usage: /<command> [page]
     vs:
         description: Technical commands under /vs.
-        usage: /vs [param]
+        usage: /<command> [param]
 permissions:
-    virtualshop.access.beta:
-        description: Restricts access during beta period
-        default: OP
-    virtualshop.access.admin:
-        description: Access to administrator commands
-        default: OP
-    virtualshop.sell:
-        description: Allow usage of /sell
-        default: true
-    virtualshop.buy:
+    virtualshop.merchant.buy:
         description: Allow usage of /buy
-        default: true
-    virtualshop.find:
-        description: Allow usage of /find
-        default: true
-    virtualshop.cancel:
+    virtualshop.merchant.cancel:
         description: Allow usage of /cancel
-        default: true
-    virtualshop.stock:
-        description: Allow usage of /stock
-        default: true
-    virtualshop.sales:
+    virtualshop.merchant.find:
+        description: Allow usage of /find
+    virtualshop.merchant.lookup:
+        description: Allow usage of /vs lookup
+    virtualshop.merchant.sales:
         description: Allow usage of /sales
+    virtualshop.merchant.sell:
+        description: Allow usage of /sell
+    virtualshop.merchant.stock:
+        description: Allow usage of /stock
+    virtualshop.admin.formatmarket:
+        description: Allow usage of /vs formatmarket
+    virtualshop.admin.reloadconfig:
+        description: Allow usage of /vs reloadconfig
+    virtualshop.admin.uuidnamesync:
+        description: Allow usage of /vs uuidnamesync
+    virtualshop.developer.reload:
+        description: Allow usage of /vs reload
+    virtualshop.merchant.*:
         default: true
+        description: Grants access to all merchant commands.
+        children:
+          virtualshop.merchant.buy: true
+          virtualshop.merchant.cancel: true
+          virtualshop.merchant.find: true
+          virtualshop.merchant.lookup: true
+          virtualshop.merchant.sales: true
+          virtualshop.merchant.sell: true
+          virtualshop.merchant.stock: true
+    virtualshop.admin.*:
+        default: OP
+        description: Access to administrator commands,
+        children:
+          virtualshop.merchant.*: true
+          virtualshop.admin.formatmarket: true
+          virtualshop.admin.reloadconfig: true
+          virtualshop.admin.uuidnamesync: true
+    virtualshop.access.beta:
+        description: Restricts access during beta period.
+        default: OP

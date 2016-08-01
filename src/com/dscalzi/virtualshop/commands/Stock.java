@@ -40,7 +40,7 @@ public class Stock implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
-		if(!sender.hasPermission("virtualshop.stock")){
+		if(!sender.hasPermission("virtualshop.merchant.stock")){
             cm.noPermissions(sender);
             return true;
         }

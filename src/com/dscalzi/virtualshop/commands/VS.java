@@ -1,5 +1,6 @@
 package com.dscalzi.virtualshop.commands;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -200,12 +201,15 @@ public class VS implements CommandExecutor{
 		cmds.add(listPrefix + trimColor + "/vs help " + ChatColor.GRAY + "[page]" + descColor + " - VirtualShop's technical commands.");
 		cmds.add(listPrefix + trimColor + "/vs lookup " + ChatColor.BLUE + "[item]" + descColor + " - Browse item name information.");
 		cmds.add(listPrefix + trimColor + "/vs version" + descColor + " - View plugin's version.");
-		if(sender.hasPermission("virtualshop.access.admin")){
+		if(sender.hasPermission("virtualshop.admin.formatmarket"))
 			cmds.add(listPrefix + trimColor + "/vs formatmarket " + ChatColor.BLUE + "[item]" + descColor + " - Reprice all items who's market price exceeds the set limit.");
+		if(sender.hasPermission("virtualshop.admin.reload"))
 			cmds.add(listPrefix + trimColor + "/vs reload" + descColor + " - Reload the entire plugin's jar file.");
+		if(sender.hasPermission("virtualshop.admin.reloadconfig"))
 			cmds.add(listPrefix + trimColor + "/vs reloadconfig" + descColor + " - Reload the plugin's configuration.");
+		if(sender.hasPermission("virtualshop.admin.uuidnamesync"))
 			cmds.add(listPrefix + trimColor + "/vs uuidnamesync [uuid]" + descColor + " - Syncs database names with uuids.");
-		}
+		
 		
 		PageList<String> commands = new PageList<>(cmds, 6);
 		
@@ -231,6 +235,12 @@ public class VS implements CommandExecutor{
 	
 	@SuppressWarnings("deprecation")
 	public void cmdLookup(CommandSender sender, String[] args){
+		
+		if(!sender.hasPermission("virtualshop.merchant.lookup")){
+			cm.noPermissions(sender);
+			return;
+		}
+		
 		final String baseColor = configM.getBaseColor();
     	final String trimColor = configM.getTrimColor();
     	
@@ -298,7 +308,7 @@ public class VS implements CommandExecutor{
 	@SuppressWarnings("deprecation")
 	public void formatMarket(CommandSender sender){
 		
-		if(!sender.hasPermission("virtualshop.access.admin")){
+		if(!sender.hasPermission("virtualshop.admin.formatmarket")){
 			cm.noPermissions(sender);
             return;
 		}
@@ -319,7 +329,7 @@ public class VS implements CommandExecutor{
 	@SuppressWarnings("deprecation")
 	public void formatMarket(CommandSender sender, String itm){
 		
-		if(!sender.hasPermission("virtualshop.access.admin")){
+		if(!sender.hasPermission("virtualshop.admin.formatmarket")){
 			cm.noPermissions(sender);
             return;
 		}
@@ -350,7 +360,7 @@ public class VS implements CommandExecutor{
 	
 	public void cmdUUIDNameSync(CommandSender sender, Optional<String> uuid){
 		
-		if(!sender.hasPermission("virtualshop.access.admin")){
+		if(!sender.hasPermission("virtualshop.admin.uuidnamesync")){
 			cm.noPermissions(sender);
             return;
 		}
@@ -388,13 +398,22 @@ public class VS implements CommandExecutor{
 	
 	public void cmdReload(CommandSender sender){
 		
-		if(!sender.hasPermission("virtualshop.access.admin")){
+		if(!sender.hasPermission("virtualshop.developer.reload")){
+			if(sender.hasPermission("virtualshop.admin.reloadconfig")){
+				cm.sendError(sender, "You do not have permission to reload the plugin, reloading config instead.");
+				this.cmdReloadConfig(sender);
+				return;
+			}
 			cm.noPermissions(sender);
             return;
 		}
 		if(plugin.getServer().getPluginManager().getPlugin("VSReloader") == null){
-			cm.sendError(sender, "VS Reloader not found, reloading config instead.");
-			cmdReloadConfig(sender);
+			if(sender.hasPermission("virtualshop.admin.reloadconfig")){
+				cm.sendError(sender, "VS Reloader not found, reloading config instead.");
+				cmdReloadConfig(sender);
+			} else {
+				cm.sendError(sender, "VS Reloader not found, could not reload the plugin.");
+			}
 			return;
 		}
 		Runnable r = () -> {
@@ -406,11 +425,17 @@ public class VS implements CommandExecutor{
 	
 	public void cmdReloadConfig(CommandSender sender){
 		
-		if(!sender.hasPermission("virtualshop.access.admin")){
+		if(!sender.hasPermission("virtualshop.admin.reloadconfig")){
 			cm.noPermissions(sender);
             return;
 		}
 		
+		try {
+			ItemDB.reload();
+		} catch (IOException e) {
+			cm.sendError(sender, "Reference file 'items.csv' not found. Shutting down!");
+            plugin.getPluginLoader().disablePlugin(plugin);
+		}
 		ConfigManager.reload();
 		ChatManager.reload();
 		
@@ -418,6 +443,9 @@ public class VS implements CommandExecutor{
 		
 	}
 	
+	/**
+	 *  Never restrict this command.
+	 */
 	public void cmdVersion(CommandSender sender){
 		ChatManager.getInstance().sendMessage(sender, "Virtual Shop version " + plugin.getDescription().getVersion());
 	}
