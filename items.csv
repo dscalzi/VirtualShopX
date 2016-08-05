@@ -1,5 +1,5 @@
-#version: TeamCity,,
-#If you change this file, it will not be automatically updated after the next release.,
+#version: TeamCity
+#If you change this file, it will not be automatically updated after the next release.
 #item,id,metadata
 stone,1,0
 sstone,1,0
@@ -4129,10 +4129,18 @@ dofence,191,0
 doakfence,191,0
 acaciafence,192,0
 afence,192,0
-magma,213,0
+magmablock,213,0
+blockmagma,213,0
 netherwartblock,214,0
+blocknetherwart,214,0
 rednetherbrick,215,0
+rednetherbrickblock,215,0
+blockrednetherbrick,215,0
+rednbblock,215,0
+blockrednb,215,0
 boneblock,216,0
+skeletonboneblock,216,0
+skeletonblock,216,0
 structureblock,255,0
 ironshovel,256,0
 ironspade,256,0
@@ -6761,6 +6769,11 @@ eggendermite,383,67
 guardianegg,383,68
 guardianspawnegg,383,68
 eggguardian,383,68
+spawneggshulker,383,69
+spawnshulker,383,69
+shulkerspawnegg,383,69
+shulkeregg,383,69
+shulkegg,383,69
 pigegg,383,90
 eggpig,383,90
 sheepegg,383,91
@@ -6791,6 +6804,18 @@ egghorse,383,100
 horseegg,383,100
 rabbitegg,383,101
 rabbitspawnegg,383,101
+spawneggpolarbear,383,102
+spawneggpolar,383,102
+spawneggbear,383,102
+spawnpolarbear,383,102
+spawnpolar,383,102
+spawnbear,383,102
+polarbearspawnegg,383,102
+polarspawnegg,383,102
+bearspawnegg,383,102
+polarbearegg,383,102
+polaregg,383,102
+bearegg,383,102
 villageregg,383,120
 eggvillager,383,120
 bottleofenchanting,384,0
@@ -7724,15 +7749,15 @@ purplepillar,202,0
 purpurcollum,202,0
 purcollum,202,0
 purplecollum,202,0
-purpurstairs,203,0
-purpurstep,203,0
-purpursteps,203,0
-purplestairs,203,0
-purplesteps,203,0
-purplestep,203,0
-purstairs,203,0
-pursteps,203,0
-purstep,203,0
+purpurstairs,203
+purpurstep,203
+purpursteps,203
+purplestairs,203
+purplesteps,203
+purplestep,203
+purstairs,203
+pursteps,203
+purstep,203
 purpurslab,205,0
 purpurhalf,205,0
 purslab,205,0
@@ -7819,11 +7844,6 @@ specterarrow,439,0
 glowstonearrow,439,0
 glowingarrow,439,0
 glowarrow,439,0
-spawneggshulker,383,0
-spawnshulker,383,0
-shulkerspawnegg,383,0
-shulkeregg,383,0
-shulkegg,383,0
 arrowregeneration,440,0
 regenerationarrow,440,0
 arrowregen,440,0
