@@ -86,7 +86,7 @@ public class VS implements CommandExecutor{
 					this.vsList(sender, 1);
 					return true;
 				}
-				if(args[0].matches("^(?iu)(buy|sell|cancel|find|stock|sales)")){
+				if(args[0].matches("^(?iu)(buy|sell|cancel|find|updateprice|stock|sales)")){
 					this.redirectCommand(sender, args);
 					return true;
 				}
@@ -291,11 +291,9 @@ public class VS implements CommandExecutor{
 		
 		if(aliases.size() < 1){
 			formattedAliasList = configM.getErrorColor() + "Could not find this item in the database. It's either damaged, not included in the VS, or from a recent update!";
-			//return;
 		} else {
 			formattedAliasList = trimColor + "Viable Names: " + aliases.toString();
 			formattedAliasList = formattedAliasList.replaceAll("\\[", trimColor + "\\[" + baseColor);
-			//formattedAliasList = formattedAliasList.replaceAll(",", trimColor + "," + baseColor);
 			formattedAliasList = formattedAliasList.replaceAll("\\]", trimColor + "\\]" + baseColor);
 		}
 		

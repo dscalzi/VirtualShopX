@@ -308,6 +308,10 @@ public final class DatabaseManager {
     	String query = "update vshop_stock set price="+price+" where id=" + id;
     	this.database.query(query);
     }
+    public void updatePrice(UUID merchantUUID, double price){
+    	String query = "update vshop_stock set price="+price+" where uuid='" + merchantUUID + "'";
+    	this.database.query(query);
+    }
     
     public void logTransaction(Transaction transaction) {
 		@SuppressWarnings("deprecation")

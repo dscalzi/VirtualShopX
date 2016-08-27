@@ -90,7 +90,7 @@ public class Sell implements CommandExecutor{
 			}
 		}
 		if(args.length < 3){
-			cm.sendError(sender, "Proper usage is /sell <amount> <item> <price>");
+			cm.sendError(sender, "Proper usage is /" + label + " <amount> <item> <price>");
 			return true;
 		}
 		if(this.confirmations.containsKey(player))

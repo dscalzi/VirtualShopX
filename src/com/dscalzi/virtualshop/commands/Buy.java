@@ -87,7 +87,7 @@ public class Buy implements CommandExecutor{
 		
 		/* Too few arguments */
 		if(args.length < 2){
-			cm.sendError(sender, "Proper usage is /buy <amount> <item> [maxprice]");
+			cm.sendError(sender, "Proper usage is /" + label + " <amount> <item> [maxprice]");
 			return true;
 		}
 		

@@ -59,7 +59,7 @@ public class Cancel implements CommandExecutor{
         	return true;
         }
 		if(args.length < 2){
-            cm.sendError(sender, "Proper usage is /cancel <amount> <item>");
+            cm.sendError(sender, "Proper usage is /" + label + " <amount> <item>");
             return true;
         }
 		

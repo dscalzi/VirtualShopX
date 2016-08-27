@@ -12,6 +12,7 @@ import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.Stock;
+import com.dscalzi.virtualshop.commands.UpdatePrice;
 import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
@@ -73,6 +74,7 @@ public class VirtualShop extends JavaPlugin {
     	this.getCommand("sales").setExecutor(new Sales(this));
     	this.getCommand("sell").setExecutor(new Sell(this));
     	this.getCommand("stock").setExecutor(new Stock(this));
+    	this.getCommand("updateprice").setExecutor(new UpdatePrice(this));
     	this.getCommand("vs").setExecutor(new VS(this));
     }
     

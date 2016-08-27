@@ -27,6 +27,9 @@ commands:
     shop:
         description: Displays help.
         usage: /<command> [page]
+    updateprice:
+        description: Updates the price for a listing.
+        usage: /<command> <item> <price>
     vs:
         description: Technical commands under /vs.
         usage: /<command> [param]
@@ -45,6 +48,8 @@ permissions:
         description: Allow usage of /sell
     virtualshop.merchant.stock:
         description: Allow usage of /stock
+    virtualhop.merchant.updateprice:
+        description: Allow usage of /vs updateprice
     virtualshop.admin.formatmarket:
         description: Allow usage of /vs formatmarket
     virtualshop.admin.reloadconfig:
@@ -64,6 +69,7 @@ permissions:
           virtualshop.merchant.sales: true
           virtualshop.merchant.sell: true
           virtualshop.merchant.stock: true
+          virtualshop.merchant.updateprice: true
     virtualshop.admin.*:
         default: OP
         description: Access to administrator commands,
