@@ -85,7 +85,7 @@ public class Cancel implements CommandExecutor{
         }
 		if(total == 0)
 		{
-			cm.sendError(player,"You do not have any " + args[1] + " for sale.");
+			cm.noSpecificStock(player, args[1]);
 			return;
 		}
 		

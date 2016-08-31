@@ -43,7 +43,11 @@ public class ConfirmationManager implements Serializable{
 	public static void initialize(Plugin plugin){
 		if(!initialized){
 			Optional<ConfirmationManager> e = ConfirmationManager.deserialize(plugin);
-			instance = e.isPresent() ? e.get() : new ConfirmationManager(plugin);
+			if(e.isPresent()){
+				instance = e.get();
+				instance.assignPlugin(plugin);
+			} else
+				instance = new ConfirmationManager(plugin);
 			initialized = true;
 		}
 	}
@@ -56,6 +60,10 @@ public class ConfirmationManager implements Serializable{
 	
 	public static ConfirmationManager getInstance(){
 		return ConfirmationManager.instance;
+	}
+	
+	private void assignPlugin(Plugin p){
+		this.plugin = (VirtualShop) p;
 	}
 	
 	/* Functions */
@@ -75,6 +83,17 @@ public class ConfirmationManager implements Serializable{
 			confirmations.remove(key);
 			return true;
 		}
+		return false;
+	}
+	
+	public VsDataCache retrieve(Class<? extends Confirmable> command, Player player){
+		Pair<Player, Class<? extends Confirmable>> key = new Pair<Player, Class<? extends Confirmable>>(player, command);
+		return confirmations.get(key);
+	}
+	
+	public boolean contains(Class<? extends Confirmable> command, Player player){
+		Pair<Player, Class<? extends Confirmable>> key = new Pair<Player, Class<? extends Confirmable>>(player, command);
+		if(confirmations.containsKey(key)) return true;
 		return false;
 	}
 	

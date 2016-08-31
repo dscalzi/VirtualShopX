@@ -173,6 +173,10 @@ public final class ChatManager {
 		sendError(sender, name + " is not selling any items.");
 	}
 	
+	public void noSpecificStock(CommandSender sender, String itemName){
+		sendError(sender, "You do not have any " + itemName + " for sale.");
+	}
+	
 	public void sellConfirmation(Player player, ListingData data){
     	if(data.getCurrentListings() < 1)
     		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
@@ -189,6 +193,11 @@ public final class ChatManager {
     
     public void buyConfirmation(Player player, TransactionData data){
     	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /buy confirm" + this.color + " within 15 seconds to complete the transaction.");
+    }
+    
+    public void updateConfirmation(Player player, ListingData data){
+    	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
+    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
     }
 	
 	/* Formatting */

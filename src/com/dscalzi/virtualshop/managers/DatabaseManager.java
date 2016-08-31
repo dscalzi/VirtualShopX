@@ -213,7 +213,7 @@ public final class DatabaseManager {
     	String merchant = DatabaseManager.DEFAULTNAME;
     	Optional<String> name = uuidm.getPlayerName(merchantUUID);
     	if(name.isPresent()) merchant = name.get();
-    	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,uuid) values('" + merchant + "',1,1,'" + merchantUUID.toString() + "')";
+    	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,updateconfirm,uuid) values('" + merchant + "',1,1,1,'" + merchantUUID.toString() + "')";
     	this.database.query(query);
     }
     
@@ -235,6 +235,16 @@ public final class DatabaseManager {
     		dataval = 1;
     	String query = "update vshop_toggles set buyconfirm=" + dataval + " where uuid='" + merchantUUID.toString() + "'";
 		this.database.query(query);
+    }
+    
+    public void updateUpdateToggle(UUID merchantUUID, boolean value){
+    	if(!isPlayerInToggles(merchantUUID))
+    		addPlayerToToggles(merchantUUID);
+    	int dataval = 0;
+    	if(value)
+    		dataval = 1;
+    	String query = "update vshop_toggles set updateconfirm=" + dataval + " where uuid='" + merchantUUID.toString() + "'";
+    	this.database.query(query);
     }
     
     public boolean getSellToggle(UUID merchantUUID){
@@ -263,6 +273,20 @@ public final class DatabaseManager {
 			e.printStackTrace();
 			return false;
 		}
+    }
+    
+    public boolean getUpdateToggle(UUID merchantUUID){
+    	if(!isPlayerInToggles(merchantUUID))
+    		addPlayerToToggles(merchantUUID);
+    	String query = "select * from vshop_toggles where uuid='" + merchantUUID.toString() + "'";
+    	try{
+    		ResultSet result = this.database.query(query);
+    		result.next();
+    		return result.getBoolean("updateconfirm");
+    	} catch (SQLException e){
+    		e.printStackTrace();
+    		return false;
+    	}
     }
     
     public void addOffer(Offer offer){

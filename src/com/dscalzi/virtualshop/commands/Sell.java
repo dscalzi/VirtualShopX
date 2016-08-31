@@ -1,8 +1,5 @@
 package com.dscalzi.virtualshop.commands;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -15,7 +12,9 @@ import org.bukkit.inventory.PlayerInventory;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
+import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDB;
@@ -25,15 +24,16 @@ import com.dscalzi.virtualshop.util.Numbers;
 /**
  * Sell CommandExecutor to handle user requests to create listings on the Virtual Market.
  */
-public class Sell implements CommandExecutor{
+public class Sell implements CommandExecutor, Confirmable{
 	
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final ConfirmationManager confirmations;
 	private final DatabaseManager dbm;
 	private final ItemDB idb;
-	private Map<Player, ListingData> confirmations;
+	//private Map<Player, ListingData> confirmations;
 	
 	/**
 	 * Initialize a new sell command executor.
@@ -43,9 +43,10 @@ public class Sell implements CommandExecutor{
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.confirmations = ConfirmationManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.idb = ItemDB.getInstance();
-		this.confirmations = new HashMap<Player, ListingData>();
+		//this.confirmations = new HashMap<Player, ListingData>();
 	}
 	
 	@SuppressWarnings("unused")
@@ -93,8 +94,7 @@ public class Sell implements CommandExecutor{
 			cm.sendError(sender, "Proper usage is /" + label + " <amount> <item> <price>");
 			return true;
 		}
-		if(this.confirmations.containsKey(player))
-			this.confirmations.remove(player);
+		confirmations.unregister(this.getClass(), player);
 		
 		this.execute(player, args);
 		return true;
@@ -110,13 +110,13 @@ public class Sell implements CommandExecutor{
 	private void execute(Player player, String[] args){
 		if(!dbm.getSellToggle(player.getUniqueId())){
 			if(this.validateData(player, args)){
-				this.createListing(player, confirmations.get(player));
+				this.createListing(player, (ListingData)confirmations.retrieve(this.getClass(), player));
 				return;
 			}
 			return;
 		}
 		if(this.validateData(player, args))
-			cm.sellConfirmation(player, confirmations.get(player));
+			cm.sellConfirmation(player, (ListingData)confirmations.retrieve(this.getClass(), player));
 	}
 	
 	/**
@@ -199,7 +199,7 @@ public class Sell implements CommandExecutor{
         
         //Submit data
         ListingData data = new ListingData(amount, item, price, currentlyListed, oldPrice, System.currentTimeMillis(), args);
-        this.confirmations.put(player, data);
+        this.confirmations.register(this.getClass(), player, data);
         return true;
 	}
 	
@@ -218,7 +218,7 @@ public class Sell implements CommandExecutor{
         item.setAmount(item.getAmount() + data.getCurrentListings());
         Offer o = new Offer(player.getUniqueId(),item,price);
 		dbm.addOffer(o);
-		confirmations.remove(player);
+		confirmations.unregister(this.getClass(), player);
         if(configM.broadcastOffers())
         {
 			cm.broadcastOffer(o);
@@ -232,22 +232,22 @@ public class Sell implements CommandExecutor{
 	 * @param player - The command sender.
 	 */
 	private void confirm(Player player){
-		if(!confirmations.containsKey(player)){
+		if(!confirmations.contains(this.getClass(), player)){
 			cm.invalidConfirmation(player);
 			return;
 		}
-		ListingData initialData = confirmations.get(player);
+		ListingData initialData = (ListingData) confirmations.retrieve(this.getClass(), player);
 		validateData(player, initialData.getArgs());
-		ListingData currentData = confirmations.get(player);
+		ListingData currentData = (ListingData) confirmations.retrieve(this.getClass(), player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
 		if(timeElapsed > 15000){
 			cm.confirmationExpired(player);
-			confirmations.remove(player);
+			confirmations.unregister(this.getClass(), player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
 			cm.invalidConfirmData(player);
-			confirmations.remove(player);
+			confirmations.unregister(this.getClass(), player);
 			return;
 		}
 		createListing(player, initialData);
@@ -273,7 +273,7 @@ public class Sell implements CommandExecutor{
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Sell confirmations turned off. To undo this /sell confirm toggle on");
-			confirmations.remove(player);
+			confirmations.unregister(this.getClass(), player);
 			dbm.updateSellToggle(player.getUniqueId(), false);
 			return;
 		}

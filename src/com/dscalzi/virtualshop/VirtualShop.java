@@ -29,6 +29,7 @@ public class VirtualShop extends JavaPlugin {
     public static final boolean BETA = false;
     
     public void onDisable(){
+    	ConfirmationManager.getInstance().serialize();
     	if(ConfigManager.getInstance().uuidSyncOnDisable()) this.syncNameToUUID();
         DatabaseManager.getInstance().close();
         System.gc();

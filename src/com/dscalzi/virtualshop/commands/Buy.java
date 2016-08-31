@@ -10,7 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
+import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.objects.TransactionData;
@@ -18,27 +20,25 @@ import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.Numbers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class Buy implements CommandExecutor{
+public class Buy implements CommandExecutor, Confirmable{
 
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
 	private final ChatManager cm;
 	private final ConfigManager configM;
+	private final ConfirmationManager confirmations;
 	private final DatabaseManager dbm;
 	private final ItemDB idb;
-	private Map<Player, TransactionData> confirmations;
 	
 	public Buy(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
+		this.confirmations = ConfirmationManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.idb = ItemDB.getInstance();
-		this.confirmations = new HashMap<Player, TransactionData>();
 	}
 	
 	@SuppressWarnings("unused")
@@ -98,13 +98,13 @@ public class Buy implements CommandExecutor{
 	private void execute(Player player, String[] args){
 		if(!dbm.getBuyToggle(player.getUniqueId())){
 			if(this.validateData(player, args)){
-				this.finalizeTransaction(player, confirmations.get(player));
+				this.finalizeTransaction(player, (TransactionData) confirmations.retrieve(this.getClass(), player));
 				return;
 			}
 			return;
 		}
 		if(this.validateData(player, args))
-			cm.buyConfirmation(player, confirmations.get(player));
+			cm.buyConfirmation(player, (TransactionData) confirmations.retrieve(this.getClass(), player));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -151,13 +151,13 @@ public class Buy implements CommandExecutor{
         }
         
         //Submit Data
-        confirmations.put(player, data);
+        confirmations.register(this.getClass(), player, data);
 		return true;
 	}
 	
 	private void finalizeTransaction(Player player, TransactionData data){
 		parseListings(player, data, true);
-		confirmations.remove(player);
+		confirmations.unregister(this.getClass(), player);
 	}
 	
 	
@@ -248,22 +248,22 @@ public class Buy implements CommandExecutor{
 	}
 	
 	private void confirm(Player player){
-		if(!confirmations.containsKey(player)){
+		if(!confirmations.contains(this.getClass(), player)){
 			cm.invalidConfirmation(player);
 			return;
 		}
-		TransactionData initialData = confirmations.get(player);
+		TransactionData initialData = (TransactionData) confirmations.retrieve(this.getClass(), player);
 		validateData(player, initialData.getArgs());
-		TransactionData currentData = confirmations.get(player);
+		TransactionData currentData = (TransactionData) confirmations.retrieve(this.getClass(), player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
 		if(timeElapsed > 15000){
 			cm.confirmationExpired(player);
-			confirmations.remove(player);
+			confirmations.unregister(this.getClass(), player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
 			cm.invalidConfirmData(player);
-			confirmations.remove(player);
+			confirmations.unregister(this.getClass(), player);
 			return;
 		}
 		finalizeTransaction(player, initialData);
@@ -283,7 +283,7 @@ public class Buy implements CommandExecutor{
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Buy confirmations turned off. To undo this /buy confirm toggle on");
-			confirmations.remove(player);
+			confirmations.unregister(this.getClass(), player);
 			dbm.updateBuyToggle(player.getUniqueId(), false);
 			return;
 		}
