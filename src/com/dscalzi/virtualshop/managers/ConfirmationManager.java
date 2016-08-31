@@ -1,5 +1,6 @@
 package com.dscalzi.virtualshop.managers;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -29,7 +31,7 @@ public class ConfirmationManager implements Serializable{
 	private static transient ConfirmationManager instance;
 	
 	private transient VirtualShop plugin;
-	private Map<Pair<Player, Class<? extends Confirmable>>, VsDataCache> confirmations;
+	private Map<Pair<UUID, Class<? extends Confirmable>>, VsDataCache> confirmations;
 	
 	private ConfirmationManager(Plugin plugin){
 		this.plugin = (VirtualShop)plugin;
@@ -37,7 +39,7 @@ public class ConfirmationManager implements Serializable{
 	}
 	
 	private void assignVars(){
-		this.confirmations = new HashMap<Pair<Player, Class<? extends Confirmable>>, VsDataCache>();
+		this.confirmations = new HashMap<Pair<UUID, Class<? extends Confirmable>>, VsDataCache>();
 	}
 	
 	public static void initialize(Plugin plugin){
@@ -46,6 +48,7 @@ public class ConfirmationManager implements Serializable{
 			if(e.isPresent()){
 				instance = e.get();
 				instance.assignPlugin(plugin);
+				instance.setUp();
 			} else
 				instance = new ConfirmationManager(plugin);
 			initialized = true;
@@ -70,7 +73,7 @@ public class ConfirmationManager implements Serializable{
 	
 	public void register(Class<? extends Confirmable> command, Player player, VsDataCache data){
 		if(data == null) throw new IllegalArgumentException();
-		Pair<Player, Class<? extends Confirmable>> key = new Pair<Player, Class<? extends Confirmable>>(player, command);
+		Pair<UUID, Class<? extends Confirmable>> key = new Pair<UUID, Class<? extends Confirmable>>(player.getUniqueId(), command);
 		if(confirmations.containsKey(key)){
 			confirmations.remove(key);
 		}
@@ -78,7 +81,7 @@ public class ConfirmationManager implements Serializable{
 	}
 	
 	public boolean unregister(Class<? extends Confirmable> command, Player player){
-		Pair<Player, Class<? extends Confirmable>> key = new Pair<Player, Class<? extends Confirmable>>(player, command);
+		Pair<UUID, Class<? extends Confirmable>> key = new Pair<UUID, Class<? extends Confirmable>>(player.getUniqueId(), command);
 		if(confirmations.containsKey(key)){
 			confirmations.remove(key);
 			return true;
@@ -87,12 +90,12 @@ public class ConfirmationManager implements Serializable{
 	}
 	
 	public VsDataCache retrieve(Class<? extends Confirmable> command, Player player){
-		Pair<Player, Class<? extends Confirmable>> key = new Pair<Player, Class<? extends Confirmable>>(player, command);
+		Pair<UUID, Class<? extends Confirmable>> key = new Pair<UUID, Class<? extends Confirmable>>(player.getUniqueId(), command);
 		return confirmations.get(key);
 	}
 	
 	public boolean contains(Class<? extends Confirmable> command, Player player){
-		Pair<Player, Class<? extends Confirmable>> key = new Pair<Player, Class<? extends Confirmable>>(player, command);
+		Pair<UUID, Class<? extends Confirmable>> key = new Pair<UUID, Class<? extends Confirmable>>(player.getUniqueId(), command);
 		if(confirmations.containsKey(key)) return true;
 		return false;
 	}
@@ -102,9 +105,9 @@ public class ConfirmationManager implements Serializable{
 		
 		long systemTime = System.currentTimeMillis();
 		
-		Iterator<Entry<Pair<Player, Class<? extends Confirmable>>, VsDataCache>> it = confirmations.entrySet().iterator();
+		Iterator<Entry<Pair<UUID, Class<? extends Confirmable>>, VsDataCache>> it = confirmations.entrySet().iterator();
 		while(it.hasNext()){
-			Entry<Pair<Player, Class<? extends Confirmable>>, VsDataCache> entry = it.next();
+			Entry<Pair<UUID, Class<? extends Confirmable>>, VsDataCache> entry = it.next();
 			if(systemTime - entry.getValue().getTransactionTime() > 15000){
 				it.remove();
 			}
@@ -114,13 +117,17 @@ public class ConfirmationManager implements Serializable{
 	public void serialize(){
 		this.clean();
 		if(confirmations.size() < 1) return; //No need to serialize nothing.
+		for(Map.Entry<Pair<UUID, Class<? extends Confirmable>>, VsDataCache> entry : confirmations.entrySet()){
+			entry.getValue().serialize();
+		}
 		try {
-			FileOutputStream fOut = new FileOutputStream(plugin.getDataFolder() + "confirmations.ser");
+			FileOutputStream fOut = new FileOutputStream(plugin.getDataFolder() + "/confirmations.ser");
 			ObjectOutputStream oOut = new ObjectOutputStream(fOut);
 			oOut.writeObject(this);
 			oOut.close();
 			fOut.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 			plugin.getLogger().severe("Serialization Error, discarding existing confirmations.");
 		}
 	}
@@ -130,11 +137,13 @@ public class ConfirmationManager implements Serializable{
 		Optional<ConfirmationManager> e = Optional.empty();
 		
 		 try {
-	         FileInputStream fIn = new FileInputStream(plugin.getDataFolder() + "confirmations.ser");
+	         FileInputStream fIn = new FileInputStream(plugin.getDataFolder() + "/confirmations.ser");
 	         ObjectInputStream oIn = new ObjectInputStream(fIn);
 	         e = Optional.of((ConfirmationManager) oIn.readObject());
 	         oIn.close();
 	         fIn.close();
+	         File f = new File(plugin.getDataFolder() + "/confirmations.ser");
+	         f.delete();
 	      } catch(IOException i) {
 	         return e;
 	      } catch(ClassNotFoundException c) {
@@ -145,4 +154,12 @@ public class ConfirmationManager implements Serializable{
 		 return e;
 	}
 	
+	/**
+	 * Deserialize the VsDataCaches
+	 */
+	private void setUp(){
+		for(Map.Entry<Pair<UUID, Class<? extends Confirmable>>, VsDataCache> entry : confirmations.entrySet()){
+			entry.getValue().deserialize();
+		}
+	}
 }

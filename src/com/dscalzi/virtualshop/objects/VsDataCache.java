@@ -14,4 +14,8 @@ public interface VsDataCache extends Serializable{
 	
 	public long getTransactionTime();
 	
+	public void serialize();
+	
+	public void deserialize();
+	
 }

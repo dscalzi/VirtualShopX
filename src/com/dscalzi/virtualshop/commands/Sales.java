@@ -74,6 +74,7 @@ public class Sales implements CommandExecutor{
     	final String trimColor = configM.getTrimColor();
     	
         OfflinePlayer target;
+        
         int start = 1;
         List<Transaction> transactions = null;
         transactions = dbm.getTransactions();

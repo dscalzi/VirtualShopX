@@ -1,17 +1,22 @@
 package com.dscalzi.virtualshop.objects;
 
+import java.util.Map;
+
 import org.bukkit.inventory.ItemStack;
 
 public class ListingData implements VsDataCache{
 
 	private static final long serialVersionUID = -8546925459706301446L;
 	
+	private Map<String,Object> serializedItem;
+	private long timeSince;
+	
 	private final int AMOUNT;
-	private final ItemStack ITEM;
+	private transient ItemStack ITEM;
 	private final double PRICE;
 	private final int CURRENTLYLISTED;
 	private final double OLDPRICE;
-	private final long TIME;
+	private long TIME;
 	private final String[] ARGS;
 	
 	public ListingData(int amount, ItemStack item, double price, int currentlyListed, double oldPrice, long systemTime, String[] args){
@@ -52,6 +57,16 @@ public class ListingData implements VsDataCache{
 		return this.ARGS;
 	}
 	
+	public void serialize(){
+		serializedItem = getItem().serialize();
+		timeSince = System.currentTimeMillis() - TIME;
+	}
+	
+	public void deserialize(){
+		ITEM = ItemStack.deserialize(this.serializedItem);
+		TIME = System.currentTimeMillis() - timeSince;
+	}
+	
 	/** 
 	Compares the transaction data excluding the system time, and initial string arguments.
 	*/
@@ -70,4 +85,5 @@ public class ListingData implements VsDataCache{
 			return false;
 		return true;
 	}
+	
 }
