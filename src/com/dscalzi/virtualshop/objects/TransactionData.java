@@ -7,8 +7,10 @@ import org.bukkit.inventory.ItemStack;
 /**
 Data Caching for use in /buy
 */
-public class TransactionData {
+public class TransactionData implements VsDataCache{
 
+	private static final long serialVersionUID = 3811036933174589119L;
+	
 	private final int AMOUNT;
 	private final ItemStack ITEM;
 	private final double PRICE;

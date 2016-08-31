@@ -2,8 +2,10 @@ package com.dscalzi.virtualshop.objects;
 
 import org.bukkit.inventory.ItemStack;
 
-public class ListingData {
+public class ListingData implements VsDataCache{
 
+	private static final long serialVersionUID = -8546925459706301446L;
+	
 	private final int AMOUNT;
 	private final ItemStack ITEM;
 	private final double PRICE;

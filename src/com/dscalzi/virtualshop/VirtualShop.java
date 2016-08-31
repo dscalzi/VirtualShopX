@@ -16,6 +16,7 @@ import com.dscalzi.virtualshop.commands.UpdatePrice;
 import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
+import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.util.ItemDB;
@@ -60,6 +61,7 @@ public class VirtualShop extends JavaPlugin {
     
     private void initializeManagers(){
     	UUIDManager.initialize(this);
+    	ConfirmationManager.initialize(this);
         ConfigManager.initialize(this);
 		ChatManager.initialize(this);
         DatabaseManager.initialize(this);
