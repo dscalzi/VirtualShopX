@@ -160,13 +160,15 @@ public class VS implements CommandExecutor{
     	List<String> cmds = new ArrayList<String>();
         cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + descColor + " - Buy items.");
         cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + descColor + " - Sell items.");
-        cmds.add(listPrefix + trimColor + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + descColor + " - Remove item from shop.");
-        cmds.add(listPrefix + trimColor + "/find " + ChatColor.BLUE + "<item> " + ChatColor.GRAY + "[page] " + descColor + " - Find offers for the item.");
-        cmds.add(listPrefix + trimColor + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + descColor + " - Browse offers.");
-        cmds.add(listPrefix + trimColor + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page] " + descColor + " - View transaction log.");
+        cmds.add(listPrefix + trimColor + "/updateprice " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + descColor + " - Update the price of a listing.");
+        cmds.add(listPrefix + trimColor + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item>" + descColor + " - Remove item from shop.");
+        cmds.add(listPrefix + trimColor + "/find " + ChatColor.BLUE + "<item> " + ChatColor.GRAY + "[page]" + descColor + " - Find offers for the item.");
+        cmds.add(listPrefix + trimColor + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page]" + descColor + " - Browse offers.");
+        cmds.add(listPrefix + trimColor + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page]" + descColor + " - View transaction log.");
         cmds.add(listPrefix + trimColor + "/vs" + descColor + " - Virtual Shop's technical commands.");
         cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle buy confirmations.");
         cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle sell confirmations.");
+        cmds.add(listPrefix + trimColor + "/updateprice " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle update price confirmations.");
         
         PageList<String> commands = new PageList<>(cmds, 7);
         

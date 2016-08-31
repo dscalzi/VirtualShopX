@@ -2,3 +2,4 @@ eclipse.preferences.version=1
 encoding//src/com/dscalzi/virtualshop/commands/Find.java=UTF-8
 encoding//src/com/dscalzi/virtualshop/commands/Sales.java=UTF-8
 encoding//src/com/dscalzi/virtualshop/commands/Stock.java=UTF-8
+encoding//src/com/dscalzi/virtualshop/managers/ChatManager.java=UTF-8

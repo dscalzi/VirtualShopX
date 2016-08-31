@@ -72,11 +72,11 @@ public class Buy implements CommandExecutor, Confirmable{
 			if(args[0].equalsIgnoreCase("confirm")){
 				if(args.length > 1){
 					if(args.length > 2 && args[1].equalsIgnoreCase("toggle") ){
-						toggleConfirmations(player, args);
+						toggleConfirmations(player, label, args);
 						return true;
 					}
 					if(args[1].equalsIgnoreCase("toggle")){
-						toggleConfirmations(player, args);
+						toggleConfirmations(player, label, args);
 						return true;
 					}
 				}
@@ -91,11 +91,11 @@ public class Buy implements CommandExecutor, Confirmable{
 			return true;
 		}
 		
-		this.execute(player, args);
+		this.execute(player, label, args);
 		return true;
 	}
 	
-	private void execute(Player player, String[] args){
+	private void execute(Player player, String label, String[] args){
 		if(!dbm.getBuyToggle(player.getUniqueId())){
 			if(this.validateData(player, args)){
 				this.finalizeTransaction(player, (TransactionData) confirmations.retrieve(this.getClass(), player));
@@ -104,7 +104,7 @@ public class Buy implements CommandExecutor, Confirmable{
 			return;
 		}
 		if(this.validateData(player, args))
-			cm.buyConfirmation(player, (TransactionData) confirmations.retrieve(this.getClass(), player));
+			cm.buyConfirmation(player, label, (TransactionData) confirmations.retrieve(this.getClass(), player));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -269,24 +269,24 @@ public class Buy implements CommandExecutor, Confirmable{
 		finalizeTransaction(player, initialData);
 	}
 	
-	private void toggleConfirmations(Player player, String[] args){
+	private void toggleConfirmations(Player player, String label, String[] args){
 		if(args.length < 3){
-			cm.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");
+			cm.sendMessage(player, "You may turn buy confirmations on or off using /" + label + " confirm toggle <on/off>");
 			return;
 		}
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
-			cm.sendSuccess(player, "Buy confirmations turned on. To undo this /buy confirm toggle off");
+			cm.sendSuccess(player, "Buy confirmations turned on. To undo this /" + label + " confirm toggle off");
 			dbm.updateBuyToggle(player.getUniqueId(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
-			cm.sendSuccess(player, "Buy confirmations turned off. To undo this /buy confirm toggle on");
+			cm.sendSuccess(player, "Buy confirmations turned off. To undo this /" + label + " confirm toggle on");
 			confirmations.unregister(this.getClass(), player);
 			dbm.updateBuyToggle(player.getUniqueId(), false);
 			return;
 		}
-		cm.sendMessage(player, "You may turn buy confirmations on or off using /buy confirm toggle <on/off>");
+		cm.sendMessage(player, "You may turn buy confirmations on or off using /" + label + " confirm toggle <on/off>");
 	}
 }

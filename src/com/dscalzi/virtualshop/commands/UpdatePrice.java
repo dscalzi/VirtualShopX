@@ -63,11 +63,11 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 			if(args[0].equalsIgnoreCase("confirm")){
 				if(args.length > 1){
 					if(args.length > 2 && args[1].equalsIgnoreCase("toggle") ){
-						//toggleConfirmations(player, args);
+						toggleConfirmations(player, label, args);
 						return true;
 					}
 					if(args[1].equalsIgnoreCase("toggle")){
-						//toggleConfirmations(player, args);
+						toggleConfirmations(player, label, args);
 						return true;
 					}
 				}
@@ -81,11 +81,11 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 		}
 		
 		
-		this.execute(player, args);
+		this.execute(player, label, args);
 		return true;
 	}
 
-	private void execute(Player player, String[] args){
+	private void execute(Player player, String label, String[] args){
 		if(!dbm.getUpdateToggle(player.getUniqueId())){
 			if(this.validateData(player, args)){
 				this.updateListing(player, (ListingData) confirmations.retrieve(this.getClass(), player));
@@ -94,7 +94,7 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 			return;
 		}
 		if(this.validateData(player, args))
-			cm.updateConfirmation(player, (ListingData) confirmations.retrieve(this.getClass(), player));
+			cm.updateConfirmation(player, label, (ListingData) confirmations.retrieve(this.getClass(), player));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -142,6 +142,10 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
         	cm.noSpecificStock(player, args[0]);
         	return false;
         }
+        if(newPrice == oldPrice){
+        	cm.sendError(player, "Your current price for this item is the same as the requested new price.");
+        	return false;
+        }
         
         //Submit data
         ListingData data = new ListingData(0, item, newPrice, currentlyListed, oldPrice, System.currentTimeMillis(), args);
@@ -150,15 +154,12 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 	}
 	
 	private void updateListing(Player player, ListingData data){
-		ItemStack item = data.getItem();
 		double newPrice = data.getPrice();
-		double oldPrice = data.getOldPrice();
         dbm.updatePrice(player.getUniqueId(), newPrice);
 		confirmations.unregister(this.getClass(), player);
         if(configM.broadcastOffers())
         {
-        	//TODO Custom broadcast for update.
-			//cm.broadcastOffer(o);
+        	cm.broadcastPriceUpdate(player, data);
 			return;
 		}
 	}
@@ -183,6 +184,34 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 			return;
 		}
 		updateListing(player, initialData);
+	}
+	
+	/**
+	 * Handles a player's request to toggle the requirement for a confirmation when they attempt to update an item's price.
+	 * 
+	 * @param player - The command sender.
+	 * @param label - The alias of the command.
+	 * @param args - Initial arguments returned by onCommand.
+	 */
+	private void toggleConfirmations(Player player, String label, String[] args){
+		if(args.length < 3){
+			cm.sendMessage(player, "You may turn update price confirmations on or off using /" + label + " confirm toggle <on/off>");
+			return;
+		}
+		String value = args[2];
+		if(value.equalsIgnoreCase("on")){
+			cm.sendSuccess(player, "Update price confirmations turned on. To undo this /" + label + " confirm toggle off");
+			dbm.updateUpdateToggle(player.getUniqueId(), true);
+			return;
+		}
+			
+		if(value.equalsIgnoreCase("off")){
+			cm.sendSuccess(player, "Update price confirmations turned off. To undo this /" + label + " confirm toggle on");
+			confirmations.unregister(this.getClass(), player);
+			dbm.updateUpdateToggle(player.getUniqueId(), false);
+			return;
+		}
+		cm.sendMessage(player, "You may turn update price confirmations on or off using /" + label + " confirm toggle <on/off>");
 	}
 	
 }

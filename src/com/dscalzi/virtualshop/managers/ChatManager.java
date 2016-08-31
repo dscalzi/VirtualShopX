@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
@@ -101,6 +102,16 @@ public final class ChatManager {
         sendGlobal(formatOffer(o));
     }
 	
+	public void broadcastPriceUpdate(Player player, ListingData data){
+		ItemStack item = data.getItem();
+		double oldPrice = data.getOldPrice();
+		double newPrice = data.getPrice();
+		double difference = newPrice-oldPrice;
+		item.setAmount(data.getCurrentListings());
+		Offer o = new Offer(player.getUniqueId(), item, newPrice);
+		sendGlobal(formatOffer(o) + ((difference < 0) ? ChatColor.GREEN + " (▼" + configM.getLocalization().formatPrice(Math.abs(difference)) +  ")" : ChatColor.RED + " (▲" + configM.getLocalization().formatPrice(difference) +  ")"));
+	}
+	
 	/* Accessors */
 	
 	public Logger getLogger(){
@@ -177,27 +188,29 @@ public final class ChatManager {
 		sendError(sender, "You do not have any " + itemName + " for sale.");
 	}
 	
-	public void sellConfirmation(Player player, ListingData data){
+	public void sellConfirmation(Player player, String label, ListingData data){
+		String confirmLine = "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the transaction.";
+		
     	if(data.getCurrentListings() < 1)
-    		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
+    		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. " + confirmLine);
     	else{
     		String common = "You are about to add " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " to your current listing";
     		if(data.getOldPrice() == data.getPrice())
-    			sendMessage(player, common + ". Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
+    			sendMessage(player, common + ". " + confirmLine);
     		if(data.getOldPrice() > data.getPrice())
-    			sendMessage(player, common + " for a lower price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
+    			sendMessage(player, common + " for a lower price of " + formatPrice(data.getPrice()) + " each. " + confirmLine);
     		if(data.getOldPrice() < data.getPrice())
-    			sendMessage(player, common + " for a higher price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
+    			sendMessage(player, common + " for a higher price of " + formatPrice(data.getPrice()) + " each. " + confirmLine);
     	}
     }
     
-    public void buyConfirmation(Player player, TransactionData data){
-    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /buy confirm" + this.color + " within 15 seconds to complete the transaction.");
+    public void buyConfirmation(Player player, String label, TransactionData data){
+    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the transaction.");
     }
     
-    public void updateConfirmation(Player player, ListingData data){
+    public void updateConfirmation(Player player, String label, ListingData data){
     	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
-    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /sell confirm" + this.color + " within 15 seconds to complete the transaction.");
+    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the transaction.");
     }
 	
 	/* Formatting */

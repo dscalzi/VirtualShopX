@@ -78,11 +78,11 @@ public class Sell implements CommandExecutor, Confirmable{
 			if(args[0].equalsIgnoreCase("confirm")){
 				if(args.length > 1){
 					if(args.length > 2 && args[1].equalsIgnoreCase("toggle") ){
-						toggleConfirmations(player, args);
+						toggleConfirmations(player, label, args);
 						return true;
 					}
 					if(args[1].equalsIgnoreCase("toggle")){
-						toggleConfirmations(player, args);
+						toggleConfirmations(player, label, args);
 						return true;
 					}
 				}
@@ -96,7 +96,7 @@ public class Sell implements CommandExecutor, Confirmable{
 		}
 		confirmations.unregister(this.getClass(), player);
 		
-		this.execute(player, args);
+		this.execute(player, label, args);
 		return true;
 	}
 	
@@ -107,7 +107,7 @@ public class Sell implements CommandExecutor, Confirmable{
 	 * @param player - The command sender.
 	 * @param args - Initial arguments returned by onCommand
 	 */
-	private void execute(Player player, String[] args){
+	private void execute(Player player, String label, String[] args){
 		if(!dbm.getSellToggle(player.getUniqueId())){
 			if(this.validateData(player, args)){
 				this.createListing(player, (ListingData)confirmations.retrieve(this.getClass(), player));
@@ -116,7 +116,7 @@ public class Sell implements CommandExecutor, Confirmable{
 			return;
 		}
 		if(this.validateData(player, args))
-			cm.sellConfirmation(player, (ListingData)confirmations.retrieve(this.getClass(), player));
+			cm.sellConfirmation(player, label, (ListingData)confirmations.retrieve(this.getClass(), player));
 	}
 	
 	/**
@@ -257,26 +257,27 @@ public class Sell implements CommandExecutor, Confirmable{
 	 * Handles a player's request to toggle the requirement for a confirmation when they attempt to sell an item.
 	 * 
 	 * @param player - The command sender.
+	 * @param label - The alias of the command.
 	 * @param args - Initial arguments returned by onCommand.
 	 */
-	private void toggleConfirmations(Player player, String[] args){
+	private void toggleConfirmations(Player player, String label, String[] args){
 		if(args.length < 3){
-			cm.sendMessage(player, "You may turn sell confirmations on or off using /sell confirm toggle <on/off>");
+			cm.sendMessage(player, "You may turn sell confirmations on or off using /" + label + " confirm toggle <on/off>");
 			return;
 		}
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
-			cm.sendSuccess(player, "Sell confirmations turned on. To undo this /sell confirm toggle off");
+			cm.sendSuccess(player, "Sell confirmations turned on. To undo this /" + label + " confirm toggle off");
 			dbm.updateSellToggle(player.getUniqueId(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
-			cm.sendSuccess(player, "Sell confirmations turned off. To undo this /sell confirm toggle on");
+			cm.sendSuccess(player, "Sell confirmations turned off. To undo this /" + label + " confirm toggle on");
 			confirmations.unregister(this.getClass(), player);
 			dbm.updateSellToggle(player.getUniqueId(), false);
 			return;
 		}
-		cm.sendMessage(player, "You may turn sell confirmations on or off using /sell confirm toggle <on/off>");
+		cm.sendMessage(player, "You may turn sell confirmations on or off using /" + label + " confirm toggle <on/off>");
 	}
 }
