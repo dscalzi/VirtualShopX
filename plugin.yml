@@ -49,13 +49,15 @@ permissions:
     virtualshop.merchant.stock:
         description: Allow usage of /stock
     virtualhop.merchant.updateprice:
-        description: Allow usage of /vs updateprice
+        description: Allow usage of / updateprice
     virtualshop.admin.formatmarket:
         description: Allow usage of /vs formatmarket
     virtualshop.admin.reloadconfig:
         description: Allow usage of /vs reloadconfig
     virtualshop.admin.uuidnamesync:
         description: Allow usage of /vs uuidnamesync
+    virtualshop.admin.updateprice.others:
+        description: Allow usage of /updareprice on others, communist command.
     virtualshop.developer.reload:
         description: Allow usage of /vs reload
     virtualshop.merchant.*:
@@ -78,6 +80,7 @@ permissions:
           virtualshop.admin.formatmarket: true
           virtualshop.admin.reloadconfig: true
           virtualshop.admin.uuidnamesync: true
+          virtualshop.admin.updateprice.others: true
     virtualshop.access.beta:
         description: Restricts access during beta period.
         default: OP

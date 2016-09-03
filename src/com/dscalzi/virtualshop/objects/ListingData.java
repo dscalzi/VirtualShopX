@@ -68,20 +68,23 @@ public class ListingData implements VsDataCache{
 	}
 	
 	/** 
-	Compares the transaction data excluding the system time, and initial string arguments.
-	*/
-	public boolean equals(ListingData other){
+	 * Compares the transaction data excluding the system time, and initial string arguments.
+	 */
+	public boolean equals(Object other){
+		if(!(other instanceof ListingData))
+			return false;
+		ListingData o = (ListingData) other;
 		if (this == other) 
             return true;
-		if(this.getAmount() != other.getAmount())
+		if(this.getAmount() != o.getAmount())
 			return false;
-		if(!this.getItem().equals(other.getItem()))
+		if(!this.getItem().equals(o.getItem()))
 			return false;
-		if(this.getCurrentListings() != other.getCurrentListings())
+		if(this.getCurrentListings() != o.getCurrentListings())
 			return false;
-		if(this.getOldPrice() != other.getOldPrice())
+		if(this.getOldPrice() != o.getOldPrice())
 			return false;
-		if(this.getPrice() != other.getPrice())
+		if(this.getPrice() != o.getPrice())
 			return false;
 		return true;
 	}

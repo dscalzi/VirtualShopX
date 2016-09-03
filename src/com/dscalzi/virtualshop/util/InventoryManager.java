@@ -105,6 +105,26 @@ public class InventoryManager {
     	}
 	}
 	
+	public int getFreeSpace(ItemStack item){
+		ItemStack[] inv = _inv.getContents();
+        int openNum = 0;
+        //Adjusting length, in 1.9+ .getContents includes armor. We only want inventory.
+        for(int i=0; i<inv.length-5; ++i){
+    		if(inv[i] == null){
+    			openNum += 64;
+    			continue;
+    		} else if(inv[i].isSimilar(item)){
+    			openNum += (64-inv[i].getAmount());
+    		}
+    	}
+        if(_inv.getItemInOffHand().isSimilar(item)){
+        	openNum += (64-_inv.getItemInOffHand().getAmount());
+        } else if(_inv.getItemInOffHand().getType() == Material.AIR){
+        	openNum += 64;
+        }
+        return openNum;
+	}
+	
 	public void removeItem(ItemStack item) {
     	int requestedDeletion = item.getAmount();
     	    	

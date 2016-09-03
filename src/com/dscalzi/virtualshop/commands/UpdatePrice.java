@@ -86,7 +86,7 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 	}
 
 	private void execute(Player player, String label, String[] args){
-		if(!dbm.getUpdateToggle(player.getUniqueId())){
+		if(!dbm.getToggle(player.getUniqueId(), this.getClass())){
 			if(this.validateData(player, args)){
 				this.updateListing(player, (ListingData) confirmations.retrieve(this.getClass(), player));
 				return;
@@ -201,14 +201,14 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
 			cm.sendSuccess(player, "Update price confirmations turned on. To undo this /" + label + " confirm toggle off");
-			dbm.updateUpdateToggle(player.getUniqueId(), true);
+			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Update price confirmations turned off. To undo this /" + label + " confirm toggle on");
 			confirmations.unregister(this.getClass(), player);
-			dbm.updateUpdateToggle(player.getUniqueId(), false);
+			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;
 		}
 		cm.sendMessage(player, "You may turn update price confirmations on or off using /" + label + " confirm toggle <on/off>");

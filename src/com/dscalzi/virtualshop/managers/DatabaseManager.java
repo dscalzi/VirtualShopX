@@ -15,6 +15,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.commands.Buy;
+import com.dscalzi.virtualshop.commands.Cancel;
+import com.dscalzi.virtualshop.commands.Sell;
+import com.dscalzi.virtualshop.commands.UpdatePrice;
+import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.persistance.Database;
@@ -26,8 +31,17 @@ import javafx.util.Pair;
 public final class DatabaseManager {
 
 	private static final String DEFAULTNAME = "sync_required";
+	private static final Map<Class<? extends Confirmable>, String> togglesKey;
 	private static boolean initialized;
 	private static DatabaseManager instance;
+	static {
+		togglesKey = new HashMap<Class<? extends Confirmable>, String>();
+		togglesKey.put(Buy.class, "buyconfirm");
+		togglesKey.put(Sell.class, "sellconfirm");
+		togglesKey.put(UpdatePrice.class, "updateconfirm");
+		togglesKey.put(Cancel.class, "cancelconfirm");
+	}
+	
 	
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
@@ -44,6 +58,7 @@ public final class DatabaseManager {
 		
 		if(configM.usingMySQL()) loadMySQL();
         else loadSQLite();
+		this.database.query("ALTER TABLE vshop_toggles  ADD `cancelconfirm` bit");
 	}
 	
 	private void loadSQLite() {
@@ -213,80 +228,34 @@ public final class DatabaseManager {
     	String merchant = DatabaseManager.DEFAULTNAME;
     	Optional<String> name = uuidm.getPlayerName(merchantUUID);
     	if(name.isPresent()) merchant = name.get();
-    	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,updateconfirm,uuid) values('" + merchant + "',1,1,1,'" + merchantUUID.toString() + "')";
+    	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,cancelconfirm,updateconfirm,uuid) values('" + merchant + "',1,1,1,'" + merchantUUID.toString() + "')";
     	this.database.query(query);
     }
     
-    public void updateSellToggle(UUID merchantUUID, boolean value){
+    public void updateToggle(UUID merchantUUID, Class<? extends Confirmable> clazz, boolean value){
+    	if(!togglesKey.containsKey(clazz))
+    		return;
     	if(!isPlayerInToggles(merchantUUID))
     		addPlayerToToggles(merchantUUID);
-    	int dataval = 0;
-    	if(value)
-    		dataval = 1;
-    	String query = "update vshop_toggles set sellconfirm=" + dataval + " where uuid='" + merchantUUID.toString() + "'";
-		this.database.query(query);
-    }
-    
-    public void updateBuyToggle(UUID merchantUUID, boolean value){
-    	if(!isPlayerInToggles(merchantUUID))
-    		addPlayerToToggles(merchantUUID);
-    	int dataval = 0;
-    	if(value)
-    		dataval = 1;
-    	String query = "update vshop_toggles set buyconfirm=" + dataval + " where uuid='" + merchantUUID.toString() + "'";
-		this.database.query(query);
-    }
-    
-    public void updateUpdateToggle(UUID merchantUUID, boolean value){
-    	if(!isPlayerInToggles(merchantUUID))
-    		addPlayerToToggles(merchantUUID);
-    	int dataval = 0;
-    	if(value)
-    		dataval = 1;
-    	String query = "update vshop_toggles set updateconfirm=" + dataval + " where uuid='" + merchantUUID.toString() + "'";
+    	int dataval = value ? 1 : 0;
+    	String query = "update vshop_toggles set " + togglesKey.get(clazz) + "=" + dataval + " where uuid='" + merchantUUID.toString() + "'";
     	this.database.query(query);
     }
     
-    public boolean getSellToggle(UUID merchantUUID){
+    public boolean getToggle(UUID merchantUUID, Class<? extends Confirmable> clazz){
+    	if(!togglesKey.containsKey(clazz))
+    		return false;
     	if(!isPlayerInToggles(merchantUUID))
     		addPlayerToToggles(merchantUUID);
     	String query = "select * from vshop_toggles where uuid='" + merchantUUID.toString() + "'";
     	try {
     		ResultSet result = this.database.query(query);
     		result.next();    		
-			return result.getBoolean("sellconfirm");
+			return result.getBoolean(togglesKey.get(clazz));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
-    }
-    
-    public boolean getBuyToggle(UUID merchantUUID){
-    	if(!isPlayerInToggles(merchantUUID))
-    		addPlayerToToggles(merchantUUID);
-    	String query = "select * from vshop_toggles where uuid='" + merchantUUID.toString() + "'";
-    	try {
-    		ResultSet result = this.database.query(query);
-    		result.next();
-			return result.getBoolean("buyconfirm");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-    }
-    
-    public boolean getUpdateToggle(UUID merchantUUID){
-    	if(!isPlayerInToggles(merchantUUID))
-    		addPlayerToToggles(merchantUUID);
-    	String query = "select * from vshop_toggles where uuid='" + merchantUUID.toString() + "'";
-    	try{
-    		ResultSet result = this.database.query(query);
-    		result.next();
-    		return result.getBoolean("updateconfirm");
-    	} catch (SQLException e){
-    		e.printStackTrace();
-    		return false;
-    	}
     }
     
     public void addOffer(Offer offer){

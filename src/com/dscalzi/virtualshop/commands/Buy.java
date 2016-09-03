@@ -96,7 +96,7 @@ public class Buy implements CommandExecutor, Confirmable{
 	}
 	
 	private void execute(Player player, String label, String[] args){
-		if(!dbm.getBuyToggle(player.getUniqueId())){
+		if(!dbm.getToggle(player.getUniqueId(), this.getClass())){
 			if(this.validateData(player, args)){
 				this.finalizeTransaction(player, (TransactionData) confirmations.retrieve(this.getClass(), player));
 				return;
@@ -277,14 +277,14 @@ public class Buy implements CommandExecutor, Confirmable{
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
 			cm.sendSuccess(player, "Buy confirmations turned on. To undo this /" + label + " confirm toggle off");
-			dbm.updateBuyToggle(player.getUniqueId(), true);
+			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Buy confirmations turned off. To undo this /" + label + " confirm toggle on");
 			confirmations.unregister(this.getClass(), player);
-			dbm.updateBuyToggle(player.getUniqueId(), false);
+			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;
 		}
 		cm.sendMessage(player, "You may turn buy confirmations on or off using /" + label + " confirm toggle <on/off>");

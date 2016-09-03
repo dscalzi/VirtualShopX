@@ -108,7 +108,7 @@ public class Sell implements CommandExecutor, Confirmable{
 	 * @param args - Initial arguments returned by onCommand
 	 */
 	private void execute(Player player, String label, String[] args){
-		if(!dbm.getSellToggle(player.getUniqueId())){
+		if(!dbm.getToggle(player.getUniqueId(), this.getClass())){
 			if(this.validateData(player, args)){
 				this.createListing(player, (ListingData)confirmations.retrieve(this.getClass(), player));
 				return;
@@ -268,14 +268,14 @@ public class Sell implements CommandExecutor, Confirmable{
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
 			cm.sendSuccess(player, "Sell confirmations turned on. To undo this /" + label + " confirm toggle off");
-			dbm.updateSellToggle(player.getUniqueId(), true);
+			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
 			cm.sendSuccess(player, "Sell confirmations turned off. To undo this /" + label + " confirm toggle on");
 			confirmations.unregister(this.getClass(), player);
-			dbm.updateSellToggle(player.getUniqueId(), false);
+			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;
 		}
 		cm.sendMessage(player, "You may turn sell confirmations on or off using /" + label + " confirm toggle <on/off>");

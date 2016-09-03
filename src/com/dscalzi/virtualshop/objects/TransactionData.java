@@ -6,8 +6,8 @@ import java.util.Map;
 import org.bukkit.inventory.ItemStack;
 
 /**
-Data Caching for use in /buy
-*/
+ * Data Caching for use in /buy
+ */
 public class TransactionData implements VsDataCache{
 
 	private static final long serialVersionUID = 3811036933174589119L;
@@ -82,22 +82,25 @@ public class TransactionData implements VsDataCache{
 	}
 	
 	/** 
-	Compares the transaction data excluding the system time, and initial string arguments.
-	*/
-	public boolean equals(TransactionData other){
+	 * Compares the transaction data excluding the system time, and initial string arguments.
+	 */
+	public boolean equals(Object other){
+		if(!(other instanceof TransactionData))
+			return false;
+		TransactionData o = (TransactionData) other;
 		if (this == other) 
             return true;
-		if(this.getAmount() != other.getAmount())
+		if(this.getAmount() != o.getAmount())
 			return false;
-		if(!this.getItem().equals(other.getItem()))
+		if(!this.getItem().equals(o.getItem()))
 			return false;
-		if(this.getPrice() != other.getPrice())
+		if(this.getPrice() != o.getPrice())
 			return false;
-		if(this.getMaxPrice() != other.getMaxPrice())
+		if(this.getMaxPrice() != o.getMaxPrice())
 			return false;
-		if(!this.getOffers().equals(other.getOffers()))
+		if(!this.getOffers().equals(o.getOffers()))
 			return false;
-		if(this.canContinue() != other.canContinue())
+		if(this.canContinue() != o.canContinue())
 			return false;
 		return true;
 	}

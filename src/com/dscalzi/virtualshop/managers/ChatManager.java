@@ -16,6 +16,7 @@ import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
 import com.dscalzi.virtualshop.commands.Stock;
 import com.dscalzi.virtualshop.commands.VS;
+import com.dscalzi.virtualshop.objects.CancelData;
 import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
@@ -206,6 +207,10 @@ public final class ChatManager {
     
     public void buyConfirmation(Player player, String label, TransactionData data){
     	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the transaction.");
+    }
+    
+    public void cancelConfirmation(Player player, String label, CancelData data){
+    	sendMessage(player, "You are about to cancel " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + ". " + ((data.getAmount() > data.getInventorySpace()) ? ChatColor.RED + "You only have inventory space for " + formatAmount(data.getInventorySpace()) + ChatColor.RED + ", excess will be dropped around you. " + this.color : "") + "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the request.");
     }
     
     public void updateConfirmation(Player player, String label, ListingData data){
