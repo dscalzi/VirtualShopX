@@ -62,8 +62,8 @@ public class VirtualShop extends JavaPlugin {
     
     private void initializeManagers(){
     	UUIDManager.initialize(this);
-    	ConfirmationManager.initialize(this);
         ConfigManager.initialize(this);
+        ConfirmationManager.initialize(this);
 		ChatManager.initialize(this);
         DatabaseManager.initialize(this);
         Reloader.initialize(this);

@@ -55,15 +55,6 @@ public class Sales implements CommandExecutor{
 		
 		try{
 			execute(sender, args);
-			/*
-			new BukkitRunnable(){
-				
-				@Override
-				public void run(){
-					execute(sender, args);
-				}
-	        }.runTaskAsynchronously(plugin);
-	        */
     	} catch (LinkageError e){
     		cm.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
     	}

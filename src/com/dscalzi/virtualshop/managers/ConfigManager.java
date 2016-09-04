@@ -8,6 +8,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.util.Localization;
 
 import net.md_5.bungee.api.ChatColor;
@@ -125,6 +126,10 @@ public final class ConfigManager {
 	
 	public long getMaxPrice(int itemID){
 		return getMaxPrice(itemID, 0);
+	}
+	
+	public int getConfirmationTimeout(Class<? extends Confirmable> clazz){
+		return this.config.getInt("general_settings.confirmation_timeouts." + (clazz.getSimpleName().toLowerCase()), 15000);
 	}
 	
 	public long getMaxPrice(int itemID, int dataValue){

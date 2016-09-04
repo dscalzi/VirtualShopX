@@ -16,6 +16,14 @@ general_settings:
     - world
     - world_nether
     - world_the_end
+    
+  # The amount of time in milliseconds it takes for
+  # a confirmation request to expire.
+  confirmation_timeouts:
+    buy: 15000
+    sell: 15000
+    updateprice: 15000
+    cancel: 15000
 
 #--------------[Database Settings]--------------
 # Indicate whether you want to use a MySQL database

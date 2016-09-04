@@ -12,9 +12,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.commands.Buy;
+import com.dscalzi.virtualshop.commands.Cancel;
 import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
+import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.Stock;
+import com.dscalzi.virtualshop.commands.UpdatePrice;
 import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.objects.CancelData;
 import com.dscalzi.virtualshop.objects.ListingData;
@@ -190,7 +194,7 @@ public final class ChatManager {
 	}
 	
 	public void sellConfirmation(Player player, String label, ListingData data){
-		String confirmLine = "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the transaction.";
+		String confirmLine = "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(Sell.class)) + " seconds to complete the transaction.";
 		
     	if(data.getCurrentListings() < 1)
     		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. " + confirmLine);
@@ -206,16 +210,16 @@ public final class ChatManager {
     }
     
     public void buyConfirmation(Player player, String label, TransactionData data){
-    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the transaction.");
+    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(Buy.class)) + " seconds to complete the transaction.");
     }
     
     public void cancelConfirmation(Player player, String label, CancelData data){
-    	sendMessage(player, "You are about to cancel " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + ". " + ((data.getAmount() > data.getInventorySpace()) ? ChatColor.RED + "Currently, you have space for " + (data.getInventorySpace() == 0 ? "none" : "only " + formatAmount(data.getInventorySpace())) + ChatColor.RED + ". Excess will be dropped around you. " + this.color : "") + "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the request.");
+    	sendMessage(player, "You are about to cancel " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + ". " + ((data.getAmount() > data.getInventorySpace()) ? ChatColor.RED + "Currently, you have space for " + (data.getInventorySpace() == 0 ? "none" : "only " + formatAmount(data.getInventorySpace())) + ChatColor.RED + ". Excess will be dropped around you. " + this.color : "") + "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(Cancel.class)) + " seconds to complete the request.");
     }
     
     public void updateConfirmation(Player player, String label, ListingData data){
     	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
-    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the transaction.");
+    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(UpdatePrice.class)) + " seconds to complete the transaction.");
     }
 	
 	/* Formatting */
@@ -269,5 +273,9 @@ public final class ChatManager {
 		if(s.length() < 1)
 			return s;
 		return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+	}
+	
+	public static int millisecondsToSeconds(int milliseconds){
+		return milliseconds/1000;
 	}
 }

@@ -256,7 +256,7 @@ public class Buy implements CommandExecutor, Confirmable{
 		validateData(player, initialData.getArgs());
 		TransactionData currentData = (TransactionData) confirmations.retrieve(this.getClass(), player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
-		if(timeElapsed > 15000){
+		if(timeElapsed > configM.getConfirmationTimeout(this.getClass())){
 			cm.confirmationExpired(player);
 			confirmations.unregister(this.getClass(), player);
 			return;

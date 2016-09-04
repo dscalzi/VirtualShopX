@@ -31,10 +31,12 @@ public class ConfirmationManager implements Serializable{
 	private static transient ConfirmationManager instance;
 	
 	private transient VirtualShop plugin;
+	private transient ConfigManager configM;
 	private Map<Pair<UUID, Class<? extends Confirmable>>, VsDataCache> confirmations;
 	
 	private ConfirmationManager(Plugin plugin){
 		this.plugin = (VirtualShop)plugin;
+		this.configM = ConfigManager.getInstance();
 		this.assignVars();
 	}
 	
@@ -48,6 +50,7 @@ public class ConfirmationManager implements Serializable{
 			if(e.isPresent()){
 				instance = e.get();
 				instance.assignPlugin(plugin);
+				instance.configM = ConfigManager.getInstance();
 				instance.setUp();
 			} else
 				instance = new ConfirmationManager(plugin);
@@ -108,7 +111,7 @@ public class ConfirmationManager implements Serializable{
 		Iterator<Entry<Pair<UUID, Class<? extends Confirmable>>, VsDataCache>> it = confirmations.entrySet().iterator();
 		while(it.hasNext()){
 			Entry<Pair<UUID, Class<? extends Confirmable>>, VsDataCache> entry = it.next();
-			if(systemTime - entry.getValue().getTransactionTime() > 15000){
+			if(systemTime - entry.getValue().getTransactionTime() > configM.getConfirmationTimeout(entry.getKey().getValue())){
 				it.remove();
 			}
 		}
