@@ -110,7 +110,7 @@ public final class ItemDB {
 		try {
 			data = ItemMetaData.parseItemMetaData(id);
 		} catch (IllegalArgumentException e){		
-			if (items.containsKey(id.toLowerCase())) data = items.get(id);
+			if (items.containsKey(id.toLowerCase())) data = items.get(id.toLowerCase());
 		}
 		
 		if(data == null) return null;

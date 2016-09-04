@@ -1,11 +1,13 @@
 package com.dscalzi.virtualshop.commands;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
@@ -105,6 +107,23 @@ public class Cancel implements CommandExecutor, Confirmable{
         
         ItemStack item = idb.get(args[1], 0);
         int cancelAmt = 0;
+        
+        PlayerInventory im = player.getInventory();
+        if(args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand")){
+			item = new ItemStack(im.getItemInMainHand());
+			if(item.getType() == Material.AIR){
+				cm.holdingNothing(player);
+				return false;
+			}
+			args[1] = idb.reverseLookup(item);
+		} else if(args[1].equalsIgnoreCase("offhand")){
+			item = new ItemStack(im.getItemInOffHand());
+			if(item.getType() == Material.AIR){
+				cm.holdingNothing(player);
+				return false;
+			}
+			args[1] = idb.reverseLookup(item);
+		}
         
 		if(item==null){
 			cm.wrongItem(player, args[1]);

@@ -58,7 +58,6 @@ public final class DatabaseManager {
 		
 		if(configM.usingMySQL()) loadMySQL();
         else loadSQLite();
-		this.database.query("ALTER TABLE vshop_toggles  ADD `cancelconfirm` bit");
 	}
 	
 	private void loadSQLite() {
@@ -228,7 +227,7 @@ public final class DatabaseManager {
     	String merchant = DatabaseManager.DEFAULTNAME;
     	Optional<String> name = uuidm.getPlayerName(merchantUUID);
     	if(name.isPresent()) merchant = name.get();
-    	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,cancelconfirm,updateconfirm,uuid) values('" + merchant + "',1,1,1,'" + merchantUUID.toString() + "')";
+    	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,cancelconfirm,updateconfirm,uuid) values('" + merchant + "',1,1,1,1,'" + merchantUUID.toString() + "')";
     	this.database.query(query);
     }
     

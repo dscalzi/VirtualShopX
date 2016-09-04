@@ -5,6 +5,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
@@ -68,12 +70,11 @@ public class Sales implements CommandExecutor{
 		return true;
 	}
 	
-    @SuppressWarnings("deprecation")
-	public void execute(CommandSender sender, String[] args) throws LinkageError {
+    public void execute(CommandSender sender, String[] args) throws LinkageError {
     	final String baseColor = configM.getBaseColor();
     	final String trimColor = configM.getTrimColor();
     	
-        OfflinePlayer target;
+        OfflinePlayer target = (sender instanceof Player) ? plugin.getServer().getOfflinePlayer(((Player)sender).getUniqueId()) : null;
         
         int start = 1;
         List<Transaction> transactions = null;
@@ -88,7 +89,7 @@ public class Sales implements CommandExecutor{
         	try {
         		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
         	} catch(IllegalArgumentException e){
-        		target = plugin.getServer().getOfflinePlayer(args[0]);
+        		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
         	}
 			if(args.length > 1) 
 				start = Numbers.parseInteger(args[1]);

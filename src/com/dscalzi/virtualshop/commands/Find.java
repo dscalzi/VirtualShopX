@@ -80,7 +80,7 @@ public class Find implements CommandExecutor{
     	PageList<Offer> listings = new PageList<Offer>(offers, 7);
     	List<String> finalMsg = new ArrayList<String>();
     	
-        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "L" + baseColor + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + baseColor + args[0].substring(1) + trimColor + ChatColor.BOLD + " >";
+        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "L" + baseColor + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + baseColor + args[0].substring(1).toLowerCase() + trimColor + ChatColor.BOLD + " >";
         finalMsg.add(cm.formatHeaderLength(header, this.getClass()));
         
         try {

@@ -210,7 +210,7 @@ public final class ChatManager {
     }
     
     public void cancelConfirmation(Player player, String label, CancelData data){
-    	sendMessage(player, "You are about to cancel " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + ". " + ((data.getAmount() > data.getInventorySpace()) ? ChatColor.RED + "You only have inventory space for " + formatAmount(data.getInventorySpace()) + ChatColor.RED + ", excess will be dropped around you. " + this.color : "") + "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the request.");
+    	sendMessage(player, "You are about to cancel " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + ". " + ((data.getAmount() > data.getInventorySpace()) ? ChatColor.RED + "Currently, you have space for " + (data.getInventorySpace() == 0 ? "none" : "only " + formatAmount(data.getInventorySpace())) + ChatColor.RED + ". Excess will be dropped around you. " + this.color : "") + "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within 15 seconds to complete the request.");
     }
     
     public void updateConfirmation(Player player, String label, ListingData data){
@@ -268,6 +268,6 @@ public final class ChatManager {
 	public static String capitalize(String s){
 		if(s.length() < 1)
 			return s;
-		return s.substring(0, 1).toUpperCase() + s.substring(1);
+		return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
 	}
 }
