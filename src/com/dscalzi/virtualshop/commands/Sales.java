@@ -70,7 +70,8 @@ public class Sales implements CommandExecutor{
 		return true;
 	}
 	
-    public void execute(CommandSender sender, String[] args) throws LinkageError {
+    @SuppressWarnings("deprecation")
+	public void execute(CommandSender sender, String[] args) throws LinkageError {
     	final String baseColor = configM.getBaseColor();
     	final String trimColor = configM.getTrimColor();
     	
@@ -89,7 +90,7 @@ public class Sales implements CommandExecutor{
         	try {
         		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
         	} catch(IllegalArgumentException e){
-        		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
+        		target = plugin.getServer().getOfflinePlayer(args[0]);
         	}
 			if(args.length > 1) 
 				start = Numbers.parseInteger(args[1]);
