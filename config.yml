@@ -18,7 +18,8 @@ general_settings:
     - world_the_end
     
   # The amount of time in milliseconds it takes for
-  # a confirmation request to expire.
+  # a confirmation request to expire. Must be
+  # 0 < time, otherwise it will be set to 15 seconds.
   confirmation_timeouts:
     buy: 15000
     sell: 15000

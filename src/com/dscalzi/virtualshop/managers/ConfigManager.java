@@ -129,7 +129,8 @@ public final class ConfigManager {
 	}
 	
 	public int getConfirmationTimeout(Class<? extends Confirmable> clazz){
-		return this.config.getInt("general_settings.confirmation_timeouts." + (clazz.getSimpleName().toLowerCase()), 15000);
+		int time = this.config.getInt("general_settings.confirmation_timeouts." + (clazz.getSimpleName().toLowerCase()), 15000);
+		return (time > 0) ? time : 15000;
 	}
 	
 	public long getMaxPrice(int itemID, int dataValue){
