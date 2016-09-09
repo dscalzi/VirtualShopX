@@ -74,7 +74,7 @@ permissions:
           virtualshop.merchant.updateprice: true
     virtualshop.admin.*:
         default: OP
-        description: Access to administrator commands,
+        description: Access to administrator commands.
         children:
           virtualshop.merchant.*: true
           virtualshop.admin.formatmarket: true

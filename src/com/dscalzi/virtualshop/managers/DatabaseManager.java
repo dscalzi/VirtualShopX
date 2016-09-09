@@ -300,8 +300,9 @@ public final class DatabaseManager {
     	String query = "update vshop_stock set price="+price+" where id=" + id;
     	this.database.query(query);
     }
-    public void updatePrice(UUID merchantUUID, double price){
-    	String query = "update vshop_stock set price="+price+" where uuid='" + merchantUUID + "'";
+    @SuppressWarnings("deprecation")
+	public void updatePrice(UUID merchantUUID, double price, ItemStack item){
+    	String query = "update vshop_stock set price="+price+" where uuid='" + merchantUUID + "' and item =" + item.getTypeId() + " and damage = " + item.getDurability();
     	this.database.query(query);
     }
     

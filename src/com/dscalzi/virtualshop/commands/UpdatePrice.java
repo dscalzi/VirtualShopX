@@ -155,7 +155,7 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 	
 	private void updateListing(Player player, ListingData data){
 		double newPrice = data.getPrice();
-        dbm.updatePrice(player.getUniqueId(), newPrice);
+        dbm.updatePrice(player.getUniqueId(), newPrice, data.getItem());
 		confirmations.unregister(this.getClass(), player);
         if(configM.broadcastOffers())
         {
