@@ -19,7 +19,7 @@ import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Numbers;
 
-public class UpdatePrice implements CommandExecutor, Confirmable{
+public class Reprice implements CommandExecutor, Confirmable{
 
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
@@ -29,7 +29,7 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
 	private final DatabaseManager dbm;
 	private final ItemDB idb;
 	
-	public UpdatePrice(VirtualShop plugin){
+	public Reprice(VirtualShop plugin){
 		this.plugin = plugin;
 		this.cm = ChatManager.getInstance();
 		this.configM = ConfigManager.getInstance();
@@ -46,7 +46,7 @@ public class UpdatePrice implements CommandExecutor, Confirmable{
             cm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.merchant.updateprice")){
+		if(!sender.hasPermission("virtualshop.merchant.reprice")){
 			cm.noPermissions(sender);
 			return true;
 		}

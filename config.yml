@@ -23,7 +23,7 @@ general_settings:
   confirmation_timeouts:
     buy: 15000
     sell: 15000
-    updateprice: 15000
+    reprice: 15000
     cancel: 15000
 
 #--------------[Database Settings]--------------

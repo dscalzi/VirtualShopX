@@ -18,7 +18,7 @@ import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.Stock;
-import com.dscalzi.virtualshop.commands.UpdatePrice;
+import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.objects.CancelData;
 import com.dscalzi.virtualshop.objects.ListingData;
@@ -219,7 +219,7 @@ public final class ChatManager {
     
     public void updateConfirmation(Player player, String label, ListingData data){
     	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
-    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(UpdatePrice.class)) + " seconds to complete the transaction.");
+    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(Reprice.class)) + " seconds to complete the transaction.");
     }
 	
 	/* Formatting */

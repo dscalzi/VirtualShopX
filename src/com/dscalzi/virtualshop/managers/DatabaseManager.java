@@ -18,7 +18,7 @@ import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
 import com.dscalzi.virtualshop.commands.Sell;
-import com.dscalzi.virtualshop.commands.UpdatePrice;
+import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
@@ -38,7 +38,7 @@ public final class DatabaseManager {
 		togglesKey = new HashMap<Class<? extends Confirmable>, String>();
 		togglesKey.put(Buy.class, "buyconfirm");
 		togglesKey.put(Sell.class, "sellconfirm");
-		togglesKey.put(UpdatePrice.class, "updateconfirm");
+		togglesKey.put(Reprice.class, "repriceconfirm");
 		togglesKey.put(Cancel.class, "cancelconfirm");
 	}
 	
@@ -227,7 +227,7 @@ public final class DatabaseManager {
     	String merchant = DatabaseManager.DEFAULTNAME;
     	Optional<String> name = uuidm.getPlayerName(merchantUUID);
     	if(name.isPresent()) merchant = name.get();
-    	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,cancelconfirm,updateconfirm,uuid) values('" + merchant + "',1,1,1,1,'" + merchantUUID.toString() + "')";
+    	String query = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,cancelconfirm,repriceconfirm,uuid) values('" + merchant + "',1,1,1,1,'" + merchantUUID.toString() + "')";
     	this.database.query(query);
     }
     

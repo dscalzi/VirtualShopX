@@ -40,7 +40,7 @@ public class SQLiteDB implements Database
 			cm.logInfo("Created vshop_transaction table.");
 		}
 		if(!db.checkTable("vshop_toggles")){
-			String query = "create table vshop_toggles('id' integer primary key,'merchant' varchar(80) not null,'buyconfirm' bit not null,'sellconfirm' bit not null, `cancelconfirm` bit not null, 'updateconfirm' bit not null, 'uuid' varchar(80) not null)";
+			String query = "create table vshop_toggles('id' integer primary key,'merchant' varchar(80) not null,'buyconfirm' bit not null,'sellconfirm' bit not null, `cancelconfirm` bit not null, 'repriceconfirm' bit not null, 'uuid' varchar(80) not null)";
 			db.createTable(query);
 			cm.logInfo("Created vshop_toggles table.");
 		}
