@@ -48,7 +48,7 @@ permissions:
         description: Allow usage of /sell
     virtualshop.merchant.stock:
         description: Allow usage of /stock
-    virtualhop.merchant.reprice:
+    virtualshop.merchant.reprice:
         description: Allow usage of /reprice
     virtualshop.admin.formatmarket:
         description: Allow usage of /vs formatmarket
