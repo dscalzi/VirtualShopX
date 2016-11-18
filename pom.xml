@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dscalzi</groupId>
   <artifactId>VirtualShop</artifactId>
-  <version>AvSoft 1.10.2-R0.1-SNAPSHOT</version>
+  <version>AvSoft 1.11-R0.1-SNAPSHOT</version>
   <name>VirtualShop</name>
   <description>VirtualShop Minecraft Plugin</description>
   <build>
@@ -23,27 +23,24 @@
         <id>spigot-repo</id>
         <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
-	<repository>
-	    <id>vault-repo</id>
-	    <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
+    <repository>
+        <id>vault-repo</id>
+        <url>http://nexus.hc.to/content/repositories/pub_releases</url>
     </repository>
   </repositories>
   <dependencies>
-	<!--Spigot API-->
-	<dependency>
-        <groupId>org.spigotmc</groupId>
-        <artifactId>spigot-api</artifactId>
-        <version>1.10.2-R0.1-SNAPSHOT</version>
-        <scope>provided</scope>
+    <dependency>
+       <groupId>org.spigotmc</groupId>
+       <artifactId>spigot-api</artifactId>
+       <version>1.11-R0.1-SNAPSHOT</version>
+       <scope>provided</scope>
     </dependency>
-	<dependency>
-		<groupId>org.spigotmc</groupId>
-		<artifactId>spigot-api</artifactId>
-		<version>1.10.2-R0.1-SNAPSHOT</version>
-		<classifier>javadoc</classifier>
-	</dependency>
-	<!-- Using a project system scope because this dependency needs to -->
-	<!-- be packaged and cloned on the target server's plugins folder. -->
+    <dependency>
+        <groupId>net.milkbowl.vault</groupId>
+        <artifactId>VaultAPI</artifactId>
+        <version>1.6</version>
+        <scope>provided</scope>
+     </dependency>
 	<dependency>
 		<groupId>com.dscalzi</groupId>
 		<artifactId>VSReloader</artifactId>
@@ -51,17 +48,5 @@
 		<scope>system</scope>
 		<systemPath>${basedir}/depend/VSReloader.jar</systemPath>
 	</dependency>
-	<dependency>
-        <groupId>net.milkbowl.vault</groupId>
-        <artifactId>VaultAPI</artifactId>
-        <version>LATEST</version>
-		<scope>provided</scope>
-	</dependency>
-	<!-- http://mvnrepository.com/artifact/commons-io/commons-io -->
-    <dependency>
-       <groupId>commons-io</groupId>
-       <artifactId>commons-io</artifactId>
-       <version>2.4</version>
-    </dependency>
   </dependencies>
 </project>
