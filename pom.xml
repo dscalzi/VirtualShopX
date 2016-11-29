@@ -6,7 +6,15 @@
   <name>VirtualShop</name>
   <description>VirtualShop Minecraft Plugin</description>
   <build>
+    <defaultGoal>package</defaultGoal>
+    <finalName>VirtualShop</finalName>
     <sourceDirectory>src</sourceDirectory>
+    <resources>
+        <resource>
+            <targetPath>.</targetPath>
+            <directory>${basedir}/src/com/dscalzi/virtualshop/resources/</directory>
+        </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

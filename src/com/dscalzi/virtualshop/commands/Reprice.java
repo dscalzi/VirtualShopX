@@ -129,7 +129,7 @@ public class Reprice implements CommandExecutor, Confirmable{
 			return false;
 		}
 		if(newPrice > configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			cm.priceTooHigh(player, args[1], configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+			cm.priceTooHigh(player, args[0], configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return false;
 		}
 		int currentlyListed = 0;
