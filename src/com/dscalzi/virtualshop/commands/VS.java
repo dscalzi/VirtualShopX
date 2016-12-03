@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.swing.text.BadLocationException;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -171,25 +169,25 @@ public class VS implements CommandExecutor{
         cmds.add(listPrefix + trimColor + "/cancel " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle cancel confirmations.");
         cmds.add(listPrefix + trimColor + "/reprice " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle reprice confirmations.");
         
-        PageList<String> commands = new PageList<>(cmds, 7);
+        PageList<String> commands = new PageList<String>(6, cmds);
         
-        List<String> finalMsg = new ArrayList<String>();
-        finalMsg.add(cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass()));
-        finalMsg.add(trimColor + "              Command List - <Required> [Optional]");
+        String header = cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass());
+        String commandKey = trimColor + "              Command List - <Required> [Optional]";
+        String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
         
+        List<String> pageContent = null;
         try {
-			for(String s : commands.getPage(page)){
-				finalMsg.add(s);
-			}
-		} catch (BadLocationException e) {
+        	pageContent = commands.getPage(page-1);
+		} catch (IndexOutOfBoundsException e) {
 			cm.sendError(sender, "Page does not exist");
 			return;
 		}
         
-        finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");
-        
-        for(String s : finalMsg)
+        sender.sendMessage(header);
+        sender.sendMessage(commandKey);
+        for(String s : pageContent)
         	sender.sendMessage(s);
+        sender.sendMessage(footer);
         
 	}
 	
@@ -214,25 +212,25 @@ public class VS implements CommandExecutor{
 			cmds.add(listPrefix + trimColor + "/vs uuidnamesync [uuid]" + descColor + " - Syncs database names with uuids.");
 		
 		
-		PageList<String> commands = new PageList<>(cmds, 6);
+		PageList<String> commands = new PageList<String>(7, cmds);
 		
-		List<String> finalMsg = new ArrayList<String>();
-		finalMsg.add(cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass()));
-        finalMsg.add(trimColor + "              Command List - <Required> [Optional]");
+		String header = cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass());
+        String commandKey = trimColor + "              Command List - <Required> [Optional]";
+        String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
 		
+        List<String> pageContent = null;
         try {
-			for(String s : commands.getPage(page)){
-				finalMsg.add(s);
-			}
-		} catch (BadLocationException e) {
+        	pageContent = commands.getPage(page-1);
+		} catch (IndexOutOfBoundsException e) {
 			cm.sendError(sender, "Page does not exist");
 			return;
 		}
         
-        finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");
-        
-        for(String s : finalMsg)
+        sender.sendMessage(header);
+        sender.sendMessage(commandKey);
+        for(String s : pageContent)
         	sender.sendMessage(s);
+        sender.sendMessage(footer);
         
 	}
 	

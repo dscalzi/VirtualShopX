@@ -15,10 +15,7 @@ import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Numbers;
 import com.dscalzi.virtualshop.util.PageList;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.text.BadLocationException;
 
 public class Find implements CommandExecutor{
 	
@@ -77,24 +74,23 @@ public class Find implements CommandExecutor{
     	int requestedPage = 1;
     	if(args.length > 1) requestedPage = Numbers.parseInteger(args[1]);
     	
-    	PageList<Offer> listings = new PageList<Offer>(offers, 7);
-    	List<String> finalMsg = new ArrayList<String>();
+    	PageList<Offer> listings = new PageList<Offer>(7, offers);
     	
-        String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "L" + baseColor + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + baseColor + args[0].substring(1).toLowerCase() + trimColor + ChatColor.BOLD + " >";
-        finalMsg.add(cm.formatHeaderLength(header, this.getClass()));
+        String headerContent = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "L" + baseColor + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(args[0].charAt(0)) + baseColor + args[0].substring(1).toLowerCase() + trimColor + ChatColor.BOLD + " >";
+        String header = cm.formatHeaderLength(headerContent, this.getClass());
+        String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + requestedPage + " of " + listings.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
         
-        try {
-			for(Offer o : listings.getPage(requestedPage)){
-				finalMsg.add(cm.formatOffer(o));
-			}
-		} catch (BadLocationException e) {
-			cm.sendError(sender, "Page does not exist");
+        List<Offer> pageContent = null;
+        try{
+        	pageContent = listings.getPage(requestedPage-1);
+        } catch(IndexOutOfBoundsException e){
+        	cm.sendError(sender, "Page does not exist");
 			return;
-		}
-        finalMsg.add(baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + requestedPage + " of " + listings.getTotalPages() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-");
+        }
         
-        for(String s : finalMsg)
-        	sender.sendMessage(s);
-        
+        sender.sendMessage(header);
+        for(Offer o : pageContent)
+        	sender.sendMessage(cm.formatOffer(o));
+        sender.sendMessage(footer);        
     }
 }
