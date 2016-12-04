@@ -89,7 +89,7 @@ public class Reprice implements CommandExecutor, Confirmable{
 			return;
 		}
 		if(this.validateData(player, args))
-			cm.updateConfirmation(player, label, (ListingData) confirmations.retrieve(this.getClass(), player));
+			cm.repriceConfirmation(player, label, (ListingData) confirmations.retrieve(this.getClass(), player));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -102,25 +102,17 @@ public class Reprice implements CommandExecutor, Confirmable{
 			cm.numberFormat(player);
 			return false;
 		}
-		if(args[0].equalsIgnoreCase("hand") || args[0].equalsIgnoreCase("mainhand")){
-			item = new ItemStack(im.getItemInMainHand());
+		if(args[0].matches("^(?iu)(hand|mainhand|offhand)")){
+			item = new ItemStack(args[0].equalsIgnoreCase("offhand") ? im.getItemInOffHand() : im.getItemInMainHand());
 			if(item.getType() == Material.AIR){
 				cm.holdingNothing(player);
 				return false;
 			}
 			item.setAmount(amt);
-			args[1] = idb.reverseLookup(item);
-		} else if(args[1].equalsIgnoreCase("offhand")){
-			item = new ItemStack(im.getItemInOffHand());
-			if(item.getType() == Material.AIR){
-				cm.holdingNothing(player);
-				return false;
-			}
-			item.setAmount(amt);
-			args[1] = idb.reverseLookup(item);
+			args[0] = idb.reverseLookup(item);
 		}
 		if(item==null){
-			cm.wrongItem(player, args[1]);
+			cm.wrongItem(player, args[0]);
 			return false;
 		}
 		if(newPrice > configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
@@ -190,23 +182,23 @@ public class Reprice implements CommandExecutor, Confirmable{
 	 */
 	private void toggleConfirmations(Player player, String label, String[] args){
 		if(args.length < 3){
-			cm.sendMessage(player, "You may turn update price confirmations on or off using /" + label + " confirm toggle <on/off>");
+			cm.sendMessage(player, "You may turn reprice confirmations on or off using /" + label + " confirm toggle <on/off>");
 			return;
 		}
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
-			cm.sendSuccess(player, "Update price confirmations turned on. To undo this /" + label + " confirm toggle off");
+			cm.sendSuccess(player, "Reprice confirmations turned on. To undo this /" + label + " confirm toggle off");
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
-			cm.sendSuccess(player, "Update price confirmations turned off. To undo this /" + label + " confirm toggle on");
+			cm.sendSuccess(player, "Reprice confirmations turned off. To undo this /" + label + " confirm toggle on");
 			confirmations.unregister(this.getClass(), player);
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;
 		}
-		cm.sendMessage(player, "You may turn update price confirmations on or off using /" + label + " confirm toggle <on/off>");
+		cm.sendMessage(player, "You may turn reprice confirmations on or off using /" + label + " confirm toggle <on/off>");
 	}
 	
 }

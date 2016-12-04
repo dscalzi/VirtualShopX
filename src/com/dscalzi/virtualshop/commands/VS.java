@@ -51,7 +51,7 @@ public class VS implements CommandExecutor{
     				this.cmdList(sender, page);
     				return true;
     			} catch (NumberFormatException e){
-    				cm.sendError(sender, "Page does not exist");
+    				cm.invalidPage(sender);
 					return true;
     			} catch (ArrayIndexOutOfBoundsException e){
     				this.cmdList(sender, 1);
@@ -71,7 +71,7 @@ public class VS implements CommandExecutor{
 		    				this.vsList(sender, page);
 		    				return true;
 		    			} catch (NumberFormatException e){
-		    				cm.sendError(sender, "Page does not exist");
+		    				cm.invalidPage(sender);
 							return true;
 		    			}
 					}
@@ -118,6 +118,14 @@ public class VS implements CommandExecutor{
 					this.cmdVersion(sender);
 					return true;
 				}
+				try{
+    				int page = Integer.parseInt(args[0]);
+    				this.vsList(sender, page);
+    				return true;
+    			} catch (NumberFormatException e){
+    				cm.invalidPage(sender);
+					return true;
+    			}
 			}
 			this.vsList(sender, 1);
 			return true;
@@ -128,7 +136,7 @@ public class VS implements CommandExecutor{
 	
 	public void cmdupdateuuid(CommandSender sender){
 		
-		if(!sender.hasPermission("virtualshop.access.admin")){
+		if(!sender.hasPermission("virtualshop.*")){
 			cm.noPermissions(sender);
             return;
 		}
@@ -158,10 +166,10 @@ public class VS implements CommandExecutor{
         cmds.add(listPrefix + trimColor + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page]" + descColor + " - Browse offers.");
         cmds.add(listPrefix + trimColor + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page]" + descColor + " - View transaction log.");
         cmds.add(listPrefix + trimColor + "/vs" + descColor + " - Virtual Shop's technical commands.");
-        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle buy confirmations.");
-        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle sell confirmations.");
-        cmds.add(listPrefix + trimColor + "/cancel " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle cancel confirmations.");
-        cmds.add(listPrefix + trimColor + "/reprice " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle reprice confirmations.");
+        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle buy confirms.");
+        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle sell confirms.");
+        cmds.add(listPrefix + trimColor + "/cancel " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle cancel confirms.");
+        cmds.add(listPrefix + trimColor + "/reprice " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle reprice confirms.");
         
         PageList<String> commands = new PageList<String>(6, cmds);
         
@@ -173,7 +181,7 @@ public class VS implements CommandExecutor{
         try {
         	pageContent = commands.getPage(page-1);
 		} catch (IndexOutOfBoundsException e) {
-			cm.sendError(sender, "Page does not exist");
+			cm.invalidPage(sender);
 			return;
 		}
         
@@ -206,7 +214,7 @@ public class VS implements CommandExecutor{
 			cmds.add(listPrefix + trimColor + "/vs uuidnamesync [uuid]" + descColor + " - Syncs database names with uuids.");
 		
 		
-		PageList<String> commands = new PageList<String>(7, cmds);
+		PageList<String> commands = new PageList<String>(6, cmds);
 		
 		String header = cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass());
         String commandKey = trimColor + "              Command List - <Required> [Optional]";
@@ -216,7 +224,7 @@ public class VS implements CommandExecutor{
         try {
         	pageContent = commands.getPage(page-1);
 		} catch (IndexOutOfBoundsException e) {
-			cm.sendError(sender, "Page does not exist");
+			cm.invalidPage(sender);
 			return;
 		}
         

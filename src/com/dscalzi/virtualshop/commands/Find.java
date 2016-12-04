@@ -1,10 +1,13 @@
 package com.dscalzi.virtualshop.commands;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
@@ -55,6 +58,18 @@ public class Find implements CommandExecutor{
     	final String trimColor = configM.getTrimColor();
     	
     	ItemStack item = idb.get(args[0], 0);
+    	
+    	if(sender instanceof Player){
+    		PlayerInventory im = ((Player)sender).getInventory();
+    		if(args[0].matches("^(?iu)(hand|mainhand|offhand)")){
+    			item = new ItemStack(args[0].equalsIgnoreCase("offhand") ? im.getItemInOffHand() : im.getItemInMainHand());
+    			if(item.getType() == Material.AIR){
+    				cm.holdingNothing(sender);
+    				return;
+    			}
+    			args[0] = idb.reverseLookup(item);
+    		}
+    	}
     	if(item == null){
     		cm.wrongItem(sender, args[0]);
     		return;
@@ -79,7 +94,7 @@ public class Find implements CommandExecutor{
         try{
         	pageContent = listings.getPage(requestedPage-1);
         } catch(IndexOutOfBoundsException e){
-        	cm.sendError(sender, "Page does not exist");
+        	cm.invalidPage(sender);
 			return;
         }
         

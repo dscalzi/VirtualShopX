@@ -1,11 +1,13 @@
 package com.dscalzi.virtualshop.commands;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.ChatManager;
@@ -107,6 +109,7 @@ public class Buy implements CommandExecutor, Confirmable{
 		//Set data
 		int amount = Numbers.parseInteger(args[0]);
 		ItemStack item = idb.get(args[1], 0);
+		PlayerInventory im = player.getInventory();
 		double maxprice;
 		//Validate data
 		if(amount < 1)		{
@@ -116,6 +119,14 @@ public class Buy implements CommandExecutor, Confirmable{
 		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
 			cm.numberFormat(player);
 			return false;
+		}
+		if(args[1].matches("^(?iu)(hand|mainhand|offhand)")){
+			item = new ItemStack(args[1].equalsIgnoreCase("offhand") ? im.getItemInOffHand() : im.getItemInMainHand());
+			if(item.getType() == Material.AIR){
+				cm.holdingNothing(player);
+				return false;
+			}
+			args[1] = idb.reverseLookup(item);
 		}
 		if(item==null){
 			cm.wrongItem(player, args[1]);
@@ -188,7 +199,7 @@ public class Buy implements CommandExecutor, Confirmable{
             
             //Revise amounts if not enough money.
             if(!VirtualShop.hasEnough(player.getName(), cost)){
-            	canbuy = (int)(VirtualShop.econ.getBalance(player.getName()) / o.getPrice());
+            	canbuy = (int)(VirtualShop.econ.getBalance(player) / o.getPrice());
                 cost = canbuy*o.getPrice();
                 amount = bought+canbuy;
                 tooHigh = true;

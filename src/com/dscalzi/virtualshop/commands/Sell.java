@@ -135,16 +135,8 @@ public class Sell implements CommandExecutor, Confirmable{
 			cm.numberFormat(player);
 			return false;
 		}
-		if(args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand")){
-			item = new ItemStack(im.getItemInMainHand());
-			if(item.getType() == Material.AIR){
-				cm.holdingNothing(player);
-				return false;
-			}
-			item.setAmount(amount);
-			args[1] = idb.reverseLookup(item);
-		} else if(args[1].equalsIgnoreCase("offhand")){
-			item = new ItemStack(im.getItemInOffHand());
+		if(args[1].matches("^(?iu)(hand|mainhand|offhand)")){
+			item = new ItemStack(args[1].equalsIgnoreCase("offhand") ? im.getItemInOffHand() : im.getItemInMainHand());
 			if(item.getType() == Material.AIR){
 				cm.holdingNothing(player);
 				return false;

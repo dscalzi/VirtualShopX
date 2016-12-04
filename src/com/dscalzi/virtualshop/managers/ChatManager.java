@@ -137,21 +137,21 @@ public final class ChatManager {
 		sendError(sender, "You must be in-game to do this.");
 	}
 	
-	public void denyBeta(CommandSender sender){
-		sendError(sender, "Virtual Shop is currently restricted for beta testing. If you think this is a mistake contact the server administrators.");
-	}
-	
 	public void wrongItem(CommandSender sender, String item){
 		sendError(sender, "What is " + item + "?");
 	}
 	
 	public void holdingNothing(CommandSender sender){
-		sendError(sender, "You are not holding anything!");
+		sendError(sender, "You are not holding anything in that hand.");
 	}
 	
 	public void priceTooHigh(CommandSender sender, String item, long priceLimit){
     	sendError(sender, "Woah, you're selling your " + formatItem(item) + this.eColor + " for a rather high price. To avoid scamming, we've set the limit for that item to $" + priceLimit);
     }
+	
+	public void invalidPage(CommandSender sender){
+		sendError(sender, "Page does not exist.");
+	}
 	
 	public void numberFormat(CommandSender sender){
 		sendError(sender, "That is not a proper number.");
@@ -190,11 +190,11 @@ public final class ChatManager {
 	}
 	
 	public void noSpecificStock(CommandSender sender, String itemName){
-		sendError(sender, "You do not have any " + itemName + " for sale.");
+		sendError(sender, "You do not have any " + formatItem(itemName) + this.eColor + " for sale.");
 	}
 	
 	public void sellConfirmation(Player player, String label, ListingData data){
-		String confirmLine = "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(Sell.class)) + " seconds to complete the transaction.";
+		String confirmLine = "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + (configM.getConfirmationTimeout(Sell.class)/1000) + " seconds to complete the transaction.";
 		
     	if(data.getCurrentListings() < 1)
     		sendMessage(player, "You are about to create a listing for " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for " + formatPrice(data.getPrice()) + " each. " + confirmLine);
@@ -210,16 +210,16 @@ public final class ChatManager {
     }
     
     public void buyConfirmation(Player player, String label, TransactionData data){
-    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(Buy.class)) + " seconds to complete the transaction.");
+    	sendMessage(player, "You are about to buy " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + " for a total price of " + formatPrice(data.getPrice()) + ". Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + (configM.getConfirmationTimeout(Buy.class)/1000) + " seconds to complete the transaction.");
     }
     
     public void cancelConfirmation(Player player, String label, CancelData data){
-    	sendMessage(player, "You are about to cancel " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + ". " + ((data.getAmount() > data.getInventorySpace()) ? ChatColor.RED + "Currently, you have space for " + (data.getInventorySpace() == 0 ? "none" : "only " + formatAmount(data.getInventorySpace())) + ChatColor.RED + ". Excess will be dropped around you. " + this.color : "") + "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(Cancel.class)) + " seconds to complete the request.");
+    	sendMessage(player, "You are about to cancel " + formatAmount(data.getAmount()) + " " + formatItem(idb.reverseLookup(data.getItem())) + ". " + ((data.getAmount() > data.getInventorySpace()) ? ChatColor.RED + "Currently, you have space for " + (data.getInventorySpace() == 0 ? "none" : "only " + formatAmount(data.getInventorySpace())) + ChatColor.RED + ". Excess will be dropped around you. " + this.color : "") + "Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + (configM.getConfirmationTimeout(Cancel.class)/1000) + " seconds to complete the request.");
     }
     
-    public void updateConfirmation(Player player, String label, ListingData data){
+    public void repriceConfirmation(Player player, String label, ListingData data){
     	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
-    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + ChatManager.millisecondsToSeconds(configM.getConfirmationTimeout(Reprice.class)) + " seconds to complete the transaction.");
+    	sendMessage(player, "You are about to update the price of your " + formatItem(idb.reverseLookup(data.getItem())) + " for a " + quantity + " price of " + formatPrice(data.getPrice()) + " each. Please type" + ChatColor.GREEN + " /" + label + " confirm" + this.color + " within " + (configM.getConfirmationTimeout(Reprice.class)/1000) + " seconds to complete the transaction.");
     }
 	
 	/* Formatting */
@@ -273,9 +273,5 @@ public final class ChatManager {
 		if(s.length() < 1)
 			return s;
 		return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
-	}
-	
-	public static int millisecondsToSeconds(int milliseconds){
-		return milliseconds/1000;
 	}
 }

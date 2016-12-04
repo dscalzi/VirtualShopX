@@ -123,7 +123,7 @@ public class Stock implements CommandExecutor{
 			if(requestedPage == 1)
 				cm.noTransactions(sender, configM.getServerName());
 			else
-				cm.sendError(sender, "Page does not exist");
+				cm.invalidPage(sender);
 			return;
 		}
 		
