@@ -6,81 +6,55 @@ version: AvSoft 1.11-R0.1-SNAPSHOT
 depend: [Vault]
 loadbefore: [VSReloader]
 commands:
-    buy:
-        description: Buy goods for sale on the VirtualShop.
-        usage: /<command> <amount> <item> [maxprice]
-    sell:
-        description: Put goods up for sale on the VirtualShop.
-        usage: /<command> <amount> <item> <price> | /<command> <amount> [hand/mainhand/offhand] <price>
-    cancel:
-        description: Removes items from VirtualShop.
-        usage: /<command> <item>
-    find:
-        description: Find offers for an item.
-        usage: /<command> <item>
-    stock:
-        description: List items for sale.
-        usage: /<command> [player] [page]
-    sales:
-        description: See sales that have been made.
-        usage: /<command> [player] [page]
-    shop:
-        description: Displays help.
-        usage: /<command> [page]
-    reprice:
-        description: Reprices a listing.
-        usage: /<command> <item> <price>
-    vs:
-        description: Technical commands under /vs.
-        usage: /<command> [param]
+  buy:
+    description: Buy goods for sale on the VirtualShop.
+    usage: /<command> <amount> <item> [maxprice]
+  sell:
+    description: Put goods up for sale on the VirtualShop.
+    usage: /<command> <amount> <item> <price> | /<command> <amount> <hand/mainhand/offhand> <price>
+  cancel:
+    description: Removes items from VirtualShop.
+    usage: /<command> <item>
+  find:
+    description: Find offers for an item.
+    usage: /<command> <item>
+  stock:
+    description: List items for sale.
+    usage: /<command> [player] [page]
+  sales:
+    description: See sales that have been made.
+    usage: /<command> [player] [page]
+  shop:
+    description: Displays help.
+    usage: /<command> [page]
+  reprice:
+    description: Reprices a listing.
+    usage: /<command> <item> <price>
+  vs:
+    description: Technical commands under /vs.
+    usage: /<command> [param]
 permissions:
-    virtualshop.merchant.buy:
-        description: Allow usage of /buy
-    virtualshop.merchant.cancel:
-        description: Allow usage of /cancel
-    virtualshop.merchant.find:
-        description: Allow usage of /find
-    virtualshop.merchant.lookup:
-        description: Allow usage of /vs lookup
-    virtualshop.merchant.sales:
-        description: Allow usage of /sales
-    virtualshop.merchant.sell:
-        description: Allow usage of /sell
-    virtualshop.merchant.stock:
-        description: Allow usage of /stock
-    virtualshop.merchant.reprice:
-        description: Allow usage of /reprice
-    virtualshop.admin.formatmarket:
-        description: Allow usage of /vs formatmarket
-    virtualshop.admin.reloadconfig:
-        description: Allow usage of /vs reloadconfig
-    virtualshop.admin.uuidnamesync:
-        description: Allow usage of /vs uuidnamesync
-    virtualshop.admin.reprice.others:
-        description: Allow usage of /reprice on others, communist command.
-    virtualshop.developer.reload:
-        description: Allow usage of /vs reload
-    virtualshop.merchant.*:
-        default: true
-        description: Grants access to all merchant commands.
+  virtualshop.*:
+    children:
+      virtualshop.merchant.*:
         children:
           virtualshop.merchant.buy: true
           virtualshop.merchant.cancel: true
           virtualshop.merchant.find: true
           virtualshop.merchant.lookup: true
-          virtualshop.merchant.sales: true
+          virtualshop.merchant.sales.*:
+            children:
+              virtualshop.merchant.sales: true
+              virtualshop.merchant.sales.server: true
           virtualshop.merchant.sell: true
-          virtualshop.merchant.stock: true
+          virtualshop.merchant.stock.*:
+            children:
+              virtualshop.merchant.stock: true
+              virtualshop.merchant.stock.server: true
           virtualshop.merchant.reprice: true
-    virtualshop.admin.*:
-        default: OP
-        description: Access to administrator commands.
+      virtualshop.admin.*:
         children:
-          virtualshop.merchant.*: true
           virtualshop.admin.formatmarket: true
           virtualshop.admin.reloadconfig: true
           virtualshop.admin.uuidnamesync: true
           virtualshop.admin.reprice.others: true
-    virtualshop.access.beta:
-        description: Restricts access during beta period.
-        default: OP

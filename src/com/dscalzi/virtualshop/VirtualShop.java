@@ -26,7 +26,6 @@ import com.dscalzi.virtualshop.util.Reloader;
 public class VirtualShop extends JavaPlugin {
     
     public static Economy econ = null;
-    public static final boolean BETA = false;
     
     public void onDisable(){
     	ConfirmationManager.getInstance().serialize();

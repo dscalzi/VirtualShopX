@@ -40,14 +40,8 @@ public class VS implements CommandExecutor{
 		this.idb = ItemDB.getInstance();
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		
-		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			cm.denyBeta(sender);
-			return true;
-		}
 		
 		String cmd = command.getName();
 		if(cmd.equalsIgnoreCase("shop") || (cmd.equals("vs") && args.length > 0 && args[0].equalsIgnoreCase("shop"))){
@@ -204,7 +198,7 @@ public class VS implements CommandExecutor{
 		cmds.add(listPrefix + trimColor + "/vs version" + descColor + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.admin.formatmarket"))
 			cmds.add(listPrefix + trimColor + "/vs formatmarket " + ChatColor.BLUE + "[item]" + descColor + " - Reprice all items who's market price exceeds the set limit.");
-		if(sender.hasPermission("virtualshop.admin.reload"))
+		if(sender.hasPermission("virtualshop.developer.reload"))
 			cmds.add(listPrefix + trimColor + "/vs reload" + descColor + " - Reload the entire plugin's jar file.");
 		if(sender.hasPermission("virtualshop.admin.reloadconfig"))
 			cmds.add(listPrefix + trimColor + "/vs reloadconfig" + descColor + " - Reload the plugin's configuration.");

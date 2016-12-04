@@ -38,7 +38,6 @@ public class Reprice implements CommandExecutor, Confirmable{
 		this.idb = ItemDB.getInstance();
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
@@ -48,10 +47,6 @@ public class Reprice implements CommandExecutor, Confirmable{
         }
 		if(!sender.hasPermission("virtualshop.merchant.reprice")){
 			cm.noPermissions(sender);
-			return true;
-		}
-		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			cm.denyBeta(sender);
 			return true;
 		}
 		Player player = (Player)sender;

@@ -34,7 +34,6 @@ public class Find implements CommandExecutor{
 		this.idb = ItemDB.getInstance();
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
@@ -42,10 +41,6 @@ public class Find implements CommandExecutor{
             cm.noPermissions(sender);
             return true;
         }
-		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			cm.denyBeta(sender);
-			return true;
-		}
 		if(args.length < 1){
 			cm.sendError(sender, "You need to specify the item.");
 			return true;

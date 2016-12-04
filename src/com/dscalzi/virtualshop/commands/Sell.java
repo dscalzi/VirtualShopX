@@ -49,7 +49,6 @@ public class Sell implements CommandExecutor, Confirmable{
 		//this.confirmations = new HashMap<Player, ListingData>();
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
@@ -61,10 +60,6 @@ public class Sell implements CommandExecutor, Confirmable{
             cm.noPermissions(sender);
             return true;
         }
-		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			cm.denyBeta(sender);
-			return true;
-		}
 		Player player = (Player)sender;
 		if(!configM.getAllowedWorlds().contains(player.getWorld().getName())){
 			cm.invalidWorld(sender, command.getName(), player.getWorld());

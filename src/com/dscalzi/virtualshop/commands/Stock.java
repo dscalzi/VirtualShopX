@@ -33,7 +33,6 @@ public class Stock implements CommandExecutor{
 		this.uuidm = UUIDManager.getInstance();
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
@@ -41,10 +40,6 @@ public class Stock implements CommandExecutor{
             cm.noPermissions(sender);
             return true;
         }
-		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			cm.denyBeta(sender);
-			return true;
-		}
 		if(args.length > 0 && args[0].contains("'")){
         	cm.noStock(sender, args[0]);
         	return true;
@@ -84,6 +79,10 @@ public class Stock implements CommandExecutor{
 	        		target = plugin.getServer().getOfflinePlayer(args[0]);
 	        	}
 	        	if(args[0].equalsIgnoreCase(serverConstant)){
+	        		if(!sender.hasPermission("virtualshop.merchant.stock.server")){
+	        			cm.sendError(sender, "You do not have permission to lookup the full server stock.");
+	        			return;
+	        		}
 	        		args[0] = configM.getServerName();
 	        		fullServerRecord = true;
 	        	}

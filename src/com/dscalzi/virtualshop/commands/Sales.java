@@ -33,17 +33,12 @@ public class Sales implements CommandExecutor{
 		this.uuidm = UUIDManager.getInstance();
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("virtualshop.merchant.sales")){
             cm.noPermissions(sender);
             return true;
         }
-		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			cm.denyBeta(sender);
-			return true;
-		}
 		if(args.length > 0 && args[0].contains("'")){
         	cm.noTransactions(sender, args[0]);
         	return true;
@@ -82,8 +77,14 @@ public class Sales implements CommandExecutor{
 	        	} catch(IllegalArgumentException e){
 	        		target = plugin.getServer().getOfflinePlayer(args[0]);
 	        	}
-	        	if(args[0].equalsIgnoreCase(serverConstant))
+	        	if(args[0].equalsIgnoreCase(serverConstant)){
+	        		if(!sender.hasPermission("virtualshop.merchant.sales.server")){
+	        			cm.sendError(sender, "You do not have permission to lookup the full server transaction log.");
+	        			return;
+	        		}
+	        		args[0] = configM.getServerName();
 	        		fullServerRecord = true;
+	        	}
 	        	if(args.length > 1){
 		        	try{
 						requestedPage = Integer.parseInt(args[1]);

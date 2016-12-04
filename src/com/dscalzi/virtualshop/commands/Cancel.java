@@ -40,7 +40,6 @@ public class Cancel implements CommandExecutor, Confirmable{
 		this.idb = ItemDB.getInstance();
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
@@ -52,10 +51,6 @@ public class Cancel implements CommandExecutor, Confirmable{
             cm.noPermissions(sender);
             return true;
         }
-		if(VirtualShop.BETA && !sender.hasPermission("virtualshop.access.beta")){
-			cm.denyBeta(sender);
-			return true;
-		}
 		Player player = (Player)sender;
 		if(!configM.getAllowedWorlds().contains(player.getWorld().getName())){
 			cm.invalidWorld(sender, command.getName(), player.getWorld());
