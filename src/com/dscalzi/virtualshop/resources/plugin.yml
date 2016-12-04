@@ -58,3 +58,4 @@ permissions:
           virtualshop.admin.reloadconfig: true
           virtualshop.admin.uuidnamesync: true
           virtualshop.admin.reprice.others: true
+      virtualshop.developer.reload: true

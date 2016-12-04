@@ -39,10 +39,6 @@ public class Sales implements CommandExecutor{
             cm.noPermissions(sender);
             return true;
         }
-		if(args.length > 0 && args[0].contains("'")){
-        	cm.noTransactions(sender, args[0]);
-        	return true;
-        }
 		
 		try{
 			execute(sender, args);
@@ -72,6 +68,7 @@ public class Sales implements CommandExecutor{
 			}
 			if(isString){
 				//First try by UUID, if it fails try by player name.
+				args[0] = args[0].replaceAll("['\"]", "");
 	        	try {
 	        		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
 	        	} catch(IllegalArgumentException e){

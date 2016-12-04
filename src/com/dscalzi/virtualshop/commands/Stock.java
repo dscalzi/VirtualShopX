@@ -40,10 +40,6 @@ public class Stock implements CommandExecutor{
             cm.noPermissions(sender);
             return true;
         }
-		if(args.length > 0 && args[0].contains("'")){
-        	cm.noStock(sender, args[0]);
-        	return true;
-        }
 		
 		try{
 			this.execute(sender, args);
@@ -73,6 +69,7 @@ public class Stock implements CommandExecutor{
 			}
 			if(isString){
 				//First try by UUID, if it fails try by player name.
+				args[0] = args[0].replaceAll("['\"]", "");
 	        	try {
 	        		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
 	        	} catch(IllegalArgumentException e){
