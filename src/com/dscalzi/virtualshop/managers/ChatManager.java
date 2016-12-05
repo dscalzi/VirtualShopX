@@ -79,6 +79,13 @@ public final class ChatManager {
 		plugin.getLogger().info(message);
 	}
 	
+	public void logError(String message, boolean severe){
+		if (severe)
+			plugin.getLogger().severe(message);
+		else
+			plugin.getLogger().warning(message);
+	}
+	
 	public void sendMessage(CommandSender sender, String message){
     	sender.sendMessage(this.prefix + " " + message);
     }

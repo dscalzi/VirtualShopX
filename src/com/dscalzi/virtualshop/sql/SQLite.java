@@ -1,11 +1,4 @@
-/**
- * SQLite
- * Inherited subclass for reading and writing to and from an SQLite file.
- * 
- * Date Created: 2011-08-26 19:08
- * @author PatPeter
- */
-package lib.PatPeter.SQLibrary;
+package com.dscalzi.virtualshop.sql;
 
 /*
  * SQLite
@@ -24,20 +17,24 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
+/**
+ * Marked for removal after overhaul is complete
+ *
+ */
+@Deprecated
 public class SQLite extends DatabaseHandler {
 	public String location;
 	public String name;
 	private File sqlFile;
 	
 	public SQLite(Logger log, String prefix, String name, String location) {
-		super(log,prefix,"[SQLite] ");
 		this.name = name;
 		this.location = location;
 		File folder = new File(this.location);
 		if (this.name.contains("/") ||
 				this.name.contains("\\") ||
 				this.name.endsWith(".db")) {
-			this.writeError("The database name can not contain: /, \\, or .db", true);
+			super.cm.logError("The database name can not contain: /, \\, or .db", true);
 		}
 		if (!folder.exists()) {
 			folder.mkdir();
@@ -46,34 +43,14 @@ public class SQLite extends DatabaseHandler {
 		sqlFile = new File(folder.getAbsolutePath() + File.separator + name + ".db");
 	}
 	
-	/*@Override
-	public void writeInfo(String toWrite) {
-		if (toWrite != null) {
-			this.log.info(this.PREFIX + this.DATABASE_PREFIX + toWrite);
-		}
-	}
-	
-	@Override
-	public void writeError(String toWrite, boolean severe) {
-		if (severe) {
-			if (toWrite != null) {
-				this.log.severe(this.PREFIX + this.DATABASE_PREFIX + toWrite);
-			}
-		} else {
-			if (toWrite != null) {
-				this.log.warning(this.PREFIX + this.DATABASE_PREFIX + toWrite);
-			}
-		}
-	}*/
-	
 	protected boolean initialize() {
 		try {
 		  Class.forName("org.sqlite.JDBC");
 		  
 		  return true;
 		} catch (ClassNotFoundException e) {
-		  this.writeError("You need the SQLite library " + e, true);
-		  return false;
+			super.cm.logError("You need the SQLite library " + e, true);
+			return false;
 		}
 	}
 	
@@ -85,7 +62,7 @@ public class SQLite extends DatabaseHandler {
 					  	   sqlFile.getAbsolutePath());
 			  return this.connection;
 			} catch (SQLException e) {
-			  this.writeError("SQLite exception on initialize " + e, true);
+				super.cm.logError("SQLite exception on initialize " + e, true);
 			}
 		}
 		return this.connection;
@@ -97,7 +74,7 @@ public class SQLite extends DatabaseHandler {
 			try {
 				this.connection.close();
 			} catch (SQLException ex) {
-				this.writeError("Error on Connection close: " + ex, true);
+				super.cm.logError("Error on Connection close: " + ex, true);
 			}
 	}
 	
@@ -136,11 +113,10 @@ public class SQLite extends DatabaseHandler {
 					return result;	
 			}
 		} catch (SQLException ex) {
-			if (ex.getMessage().toLowerCase().contains("locking") || ex.getMessage().toLowerCase().contains("locked")) {
+			if (ex.getMessage().toLowerCase().contains("locking")) {
 				return retryResult(query);
-				//this.writeError("",false);
 			} else {
-				this.writeError("Error at SQL Query: " + ex.getMessage(), false);
+				super.cm.logError("Error at SQL Query: " + ex.getMessage(), false);
 			}
 			
 		}
@@ -152,7 +128,7 @@ public class SQLite extends DatabaseHandler {
 		Statement statement = null;
 		try {
 			if (query.equals("") || query == null) {
-				this.writeError("SQL Create Table query empty.", true);
+				super.cm.logError("SQL Create Table query empty.", true);
 				return false;
 			}
 			
@@ -160,7 +136,7 @@ public class SQLite extends DatabaseHandler {
 			statement.execute(query);
 			return true;
 		} catch (SQLException ex){
-			this.writeError(ex.getMessage(), true);
+			super.cm.logError(ex.getMessage(), true);
 			return false;
 		}
 	}
@@ -176,7 +152,7 @@ public class SQLite extends DatabaseHandler {
 			else
 			  return false;
 		} catch (SQLException e) {
-			this.writeError("Failed to check if table \"" + table + "\" exists: " + e.getMessage(), true);
+			super.cm.logError("Failed to check if table \"" + table + "\" exists: " + e.getMessage(), true);
 			return false;
 		}
 	}
@@ -187,7 +163,7 @@ public class SQLite extends DatabaseHandler {
 		String query = null;
 		try {
 			if (!this.checkTable(table)) {
-				this.writeError("Error at Wipe Table: table, " + table + ", does not exist", true);
+				super.cm.logError("Error at Wipe Table: table, " + table + ", does not exist", true);
 				return false;
 			}
 			//Connection connection = getConnection();
@@ -200,26 +176,17 @@ public class SQLite extends DatabaseHandler {
 			if (!(ex.getMessage().toLowerCase().contains("locking") ||
 				ex.getMessage().toLowerCase().contains("locked")) &&
 				!ex.toString().contains("not return ResultSet"))
-					this.writeError("Error at SQL Wipe Table Query: " + ex, false);
+				super.cm.logError("Error at SQL Wipe Table Query: " + ex, false);
 			return false;
 		}
 	}
 	
-	/*
-	 * <b>retry</b><br>
-	 * <br>
-	 * Retries.
-	 * <br>
-	 * <br>
-	 * @param query The SQL query.
-	 */
 	public void retry(String query) {
 		boolean passed = false;
 		Statement statement = null;
 		
 		while (!passed) {
 			try {
-				//Connection connection = getConnection();
 				this.connection = this.getConnection();
 				statement = this.connection.createStatement();
 				statement.executeQuery(query);
@@ -228,7 +195,7 @@ public class SQLite extends DatabaseHandler {
 				if (ex.getMessage().toLowerCase().contains("locking") || ex.getMessage().toLowerCase().contains("locked") ) {
 					passed = false;
 				} else {
-					this.writeError("Error at SQL Query: " + ex.getMessage(), false);
+					super.cm.logError("Error at SQL Query: " + ex.getMessage(), false);
 				}
 			}
 		}
@@ -257,7 +224,7 @@ public class SQLite extends DatabaseHandler {
 				if (ex.getMessage().toLowerCase().contains("locking") || ex.getMessage().toLowerCase().contains("locked")) {
                     passed = false;
 				} else {
-					this.writeError("Error at SQL Query: " + ex.getMessage(), false);
+					super.cm.logError("Error at SQL Query: " + ex.getMessage(), false);
 				}
 			}
 		}

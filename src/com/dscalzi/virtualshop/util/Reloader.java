@@ -57,15 +57,12 @@ public final class Reloader {
 	/* Reflect */
 	
 	private void loadVSR(final File dest){
-        final InputStream in = this.getClass().getResourceAsStream("/depend/VSReloader.jar");
-        try {
+        try(InputStream in = this.getClass().getResourceAsStream("/depend/VSReloader.jar")){
         	plugin.getLogger().info("Saving VSReloader.jar");
 			Files.copy(in, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException | NullPointerException e) {
 			plugin.getLogger().severe("Error ocurred while saving VSReloader");
 			return;
-		} finally {
-			try { in.close(); } catch (IOException e) {}
 		}
         enableVSR(dest);
     }

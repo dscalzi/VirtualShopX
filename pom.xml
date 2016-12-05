@@ -5,6 +5,9 @@
   <version>AvSoft 1.11-R0.1-SNAPSHOT</version>
   <name>VirtualShop</name>
   <description>VirtualShop Minecraft Plugin</description>
+  <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <build>
     <defaultGoal>package</defaultGoal>
     <finalName>VirtualShop</finalName>
@@ -23,6 +26,30 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <finalName>VirtualShop</finalName>
+              <filters>
+              </filters>
+              <relocations>
+                <relocation>
+                  <pattern>org.apache.commons</pattern>
+                  <shadedPattern>lib.apache.commons</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -48,7 +75,12 @@
         <artifactId>VaultAPI</artifactId>
         <version>1.6</version>
         <scope>provided</scope>
-     </dependency>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.commons</groupId>
+    	<artifactId>commons-dbcp2</artifactId>
+    	<version>2.1.1</version>
+	</dependency>
 	<dependency>
 		<groupId>com.dscalzi</groupId>
 		<artifactId>VSReloader</artifactId>

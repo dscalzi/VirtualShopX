@@ -417,7 +417,7 @@ public class VS implements CommandExecutor{
 			}
 			return;
 		}
-		DatabaseManager.getInstance().close();
+		DatabaseManager.getInstance().terminate();
 		cm.sendMessage(sender, "Begining reload of VirtualShop, this may lag the server for a few seconds..");
 		Runnable r = () -> {
 			PluginUtil.reload(plugin);

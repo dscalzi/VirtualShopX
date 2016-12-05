@@ -1,37 +1,17 @@
-/**
- * Database Handler
- * Abstract superclass for all subclass database files.
- * 
- * Date Created: 2011-08-26 19:08
- * @author PatPeter
- */
-package lib.PatPeter.SQLibrary;
+package com.dscalzi.virtualshop.sql;
 
-/*
- *  MySQL
- */
 import java.net.MalformedURLException;
-
-/*
- *  SQLLite
- */
-//import java.io.File;
-//import java.sql.DatabaseMetaData;
-
-/*
- *  Both
- */
 import java.sql.Connection;
-//import java.sql.DriverManager;
 import java.sql.ResultSet;
-//import java.sql.SQLException;
-//import java.sql.Statement;
-import java.util.logging.Logger;
 
+import com.dscalzi.virtualshop.managers.ChatManager;
+
+/**
+ * Marked for removal after overhaul is complete
+ *
+ */
 public abstract class DatabaseHandler {
-	protected Logger log;
-	protected final String PREFIX;
-	protected final String DATABASE_PREFIX;
+	protected final ChatManager cm;
 	protected Connection connection;
 	protected enum Statements {
 		SELECT, INSERT, UPDATE, DELETE, DO, REPLACE, LOAD, HANDLER, CALL, // Data manipulation statements
@@ -41,47 +21,9 @@ public abstract class DatabaseHandler {
 	/*
 	 *  MySQL, SQLLite
 	 */
-	
-	public DatabaseHandler(Logger log, String prefix, String dp) {
-		this.log = log;
-		this.PREFIX = prefix;
-		this.DATABASE_PREFIX = dp;
+	public DatabaseHandler(){
+		this.cm = ChatManager.getInstance();
 		this.connection = null;
-	}
-	
-	/**
-	 * <b>writeInfo</b><br>
-	 * <br>
-	 * &nbsp;&nbsp;Writes information to the console.
-	 * <br>
-	 * <br>
-	 * @param toWrite - the <a href="http://download.oracle.com/javase/6/docs/api/java/lang/String.html">String</a>
-	 * of content to write to the console.
-	 */
-	protected void writeInfo(String toWrite) {
-		if (toWrite != null) {
-			//this.log.info(this.PREFIX + this.DATABASE_PREFIX + toWrite);
-		}
-	}
-	
-	/**
-	 * <b>writeError</b><br>
-	 * <br>
-	 * &nbsp;&nbsp;Writes either errors or warnings to the console.
-	 * <br>
-	 * <br>
-	 * @param toWrite - the <a href="http://download.oracle.com/javase/6/docs/api/java/lang/String.html">String</a>
-	 * written to the console.
-	 * @param severe - whether console output should appear as an error or warning.
-	 */
-	protected void writeError(String toWrite, boolean severe) {
-        if (toWrite != null) {
-			if (severe) {
-				this.log.severe(this.PREFIX + this.DATABASE_PREFIX + toWrite);
-			} else {
-				this.log.warning(this.PREFIX + this.DATABASE_PREFIX + toWrite);
-			}
-		}
 	}
 	
 	/**
@@ -234,26 +176,4 @@ public abstract class DatabaseHandler {
 	 */
 	abstract boolean wipeTable(String table)
 		throws MalformedURLException, InstantiationException, IllegalAccessException;
-	
-	/*
-	 *  SQLLite
-	 */
-	
-	/*
-	 * <b>retry</b><br>
-	 * <br>
-	 * Retries.
-	 * <br>
-	 * <br>
-	 * @param query The SQL query.
-	 */
-	//abstract void retry(String query);
-	
-	/*
-	 * Retries a result.
-	 * 
-	 * @param query The SQL query to retry.
-	 * @return The SQL query result.
-	 */
-	//abstract ResultSet retryResult(String query);
 }
