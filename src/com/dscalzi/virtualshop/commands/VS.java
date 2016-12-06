@@ -441,6 +441,7 @@ public class VS implements CommandExecutor{
 		}
 		ConfigManager.reload();
 		ChatManager.reload();
+		DatabaseManager.reload();
 		
 		cm.sendSuccess(sender, "Configuration successfully reloaded.");
 		

@@ -18,6 +18,7 @@ import com.dscalzi.virtualshop.managers.ChatManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.managers.DatabaseManager.ConnectionType;
 import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Reloader;
@@ -30,23 +31,27 @@ public class VirtualShop extends JavaPlugin {
     public void onDisable(){
     	ConfirmationManager.getInstance().serialize();
     	if(ConfigManager.getInstance().uuidSyncOnDisable()) this.syncNameToUUID();
-        DatabaseManager.getInstance().terminate();
+    	DatabaseManager.getInstance().terminate();
         System.gc();
     }
 
     public void onEnable(){
         if (!this.setupEconomy()){
             this.getLogger().severe("Vault not found. Shutting down!");
-            this.getServer().getPluginManager().disablePlugin(this);
+            this.getPluginLoader().disablePlugin(this);
         }
         try {
 			ItemDB.initialize(this);
 		} catch (IOException e) {
 			this.getLogger().severe("Reference file 'items.csv' not found. Shutting down!");
-            this.getPluginLoader().disablePlugin(this);
+			this.getPluginLoader().disablePlugin(this);
             return;
 		}
         this.initializeManagers();
+        DatabaseManager.initialize(this);
+        if(DatabaseManager.getInstance().getConnectionType() == ConnectionType.VOID)
+        	this.getPluginLoader().disablePlugin(this);
+        Reloader.initialize(this);
         this.registerCommands();
         if(ConfigManager.getInstance().uuidSyncOnEnable()) this.syncNameToUUID();
     }
@@ -64,8 +69,6 @@ public class VirtualShop extends JavaPlugin {
         ConfigManager.initialize(this);
         ConfirmationManager.initialize(this);
 		ChatManager.initialize(this);
-        DatabaseManager.initialize(this);
-        Reloader.initialize(this);
     }
     
     private void registerCommands(){
