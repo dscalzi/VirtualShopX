@@ -45,13 +45,13 @@ public final class ItemDB {
 		
 		if (!file.exists())	{
 			file.createNewFile();
-			InputStream in = ItemDB.class.getResourceAsStream("/items.csv");
-			Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			in.close();
+			try(InputStream in = ItemDB.class.getResourceAsStream("/items.csv")){
+				Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			}
 		}
 		
-		BufferedReader rx = new BufferedReader(new FileReader(file));
-		try {
+		try(FileReader reader = new FileReader(file);
+			BufferedReader rx = new BufferedReader(reader)){
 			items.clear();
 
 			for (int i = 0; rx.ready(); i++){
@@ -71,8 +71,6 @@ public final class ItemDB {
 					plugin.getLogger().warning("Error parsing items.csv on line " + i);
 				}
 			}
-		} finally {
-			rx.close();
 		}
 	}
 	

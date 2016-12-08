@@ -16,6 +16,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.UnknownDependencyException;
 
+import com.dscalzi.virtualshop.managers.ChatManager;
+
 public final class Reloader {
 
 	private static boolean initialized;
@@ -31,10 +33,10 @@ public final class Reloader {
 	/* Method to load this Reloader */
 	private void load(){
 		File dest = new File(new File("plugins") + "/VSReloader.jar");
-		if(updateAvailable(dest))
-			plugin.getServer().getConsoleSender().sendMessage("[" + plugin.getName() + "] " + ChatColor.GREEN + "UPDATE FOR VSRELOADER AVAILABLE - Just delete the existing jar file and restart the server!");
 		if(!dest.exists())
 			this.loadVSR(dest);
+		if(updateAvailable(dest))
+			plugin.getServer().getConsoleSender().sendMessage("[" + plugin.getName() + "] " + ChatColor.GREEN + "UPDATE FOR VSRELOADER AVAILABLE - Just delete the existing jar file and restart the server!");
 	}
 	
 	public static void initialize(Plugin plugin){
@@ -61,7 +63,7 @@ public final class Reloader {
         	plugin.getLogger().info("Saving VSReloader.jar");
 			Files.copy(in, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException | NullPointerException e) {
-			plugin.getLogger().severe("Error ocurred while saving VSReloader");
+			ChatManager.getInstance().logError("Error ocurred while saving VSReloader", true);
 			return;
 		}
         enableVSR(dest);
@@ -72,7 +74,7 @@ public final class Reloader {
 		try {
 			target = Bukkit.getPluginManager().loadPlugin(dest);
 		} catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e) {
-			plugin.getLogger().severe("Could not enable VSReloader.");
+			ChatManager.getInstance().logError("Could not enable VSReloader.", true);
 			return false;
 		}
 		target.onLoad();
@@ -82,30 +84,39 @@ public final class Reloader {
 	
 	private boolean updateAvailable(File dest){
 		System.gc();
-    	try {
-    		File pluginFile = new File(new File("plugins"), "VSReloader.jar");
-    		PluginDescriptionFile desc = plugin.getPluginLoader().getPluginDescription(pluginFile);
-    		String currentVersion = desc.getVersion();
-    		InputStream in = this.getClass().getResourceAsStream("/depend/updater");
-    		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+		File pluginFile;
+		PluginDescriptionFile desc;
+		try{
+			pluginFile = new File(new File("plugins"), "VSReloader.jar");
+			desc = plugin.getPluginLoader().getPluginDescription(pluginFile);
+		} catch (NullPointerException e){
+			ChatManager.getInstance().logError("Could not check for an update to VSReloader, jar file is missing.", true);
+			return false;
+		} catch (InvalidDescriptionException e) {
+			ChatManager.getInstance().logError("Could not check for an update to VSReloader, jar file is missing or corrupt.", true);
+			return false;
+		}
+		final String currentVersion = desc.getVersion();
+    	try(InputStream in = this.getClass().getResourceAsStream("/depend/updater");
+    		InputStreamReader ireader = new InputStreamReader(in);
+    		BufferedReader reader = new BufferedReader(ireader)){
     		String line = null;
     		while((line = reader.readLine()) != null){
     			if(line.startsWith("VSReloader-Provided")){
     				String[] tmp = line.split("'");
     				String version = tmp[1];
     				if(!(version.equals(currentVersion))){
-    					in.close();
-    					reader.close();
-    					System.gc();
     					return true;
     				}
-    				in.close();
-					reader.close();
 					System.gc();
     				break;
     			}
     		}
-		} catch (Exception e) {
+		} catch (IOException e){
+			ChatManager.getInstance().logError("Error occurred while checking for VSReloader update.", true);
+			return false;
+		} catch (ArrayIndexOutOfBoundsException e){
+			ChatManager.getInstance().logError("Could not check for VSReloader update due to malformed updater file.", true);
 			return false;
 		}
     	

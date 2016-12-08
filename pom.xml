@@ -17,6 +17,10 @@
             <targetPath>.</targetPath>
             <directory>${basedir}/src/com/dscalzi/virtualshop/resources/</directory>
         </resource>
+        <resource>
+            <targetPath>./depend/</targetPath>
+            <directory>${basedir}/depend/</directory>
+        </resource>
     </resources>
     <plugins>
       <plugin>

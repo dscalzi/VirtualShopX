@@ -419,6 +419,13 @@ public class VS implements CommandExecutor{
 		}
 		DatabaseManager.getInstance().terminate();
 		cm.sendMessage(sender, "Begining reload of VirtualShop, this may lag the server for a few seconds..");
+		/* TODO Test async relaod.
+		 * 
+		 * Thread th = new Thread(() -> {
+		 *      PluginUtil.reload(plugin);
+		 * }).start();
+		 * 
+		 */
 		Runnable r = () -> {
 			PluginUtil.reload(plugin);
 		};
