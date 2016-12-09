@@ -3,11 +3,12 @@ package com.dscalzi.virtualshop.connection;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.dscalzi.virtualshop.managers.ChatManager;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.pool.HikariPool.PoolInitializationException;
 
 public class SQLiteWrapper extends ConnectionWrapper{
 
@@ -29,7 +30,7 @@ public class SQLiteWrapper extends ConnectionWrapper{
 		ChatManager.getInstance().logInfo("Using SQLite, attempting to establish connection..");
 		try {
 			Class.forName("org.sqlite.JDBC");
-			ds.setDriverClassName("org.sqlite.JDBC");
+			config.setDriverClassName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e){
 			ChatManager.getInstance().logError("SQLite Driver not found. Shutting down!", true);
 			return false;
@@ -40,26 +41,19 @@ public class SQLiteWrapper extends ConnectionWrapper{
 		
 		File sqlFile = new File(folder.getAbsolutePath() + File.separator + name + ".db");
 		
-		ds.setUrl("jdbc:sqlite:" + sqlFile.toPath().toString());
-		ds.setMaxIdle(0);
+		config.setJdbcUrl("jdbc:sqlite:" + sqlFile.toPath().toString());
+		config.setMaximumPoolSize(1);
 		
-		boolean connectionSuccessful;
-		
-		//Test connection
-		try(Connection connection = ds.getConnection();
-			PreparedStatement stmt = connection.prepareStatement("SELECT 1"))
-		{
-			try(ResultSet result = stmt.executeQuery()){
-				connectionSuccessful = true;
-				ChatManager.getInstance().logInfo("Successfully connected to SQLite.");
-			}
-		} catch (SQLException e) {
-			connectionSuccessful = false;
-			ChatManager.getInstance().logError("Could not establish connection to SQLite: " + e.getMessage(), true);
+		try{
+			ds = new HikariDataSource(config);
+		} catch (PoolInitializationException e){
+			ChatManager.getInstance().logError("Could not establish connection to SQLite.", true);
 			ChatManager.getInstance().logError("Check your settings or submit a ticket, shutting down..", true);
+			return false;
 		}
 		
-		return connectionSuccessful;
+		ChatManager.getInstance().logInfo("Successfully connected to SQLite.");
+		return true;
 	}
 
 	@Override

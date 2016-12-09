@@ -1,29 +1,26 @@
 package com.dscalzi.virtualshop.connection;
 
 import java.sql.SQLException;
-import java.util.MissingResourceException;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class ConnectionWrapper {
 
-	protected BasicDataSource ds;
+	protected HikariDataSource ds;
+	protected HikariConfig config;
 	
 	public ConnectionWrapper(){
-		try {
-			this.ds = new BasicDataSource();
-		} catch (MissingResourceException e){
-			System.out.println("It happened again");
-			//Son of a bitch.
-		}
+		this.config = new HikariConfig();
 	}
 	
-	public BasicDataSource getDataSource(){
+	public HikariDataSource getDataSource(){
 		return ds;
 	}
 	
 	public void terminate() throws SQLException {
-		ds.close();
+		if(ds != null)
+			ds.close();
 	}
 	
 	public abstract boolean initialize();

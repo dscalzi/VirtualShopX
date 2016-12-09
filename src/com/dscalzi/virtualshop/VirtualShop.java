@@ -3,6 +3,7 @@ package com.dscalzi.virtualshop;
 import java.io.IOException;
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,7 +24,6 @@ import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Reloader;
 
-@SuppressWarnings("deprecation")
 public class VirtualShop extends JavaPlugin {
     
     public static Economy econ = null;
@@ -90,8 +90,8 @@ public class VirtualShop extends JavaPlugin {
     	else this.getLogger().info("All accounts are already synced!");
     }
     
-    public static boolean hasEnough(String playerName, double money){
-        double balance = econ.getBalance(playerName) - money;
+    public static boolean hasEnough(Player player, double money){
+        double balance = econ.getBalance(player) - money;
         if (balance > 0){
             return true;
         } else {

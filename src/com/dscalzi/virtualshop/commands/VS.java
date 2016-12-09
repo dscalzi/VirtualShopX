@@ -20,6 +20,7 @@ import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.PageList;
+import com.dscalzi.virtualshop.util.Reloader;
 import com.dscalzi.vsreloader.PluginUtil;
 
 import javafx.util.Pair;
@@ -449,6 +450,7 @@ public class VS implements CommandExecutor{
 		ConfigManager.reload();
 		ChatManager.reload();
 		DatabaseManager.reload();
+		Reloader.reload();
 		
 		cm.sendSuccess(sender, "Configuration successfully reloaded.");
 		

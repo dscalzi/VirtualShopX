@@ -418,7 +418,7 @@ public final class DatabaseManager {
     	try(Connection connection = ds.getDataSource().getConnection();
     		PreparedStatement stmt = connection.prepareStatement(sql))
     	{
-    		stmt.executeQuery();
+    		stmt.executeUpdate();
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     	}

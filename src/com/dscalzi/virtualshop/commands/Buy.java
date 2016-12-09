@@ -198,7 +198,7 @@ public class Buy implements CommandExecutor, Confirmable{
             anyLessThanMax = true;
             
             //Revise amounts if not enough money.
-            if(!VirtualShop.hasEnough(player.getName(), cost)){
+            if(!VirtualShop.hasEnough(player, cost)){
             	canbuy = (int)(VirtualShop.econ.getBalance(player) / o.getPrice());
                 cost = canbuy*o.getPrice();
                 amount = bought+canbuy;

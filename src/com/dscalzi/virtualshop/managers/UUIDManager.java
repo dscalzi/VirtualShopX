@@ -69,6 +69,7 @@ public final class UUIDManager {
 	
 	public Optional<String> getNewPlayerName(UUID uuid, String oldName){
 		String currentName = Bukkit.getOfflinePlayer(uuid).getName();
+		if(currentName == null) return Optional.empty();
 		return (currentName.equals(oldName)) ? Optional.empty() : Optional.of(currentName);
 	}
 	

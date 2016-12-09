@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.dscalzi.virtualshop.managers.ChatManager;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.pool.HikariPool.PoolInitializationException;
 
 public class MySQLWrapper extends ConnectionWrapper{
 
@@ -33,37 +35,28 @@ public class MySQLWrapper extends ConnectionWrapper{
 		ChatManager.getInstance().logInfo("Using MySQL, attempting to establish connection..");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			ds.setDriverClassName("com.mysql.jdbc.Driver");
+			config.setDriverClassName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e){
 			ChatManager.getInstance().logError("MySQL Driver not found. Shutting down..", true);
 			return false;
 		}
     	
-		ds.setUrl("jdbc:mysql://" + host + ":" + port + "/" + schema);
-		ds.setUsername(user);
-		ds.setPassword(pass);
+		config.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + schema);
+		config.setUsername(user);
+		config.setPassword(pass);
+		config.setIdleTimeout(1500);
+		config.setMaximumPoolSize(5);
 		
-		ds.setMinIdle(5);
-		ds.setMaxIdle(15);
-		ds.setMaxOpenPreparedStatements(100);
-		
-		boolean connectionSuccessful;
-		
-		//Test connection
-		try(Connection connection = ds.getConnection();
-			PreparedStatement stmt = connection.prepareStatement("SELECT 1"))
-		{
-			try(ResultSet result = stmt.executeQuery()){
-				connectionSuccessful = true;
-				ChatManager.getInstance().logInfo("Successfully connected to MySQL server.");
-			}
-		} catch (SQLException e) {
-			connectionSuccessful = false;
-			ChatManager.getInstance().logError("Could not establish connection to MySQL Server: " + e.getMessage(), true);
+		try{
+			ds = new HikariDataSource(config);
+		} catch (PoolInitializationException e){
+			ChatManager.getInstance().logError("Could not establish connection to MySQL Server.", true);
 			ChatManager.getInstance().logError("Check your settings or use SQLite, shutting down..", true);
+			return false;
 		}
 		
-		return connectionSuccessful;
+		ChatManager.getInstance().logInfo("Successfully connected to MySQL server.");
+		return true;
 	}
 
 	@Override

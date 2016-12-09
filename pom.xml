@@ -5,9 +5,20 @@
   <version>AvSoft 1.11-R0.1-SNAPSHOT</version>
   <name>VirtualShop</name>
   <description>VirtualShop Minecraft Plugin</description>
+  
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  
+  <developers>
+      <developer>
+         <name>Daniel Scalzi (TheKraken7)</name>
+         <roles>
+           <role>Project Lead</role>
+         </roles>
+      </developer>
+   </developers>
+  
   <build>
     <defaultGoal>package</defaultGoal>
     <finalName>VirtualShop</finalName>
@@ -23,6 +34,7 @@
         </resource>
     </resources>
     <plugins>
+    
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.3</version>
@@ -31,6 +43,7 @@
           <target>1.8</target>
         </configuration>
       </plugin>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -47,16 +60,22 @@
               </filters>
               <relocations>
                 <relocation>
-                  <pattern>org.apache.commons</pattern>
-                  <shadedPattern>lib.apache.commons</shadedPattern>
+                  <pattern>com.zaxxer</pattern>
+                  <shadedPattern>lib.com.zaxxer</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.slf4j</pattern>
+                  <shadedPattern>lib.org.slf4j</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
           </execution>
         </executions>
       </plugin>
+      
     </plugins>
   </build>
+  
   <repositories>
     <repository>
         <id>spigot-repo</id>
@@ -67,6 +86,7 @@
         <url>http://nexus.hc.to/content/repositories/pub_releases</url>
     </repository>
   </repositories>
+  
   <dependencies>
     <dependency>
        <groupId>org.spigotmc</groupId>
@@ -81,10 +101,10 @@
         <scope>provided</scope>
     </dependency>
     <dependency>
-    	<groupId>org.apache.commons</groupId>
-    	<artifactId>commons-dbcp2</artifactId>
-    	<version>2.1.1</version>
-	</dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>2.5.1</version>
+    </dependency>
 	<dependency>
 		<groupId>com.dscalzi</groupId>
 		<artifactId>VSReloader</artifactId>
@@ -93,4 +113,5 @@
 		<systemPath>${basedir}/depend/VSReloader.jar</systemPath>
 	</dependency>
   </dependencies>
+  
 </project>

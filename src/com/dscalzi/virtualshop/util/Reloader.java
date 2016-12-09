@@ -33,10 +33,12 @@ public final class Reloader {
 	/* Method to load this Reloader */
 	private void load(){
 		File dest = new File(new File("plugins") + "/VSReloader.jar");
+		boolean checkForUpdate = true;
 		if(!dest.exists())
-			this.loadVSR(dest);
-		if(updateAvailable(dest))
-			plugin.getServer().getConsoleSender().sendMessage("[" + plugin.getName() + "] " + ChatColor.GREEN + "UPDATE FOR VSRELOADER AVAILABLE - Just delete the existing jar file and restart the server!");
+			checkForUpdate = this.loadVSR(dest);
+		if(checkForUpdate)
+			if(updateAvailable(dest))
+				plugin.getServer().getConsoleSender().sendMessage("[" + plugin.getName() + "] " + ChatColor.GREEN + "UPDATE FOR VSRELOADER AVAILABLE - Just delete the existing jar file and restart the server!");
 	}
 	
 	public static void initialize(Plugin plugin){
@@ -58,15 +60,15 @@ public final class Reloader {
 	
 	/* Reflect */
 	
-	private void loadVSR(final File dest){
+	private boolean loadVSR(final File dest){
         try(InputStream in = this.getClass().getResourceAsStream("/depend/VSReloader.jar")){
         	plugin.getLogger().info("Saving VSReloader.jar");
 			Files.copy(in, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException | NullPointerException e) {
 			ChatManager.getInstance().logError("Error ocurred while saving VSReloader", true);
-			return;
+			return false;
 		}
-        enableVSR(dest);
+        return enableVSR(dest);
     }
 	
 	private boolean enableVSR(File dest){
@@ -97,7 +99,7 @@ public final class Reloader {
 			return false;
 		}
 		final String currentVersion = desc.getVersion();
-    	try(InputStream in = this.getClass().getResourceAsStream("/depend/updater");
+    	try(InputStream in = Reloader.class.getResourceAsStream("/depend/updater");
     		InputStreamReader ireader = new InputStreamReader(in);
     		BufferedReader reader = new BufferedReader(ireader)){
     		String line = null;

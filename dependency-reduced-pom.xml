@@ -6,6 +6,14 @@
   <name>VirtualShop</name>
   <version>AvSoft 1.11-R0.1-SNAPSHOT</version>
   <description>VirtualShop Minecraft Plugin</description>
+  <developers>
+    <developer>
+      <name>Daniel Scalzi (TheKraken7)</name>
+      <roles>
+        <role>Project Lead</role>
+      </roles>
+    </developer>
+  </developers>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <defaultGoal>package</defaultGoal>
@@ -43,8 +51,12 @@
               <filters />
               <relocations>
                 <relocation>
-                  <pattern>org.apache.commons</pattern>
-                  <shadedPattern>lib.apache.commons</shadedPattern>
+                  <pattern>com.zaxxer</pattern>
+                  <shadedPattern>lib.com.zaxxer</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.slf4j</pattern>
+                  <shadedPattern>lib.org.slf4j</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
