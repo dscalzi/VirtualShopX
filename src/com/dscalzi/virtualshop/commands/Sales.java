@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.dscalzi.virtualshop.VirtualShop;
-import com.dscalzi.virtualshop.managers.ChatManager;
+import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.managers.UUIDManager;
@@ -20,15 +20,15 @@ import java.util.List;
 public class Sales implements CommandExecutor{
 	
 	private VirtualShop plugin;
-	private final ChatManager cm;
-	private final ConfigManager configM;
+	private final MessageManager mm;
+	private final ConfigManager cm;
 	private final DatabaseManager dbm;
 	private final UUIDManager uuidm;
 	
 	public Sales(VirtualShop plugin){
 		this.plugin = plugin;
-		this.cm = ChatManager.getInstance();
-		this.configM = ConfigManager.getInstance();
+		this.mm = MessageManager.getInstance();
+		this.cm = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.uuidm = UUIDManager.getInstance();
 	}
@@ -36,22 +36,22 @@ public class Sales implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!sender.hasPermission("virtualshop.merchant.sales")){
-            cm.noPermissions(sender);
+            mm.noPermissions(sender);
             return true;
         }
 		
 		try{
 			execute(sender, args);
     	} catch (LinkageError e){
-    		cm.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
+    		mm.sendError(sender, "Linkage error occurred. Please restart the server to fix.");
     	}
 		return true;
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void execute(CommandSender sender, String[] args) throws LinkageError {
-		final String baseColor = configM.getBaseColor();
-		final String trimColor = configM.getTrimColor();
+		final ChatColor baseColor = cm.getBaseColor();
+		final ChatColor trimColor = cm.getTrimColor();
 		
 		boolean fullServerRecord = false;
 		final String serverConstant = "@s";
@@ -76,10 +76,10 @@ public class Sales implements CommandExecutor{
 	        	}
 	        	if(args[0].equalsIgnoreCase(serverConstant)){
 	        		if(!sender.hasPermission("virtualshop.merchant.sales.server")){
-	        			cm.sendError(sender, "You do not have permission to lookup the full server transaction log.");
+	        			mm.sendError(sender, "You do not have permission to lookup the full server transaction log.");
 	        			return;
 	        		}
-	        		args[0] = configM.getServerName();
+	        		args[0] = cm.getServerName();
 	        		fullServerRecord = true;
 	        	}
 	        	if(args.length > 1){
@@ -97,7 +97,7 @@ public class Sales implements CommandExecutor{
 				target = (Player)sender;
 			else
 				if(!fullServerRecord){
-					cm.sendError(sender, "You must either specify a player to lookup or give the argument " + serverConstant + ".");
+					mm.sendError(sender, "You must either specify a player to lookup or give the argument " + serverConstant + ".");
 					return;
 				}
 		}
@@ -106,11 +106,11 @@ public class Sales implements CommandExecutor{
 		try{
 			transactions = fullServerRecord ? dbm.getTransactions() : dbm.getTransactions(target.getUniqueId());
 		} catch (NullPointerException e){
-			cm.noTransactions(sender, (target.getName() == null) ? args[0] : target.getName());
+			mm.noTransactions(sender, (target.getName() == null) ? args[0] : target.getName());
 			return;
 		}
 		if(transactions.size() < 1){
-        	cm.noTransactions(sender, (target.getName() == null) ? args[0] : target.getName());
+        	mm.noTransactions(sender, (target.getName() == null) ? args[0] : target.getName());
         	return;
         }
 		
@@ -120,19 +120,19 @@ public class Sales implements CommandExecutor{
 			page = sales.getPage(requestedPage-1);
 		} catch (IndexOutOfBoundsException e){
 			if(requestedPage == 1)
-				cm.noTransactions(sender, configM.getServerName());
+				mm.noTransactions(sender, cm.getServerName());
 			else
-				cm.invalidPage(sender);
+				mm.invalidPage(sender);
 			return;
 		}
 		
-		String headerContent = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + ((fullServerRecord) ? configM.getServerName() : target.getName()) + trimColor + ChatColor.BOLD + " >";
-		String header = cm.formatHeaderLength(headerContent, this.getClass());
+		String headerContent = trimColor + "" + ChatColor.BOLD + "< " + baseColor + ChatColor.BOLD + "T" + baseColor + "ransaction " + ChatColor.BOLD + "L" + baseColor + "og ◄► " + ((fullServerRecord) ? cm.getServerName() : target.getName()) + trimColor + ChatColor.BOLD + " >";
+		String header = mm.formatHeaderLength(headerContent, this.getClass());
 		String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + requestedPage + " of " + sales.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
 		
 		sender.sendMessage(header);
 		for(Transaction t : page){
-			sender.sendMessage(cm.formatTransaction(t));
+			sender.sendMessage(mm.formatTransaction(t));
 		}
 		sender.sendMessage(footer);
 		

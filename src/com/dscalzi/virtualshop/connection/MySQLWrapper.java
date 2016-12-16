@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.dscalzi.virtualshop.managers.ChatManager;
+import com.dscalzi.virtualshop.managers.MessageManager;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool.PoolInitializationException;
 
@@ -32,12 +32,12 @@ public class MySQLWrapper extends ConnectionWrapper{
 	public boolean initialize(){
 		if(this.initialized) return true;
 		initialized = true;
-		ChatManager.getInstance().logInfo("Using MySQL, attempting to establish connection..");
+		MessageManager.getInstance().logInfo("Using MySQL, attempting to establish connection..");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			config.setDriverClassName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e){
-			ChatManager.getInstance().logError("MySQL Driver not found. Shutting down..", true);
+			MessageManager.getInstance().logError("MySQL Driver not found. Shutting down..", true);
 			return false;
 		}
     	
@@ -50,12 +50,12 @@ public class MySQLWrapper extends ConnectionWrapper{
 		try{
 			ds = new HikariDataSource(config);
 		} catch (PoolInitializationException e){
-			ChatManager.getInstance().logError("Could not establish connection to MySQL Server.", true);
-			ChatManager.getInstance().logError("Check your settings or use SQLite, shutting down..", true);
+			MessageManager.getInstance().logError("Could not establish connection to MySQL Server.", true);
+			MessageManager.getInstance().logError("Check your settings or use SQLite, shutting down..", true);
 			return false;
 		}
 		
-		ChatManager.getInstance().logInfo("Successfully connected to MySQL server.");
+		MessageManager.getInstance().logInfo("Successfully connected to MySQL server.");
 		return true;
 	}
 
@@ -73,7 +73,7 @@ public class MySQLWrapper extends ConnectionWrapper{
 			if (e.getMessage().contains("exist")) {
 				return false;
 			} else {
-				ChatManager.getInstance().logError("Error in SQL query: " + e.getMessage(), false);
+				MessageManager.getInstance().logError("Error in SQL query: " + e.getMessage(), false);
 			}
 		}
     	return false;

@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.dscalzi.virtualshop.VirtualShop;
-import com.dscalzi.virtualshop.managers.ChatManager;
+import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
@@ -24,8 +24,8 @@ public class Cancel implements CommandExecutor, Confirmable{
 
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
-	private final ChatManager cm;
-	private final ConfigManager configM;
+	private final MessageManager mm;
+	private final ConfigManager cm;
 	private final ConfirmationManager confirmations;
 	private final DatabaseManager dbm;
 	private final ItemDB idb;
@@ -33,8 +33,8 @@ public class Cancel implements CommandExecutor, Confirmable{
 	
 	public Cancel(VirtualShop plugin){
 		this.plugin = plugin;
-		this.cm = ChatManager.getInstance();
-		this.configM = ConfigManager.getInstance();
+		this.mm = MessageManager.getInstance();
+		this.cm = ConfigManager.getInstance();
 		this.confirmations = ConfirmationManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.idb = ItemDB.getInstance();
@@ -44,20 +44,20 @@ public class Cancel implements CommandExecutor, Confirmable{
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!(sender instanceof Player)){
-            cm.denyConsole(sender);
+            mm.denyConsole(sender);
             return true;
         }
 		if(!sender.hasPermission("virtualshop.merchant.cancel")){
-            cm.noPermissions(sender);
+            mm.noPermissions(sender);
             return true;
         }
 		Player player = (Player)sender;
-		if(!configM.getAllowedWorlds().contains(player.getWorld().getName())){
-			cm.invalidWorld(sender, command.getName(), player.getWorld());
+		if(!cm.getAllowedWorlds().contains(player.getWorld().getName())){
+			mm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
 		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
-        	cm.invalidGamemode(sender, command.getName(), player.getGameMode());
+        	mm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
 		if(args.length > 0){
@@ -77,7 +77,7 @@ public class Cancel implements CommandExecutor, Confirmable{
 			}
 		}
 		if(args.length < 2){
-            cm.sendError(sender, "Proper usage is /" + label + " <amount> <item>");
+            mm.sendError(sender, "Proper usage is /" + label + " <amount> <item>");
             return true;
         }
 		
@@ -95,7 +95,7 @@ public class Cancel implements CommandExecutor, Confirmable{
 			return;
 		}
 		if(this.validateData(player, args))
-			cm.cancelConfirmation(player, label, (CancelData)confirmations.retrieve(this.getClass(), player));
+			mm.cancelConfirmation(player, label, (CancelData)confirmations.retrieve(this.getClass(), player));
 	}
 	
     public boolean validateData(Player player, String[] args){
@@ -107,21 +107,21 @@ public class Cancel implements CommandExecutor, Confirmable{
         if(args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand")){
 			item = new ItemStack(im.getItemInMainHand());
 			if(item.getType() == Material.AIR){
-				cm.holdingNothing(player);
+				mm.holdingNothing(player);
 				return false;
 			}
 			args[1] = idb.reverseLookup(item);
 		} else if(args[1].equalsIgnoreCase("offhand")){
 			item = new ItemStack(im.getItemInOffHand());
 			if(item.getType() == Material.AIR){
-				cm.holdingNothing(player);
+				mm.holdingNothing(player);
 				return false;
 			}
 			args[1] = idb.reverseLookup(item);
 		}
         
 		if(item==null){
-			cm.wrongItem(player, args[1]);
+			mm.wrongItem(player, args[1]);
 			return false;
 		}
 		
@@ -130,7 +130,7 @@ public class Cancel implements CommandExecutor, Confirmable{
             total += o.getItem().getAmount();
         }
 		if(total == 0){
-			cm.noSpecificStock(player, args[1]);
+			mm.noSpecificStock(player, args[1]);
 			return false;
 		}
 		
@@ -141,11 +141,11 @@ public class Cancel implements CommandExecutor, Confirmable{
         	try{
         		cancelAmt = Integer.parseInt(args[0]);
         		if(cancelAmt < 1){
-        			cm.numberFormat(player);
+        			mm.numberFormat(player);
             		return false;
         		}
         	} catch (NumberFormatException e){
-        		cm.numberFormat(player);
+        		mm.numberFormat(player);
         		return false;
         	}
 		}
@@ -178,25 +178,25 @@ public class Cancel implements CommandExecutor, Confirmable{
         	Offer o = new Offer(player.getUniqueId(), item, oPrice);
         	dbm.addOffer(o);
         }
-        cm.sendSuccess(player, "Removed " + cm.formatAmount(cancelAmt) + " " + cm.formatItem(data.getArgs()[1]));
+        mm.sendSuccess(player, "Removed " + mm.formatAmount(cancelAmt) + " " + mm.formatItem(data.getArgs()[1]) + mm.getSuccessColor() + ".");
     }
     
     private void confirm(Player player){
 		if(!confirmations.contains(this.getClass(), player)){
-			cm.invalidConfirmation(player);
+			mm.invalidConfirmation(player);
 			return;
 		}
 		CancelData initialData = (CancelData) confirmations.retrieve(this.getClass(), player);
 		validateData(player, initialData.getArgs());
 		CancelData currentData = (CancelData) confirmations.retrieve(this.getClass(), player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
-		if(timeElapsed > configM.getConfirmationTimeout(this.getClass())){
-			cm.confirmationExpired(player);
+		if(timeElapsed > cm.getConfirmationTimeout(this.getClass())){
+			mm.confirmationExpired(player);
 			confirmations.unregister(this.getClass(), player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
-			cm.invalidConfirmData(player);
+			mm.invalidConfirmData(player);
 			confirmations.unregister(this.getClass(), player);
 			return;
 		}
@@ -205,23 +205,23 @@ public class Cancel implements CommandExecutor, Confirmable{
     
     private void toggleConfirmations(Player player, String label, String[] args){
 		if(args.length < 3){
-			cm.sendMessage(player, "You may turn cancel confirmations on or off using /" + label + " confirm toggle <on/off>");
+			mm.sendMessage(player, "You may turn cancel confirmations on or off using /" + label + " confirm toggle <on/off>");
 			return;
 		}
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
-			cm.sendSuccess(player, "Cancel confirmations turned on. To undo this /" + label + " confirm toggle off");
+			mm.sendSuccess(player, "Cancel confirmations turned on. To undo this /" + label + " confirm toggle off");
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
-			cm.sendSuccess(player, "Cancel confirmations turned off. To undo this /" + label + " confirm toggle on");
+			mm.sendSuccess(player, "Cancel confirmations turned off. To undo this /" + label + " confirm toggle on");
 			confirmations.unregister(this.getClass(), player);
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;
 		}
-		cm.sendMessage(player, "You may turn Cancel confirmations on or off using /" + label + " confirm toggle <on/off>");
+		mm.sendMessage(player, "You may turn Cancel confirmations on or off using /" + label + " confirm toggle <on/off>");
 	}
 
 }

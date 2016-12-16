@@ -12,11 +12,17 @@ commands:
   sell:
     description: Put goods up for sale on the VirtualShop.
     usage: /<command> <amount> <item> <price> | /<command> <amount> <hand/mainhand/offhand> <price>
+  esell:
+    description: Put enchanted goods up for sale on the VirtualShop.
+    usage: /<command> <item> <price>
   cancel:
     description: Removes items from VirtualShop.
     usage: /<command> <item>
   find:
     description: Find offers for an item.
+    usage: /<command> <item>
+  efind:
+    description: Find offers for an enchanted item.
     usage: /<command> <item>
   stock:
     description: List items for sale.
@@ -41,12 +47,14 @@ permissions:
           virtualshop.merchant.buy: true
           virtualshop.merchant.cancel: true
           virtualshop.merchant.find: true
+          virtualshop.merchant.efind: true
           virtualshop.merchant.lookup: true
           virtualshop.merchant.sales.*:
             children:
               virtualshop.merchant.sales: true
               virtualshop.merchant.sales.server: true
           virtualshop.merchant.sell: true
+          virtualshop.merchant.esell: true
           virtualshop.merchant.stock.*:
             children:
               virtualshop.merchant.stock: true

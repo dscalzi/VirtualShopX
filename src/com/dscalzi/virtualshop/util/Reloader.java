@@ -16,7 +16,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.UnknownDependencyException;
 
-import com.dscalzi.virtualshop.managers.ChatManager;
+import com.dscalzi.virtualshop.managers.MessageManager;
 
 public final class Reloader {
 
@@ -65,7 +65,7 @@ public final class Reloader {
         	plugin.getLogger().info("Saving VSReloader.jar");
 			Files.copy(in, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException | NullPointerException e) {
-			ChatManager.getInstance().logError("Error ocurred while saving VSReloader", true);
+			MessageManager.getInstance().logError("Error ocurred while saving VSReloader", true);
 			return false;
 		}
         return enableVSR(dest);
@@ -76,7 +76,7 @@ public final class Reloader {
 		try {
 			target = Bukkit.getPluginManager().loadPlugin(dest);
 		} catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e) {
-			ChatManager.getInstance().logError("Could not enable VSReloader.", true);
+			MessageManager.getInstance().logError("Could not enable VSReloader.", true);
 			return false;
 		}
 		target.onLoad();
@@ -92,10 +92,10 @@ public final class Reloader {
 			pluginFile = new File(new File("plugins"), "VSReloader.jar");
 			desc = plugin.getPluginLoader().getPluginDescription(pluginFile);
 		} catch (NullPointerException e){
-			ChatManager.getInstance().logError("Could not check for an update to VSReloader, jar file is missing.", true);
+			MessageManager.getInstance().logError("Could not check for an update to VSReloader, jar file is missing.", true);
 			return false;
 		} catch (InvalidDescriptionException e) {
-			ChatManager.getInstance().logError("Could not check for an update to VSReloader, jar file is missing or corrupt.", true);
+			MessageManager.getInstance().logError("Could not check for an update to VSReloader, jar file is missing or corrupt.", true);
 			return false;
 		}
 		final String currentVersion = desc.getVersion();
@@ -114,11 +114,11 @@ public final class Reloader {
     				break;
     			}
     		}
-		} catch (IOException e){
-			ChatManager.getInstance().logError("Error occurred while checking for VSReloader update.", true);
+		} catch (IOException | NullPointerException e){
+			MessageManager.getInstance().logError("Error occurred while checking for VSReloader update.", true);
 			return false;
 		} catch (ArrayIndexOutOfBoundsException e){
-			ChatManager.getInstance().logError("Could not check for VSReloader update due to malformed updater file.", true);
+			MessageManager.getInstance().logError("Could not check for VSReloader update due to malformed updater file.", true);
 			return false;
 		}
     	

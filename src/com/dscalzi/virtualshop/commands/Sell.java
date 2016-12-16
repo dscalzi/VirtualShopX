@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.dscalzi.virtualshop.VirtualShop;
-import com.dscalzi.virtualshop.managers.ChatManager;
+import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
@@ -28,8 +28,8 @@ public class Sell implements CommandExecutor, Confirmable{
 	
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
-	private final ChatManager cm;
-	private final ConfigManager configM;
+	private final MessageManager mm;
+	private final ConfigManager cm;
 	private final ConfirmationManager confirmations;
 	private final DatabaseManager dbm;
 	private final ItemDB idb;
@@ -41,32 +41,31 @@ public class Sell implements CommandExecutor, Confirmable{
 	 */
 	public Sell(VirtualShop plugin){
 		this.plugin = plugin;
-		this.cm = ChatManager.getInstance();
-		this.configM = ConfigManager.getInstance();
+		this.mm = MessageManager.getInstance();
+		this.cm = ConfigManager.getInstance();
 		this.confirmations = ConfirmationManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.idb = ItemDB.getInstance();
-		//this.confirmations = new HashMap<Player, ListingData>();
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
 		if(!(sender instanceof Player)){
-            cm.denyConsole(sender);
+            mm.denyConsole(sender);
             return true;
         }
 		if(!sender.hasPermission("virtualshop.merchant.sell")){
-            cm.noPermissions(sender);
+            mm.noPermissions(sender);
             return true;
         }
 		Player player = (Player)sender;
-		if(!configM.getAllowedWorlds().contains(player.getWorld().getName())){
-			cm.invalidWorld(sender, command.getName(), player.getWorld());
+		if(!cm.getAllowedWorlds().contains(player.getWorld().getName())){
+			mm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
 		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
-        	cm.invalidGamemode(sender, command.getName(), player.getGameMode());
+        	mm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
 		if(args.length > 0){
@@ -86,7 +85,7 @@ public class Sell implements CommandExecutor, Confirmable{
 			}
 		}
 		if(args.length < 3){
-			cm.sendError(sender, "Proper usage is /" + label + " <amount> <item> <price>");
+			mm.sendError(sender, "Proper usage is /" + label + " <amount> <item> <price>");
 			return true;
 		}
 		confirmations.unregister(this.getClass(), player);
@@ -111,7 +110,7 @@ public class Sell implements CommandExecutor, Confirmable{
 			return;
 		}
 		if(this.validateData(player, args))
-			cm.sellConfirmation(player, label, (ListingData)confirmations.retrieve(this.getClass(), player));
+			mm.sellConfirmation(player, label, (ListingData)confirmations.retrieve(this.getClass(), player));
 	}
 	
 	/**
@@ -128,24 +127,33 @@ public class Sell implements CommandExecutor, Confirmable{
 		int amount = Numbers.parseInteger(args[0]);
 		ItemStack item = idb.get(args[1], amount);
 		double price = Numbers.parseDouble(args[2]);
+		boolean samePrice = false;
 		PlayerInventory im = player.getInventory();
 		InventoryManager invM = new InventoryManager(player);
 		//Validate Data
-		if(amount < 0 || price < 0){
-			cm.numberFormat(player);
+		if(amount < 0){
+			mm.numberFormat(player);
 			return false;
+		}
+		if(price < 0){
+			if(args[2].equals("-"))
+				samePrice = true;
+			else{
+				mm.numberFormat(player);
+				return false;
+			}
 		}
 		if(args[1].matches("^(?iu)(hand|mainhand|offhand)")){
 			item = new ItemStack(args[1].equalsIgnoreCase("offhand") ? im.getItemInOffHand() : im.getItemInMainHand());
 			if(item.getType() == Material.AIR){
-				cm.holdingNothing(player);
+				mm.holdingNothing(player);
 				return false;
 			}
 			item.setAmount(amount);
 			args[1] = idb.reverseLookup(item);
 		}
 		if(item==null){
-			cm.wrongItem(player, args[1]);
+			mm.wrongItem(player, args[1]);
 			return false;
 		}
 		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
@@ -164,16 +172,12 @@ public class Sell implements CommandExecutor, Confirmable{
         	amount = total;
         	item.setAmount(total);
         }
-		if(price > configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			cm.priceTooHigh(player, args[1], configM.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
-			return false;
-		}
 		
 		if(!(invM.contains(item))){
 			if(item.getAmount() == 0)
-				cm.sendError(player, "You do not have any " + cm.formatItem(args[1]));
+				mm.sendError(player, "You do not have any " + mm.formatItem(args[1]) + mm.getErrorColor() + ".");
 			else
-				cm.sendError(player, "You do not have " + cm.formatAmount(item.getAmount()) + " " + cm.formatItem(args[1]));
+				mm.sendError(player, "You do not have " + mm.formatAmount(item.getAmount()) + " " + mm.formatItem(args[1]) + mm.getErrorColor() + ".");
 			return false;
 		}
 		//Database checks
@@ -183,6 +187,20 @@ public class Sell implements CommandExecutor, Confirmable{
         	currentlyListed += o.getItem().getAmount();
         	oldPrice = o.getPrice();
         }
+        
+        if(samePrice){
+        	if(oldPrice == -1){
+        		mm.sendError(player, "You are not selling any " + mm.formatItem(args[1]) + mm.getErrorColor() + " and must specify a price.");
+        		return false;
+        	}
+        	price = oldPrice;
+        	args[2] = Double.toString(oldPrice);
+        }
+        
+        if(price > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
+			mm.priceTooHigh(player, args[1], cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+			return false;
+		}
         
         //Submit data
         ListingData data = new ListingData(amount, item, price, currentlyListed, oldPrice, System.currentTimeMillis(), args);
@@ -206,9 +224,9 @@ public class Sell implements CommandExecutor, Confirmable{
         Offer o = new Offer(player.getUniqueId(),item,price);
 		dbm.addOffer(o);
 		confirmations.unregister(this.getClass(), player);
-        if(configM.broadcastOffers())
+        if(cm.broadcastOffers())
         {
-			cm.broadcastOffer(o);
+			mm.broadcastOffer(o);
 			return;
 		}
 	}
@@ -220,20 +238,20 @@ public class Sell implements CommandExecutor, Confirmable{
 	 */
 	private void confirm(Player player){
 		if(!confirmations.contains(this.getClass(), player)){
-			cm.invalidConfirmation(player);
+			mm.invalidConfirmation(player);
 			return;
 		}
 		ListingData initialData = (ListingData) confirmations.retrieve(this.getClass(), player);
 		validateData(player, initialData.getArgs());
 		ListingData currentData = (ListingData) confirmations.retrieve(this.getClass(), player);
 		long timeElapsed = System.currentTimeMillis() - initialData.getTransactionTime();
-		if(timeElapsed > configM.getConfirmationTimeout(this.getClass())){
-			cm.confirmationExpired(player);
+		if(timeElapsed > cm.getConfirmationTimeout(this.getClass())){
+			mm.confirmationExpired(player);
 			confirmations.unregister(this.getClass(), player);
 			return;
 		}
 		if(!currentData.equals(initialData)){
-			cm.invalidConfirmData(player);
+			mm.invalidConfirmData(player);
 			confirmations.unregister(this.getClass(), player);
 			return;
 		}
@@ -249,22 +267,22 @@ public class Sell implements CommandExecutor, Confirmable{
 	 */
 	private void toggleConfirmations(Player player, String label, String[] args){
 		if(args.length < 3){
-			cm.sendMessage(player, "You may turn sell confirmations on or off using /" + label + " confirm toggle <on/off>");
+			mm.sendMessage(player, "You may turn sell confirmations on or off using /" + label + " confirm toggle <on/off>");
 			return;
 		}
 		String value = args[2];
 		if(value.equalsIgnoreCase("on")){
-			cm.sendSuccess(player, "Sell confirmations turned on. To undo this /" + label + " confirm toggle off");
+			mm.sendSuccess(player, "Sell confirmations turned on. To undo this /" + label + " confirm toggle off");
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
 		}
 			
 		if(value.equalsIgnoreCase("off")){
-			cm.sendSuccess(player, "Sell confirmations turned off. To undo this /" + label + " confirm toggle on");
+			mm.sendSuccess(player, "Sell confirmations turned off. To undo this /" + label + " confirm toggle on");
 			confirmations.unregister(this.getClass(), player);
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;
 		}
-		cm.sendMessage(player, "You may turn sell confirmations on or off using /" + label + " confirm toggle <on/off>");
+		mm.sendMessage(player, "You may turn sell confirmations on or off using /" + label + " confirm toggle <on/off>");
 	}
 }

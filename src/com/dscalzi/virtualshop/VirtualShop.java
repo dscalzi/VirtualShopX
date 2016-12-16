@@ -9,13 +9,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
+import com.dscalzi.virtualshop.commands.EFind;
+import com.dscalzi.virtualshop.commands.ESell;
 import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.Stock;
 import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.commands.VS;
-import com.dscalzi.virtualshop.managers.ChatManager;
+import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
@@ -68,16 +70,18 @@ public class VirtualShop extends JavaPlugin {
     	UUIDManager.initialize(this);
         ConfigManager.initialize(this);
         ConfirmationManager.initialize(this);
-		ChatManager.initialize(this);
+		MessageManager.initialize(this);
     }
     
     private void registerCommands(){
     	this.getCommand("buy").setExecutor(new Buy(this));
     	this.getCommand("cancel").setExecutor(new Cancel(this));
     	this.getCommand("find").setExecutor(new Find(this));
+    	this.getCommand("efind").setExecutor(new EFind(this));
     	this.getCommand("shop").setExecutor(new VS(this));
     	this.getCommand("sales").setExecutor(new Sales(this));
     	this.getCommand("sell").setExecutor(new Sell(this));
+    	this.getCommand("esell").setExecutor(new ESell(this));
     	this.getCommand("stock").setExecutor(new Stock(this));
     	this.getCommand("reprice").setExecutor(new Reprice(this));
     	this.getCommand("vs").setExecutor(new VS(this));

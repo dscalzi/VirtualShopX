@@ -3,15 +3,17 @@ package com.dscalzi.virtualshop.managers;
 import java.io.File;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.commands.ESell;
+import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.util.Localization;
 
-import net.md_5.bungee.api.ChatColor;
 
 public final class ConfigManager {
 
@@ -61,11 +63,11 @@ public final class ConfigManager {
 	/* Configuration Accessors */
 	
 	public String getPrefix(){
-    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.msg_prefix")) + getColor()).trim();
+    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.msg_prefix")) + getMessageColor()).trim();
     }
     
     public String getServerName(){
-    	return (this.config.getString("chat_settings.details.server_name")).trim();
+    	return (this.config.getString("chat_settings.details.server_name", "Server")).trim();
     }
     
     public Localization getLocalization(){
@@ -78,28 +80,35 @@ public final class ConfigManager {
     	return Localization.US;
     }
     
-    public String getColor(){
-    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.message_color"))).trim();
+    public ChatColor getMessageColor(){
+    	return getChatColor("chat_settings.details.message_color", ChatColor.YELLOW);
     }
     
-    public String getBaseColor(){
-    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.base_color"))).trim();
+    public ChatColor getBaseColor(){
+    	return getChatColor("chat_settings.details.base_color", ChatColor.LIGHT_PURPLE);
     }
     
-    public String getTrimColor(){
-    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.trim_color"))).trim();
+    public ChatColor getTrimColor(){
+    	return getChatColor("chat_settings.details.trim_color", ChatColor.DARK_PURPLE);
     }
     
-    public String getDescriptionColor(){
-    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.description_color"))).trim();
+    public ChatColor getDescriptionColor(){
+    	return getChatColor("chat_settings.details.description_color", ChatColor.LIGHT_PURPLE);
     }
     
-    public String getErrorColor(){
-    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.error_color"))).trim();
+    public ChatColor getErrorColor(){
+    	return getChatColor("chat_settings.details.error_color", ChatColor.RED);
     }
     
-    public String getSuccessColor(){
-    	return (ChatColor.translateAlternateColorCodes('&', this.config.getString("chat_settings.details.success_color"))).trim();
+    public ChatColor getSuccessColor(){
+    	return getChatColor("chat_settings.details.success_color", ChatColor.GREEN);
+    }
+    
+    private ChatColor getChatColor(String path, ChatColor def){
+    	String s = this.config.getString(path);
+    	s = s.replaceAll("\\&", "");
+    	ChatColor r = ChatColor.getByChar(s);
+    	return r == null ? def : r;
     }
     
     public int getPackSpacing(){
@@ -129,6 +138,7 @@ public final class ConfigManager {
 	}
 	
 	public int getConfirmationTimeout(Class<? extends Confirmable> clazz){
+		if(clazz == ESell.class) clazz = Sell.class;
 		int time = this.config.getInt("general_settings.confirmation_timeouts." + (clazz.getSimpleName().toLowerCase()), 15000);
 		return (time > 0) ? time : 15000;
 	}

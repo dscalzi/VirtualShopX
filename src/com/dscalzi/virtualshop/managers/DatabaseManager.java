@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
+import com.dscalzi.virtualshop.commands.ESell;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.connection.ConnectionWrapper;
 import com.dscalzi.virtualshop.connection.MySQLWrapper;
@@ -39,6 +40,7 @@ public final class DatabaseManager {
 		togglesKey = new HashMap<Class<? extends Confirmable>, String>();
 		togglesKey.put(Buy.class, "buyconfirm");
 		togglesKey.put(Sell.class, "sellconfirm");
+		togglesKey.put(ESell.class, "sellconfirm");
 		togglesKey.put(Reprice.class, "repriceconfirm");
 		togglesKey.put(Cancel.class, "cancelconfirm");
 	}
@@ -53,13 +55,13 @@ public final class DatabaseManager {
 	private VirtualShop plugin;
 	private ConnectionWrapper ds;
 	private ConfigManager configM;
-	private ChatManager cm;
+	private MessageManager cm;
 	private UUIDManager uuidm;
 	
 	private DatabaseManager(VirtualShop plugin){
 		this.plugin = plugin;
 		this.configM = ConfigManager.getInstance();
-		this.cm = ChatManager.getInstance();
+		this.cm = MessageManager.getInstance();
 		this.uuidm = UUIDManager.getInstance();
 		if(!this.setUp())
 			this.type = ConnectionType.VOID;
@@ -129,6 +131,15 @@ public final class DatabaseManager {
 			String query = "create table vshop_stock(`id` integer primary key" + autoIncrement + ",`damage` integer,`seller` varchar(80) not null,`item` integer not null, `price` double not null,`amount` integer not null, `uuid` varchar(80) not null)";
 			if(createTable(query)){
 				cm.logInfo("Successfully created table vshop_stock.");
+				++checksum;
+			} else
+				cm.logError("Unable to create table vshop_stock.", true);
+		}
+		if(!ds.checkTable("vshop_estock")){
+			++desired;
+			String query = "create table vshop_estock(`id` integer primary key" + autoIncrement + ", `merchant` varchar(80) not null, `item` integer not null, `data` smallint not null, `price` double not null, `edata` varchar(255) not null, `uuid` varchar(80) not null)";
+			if(createTable(query)){
+				cm.logInfo("Successfully created table vshop_estock.");
 				++checksum;
 			} else
 				cm.logError("Unable to create table vshop_stock.", true);
@@ -368,6 +379,18 @@ public final class DatabaseManager {
     	}
     }
     
+    @SuppressWarnings("deprecation")
+    public void addEOffer(Offer offer, String edata){
+		String sql = "insert into vshop_estock(merchant,item,data,price,edata,uuid) values('" +offer.getSeller() +"',"+ offer.getItem().getType().getId() + ","+offer.getItem().getDurability() +","+offer.getPrice()+",'" + edata +"','"+offer.getSellerUUID().toString()+"')";
+    	try(Connection connection = ds.getDataSource().getConnection();
+        	PreparedStatement stmt = connection.prepareStatement(sql))
+        {
+        	stmt.executeUpdate();
+        } catch(SQLException e){
+        	cm.logError(e.getMessage(), true);
+        }
+    }
+    
     public List<Offer> getAllOffers(){
     	String sql = "select * from vshop_stock order by price asc";
     	try(Connection connection = ds.getDataSource().getConnection();
@@ -392,6 +415,21 @@ public final class DatabaseManager {
     			return Offer.listOffers(result);
     		}
     	} catch(SQLException e){
+    		cm.logError(e.getMessage(), true);
+    		return null;
+    	}
+    }
+    
+    @SuppressWarnings("deprecation")
+	public List<Offer> getEnchantedOffers(ItemStack item){
+    	String sql = "select * from vshop_estock where item=" + item.getTypeId() + " and data=" + item.getDurability() + " order by price asc";
+    	try(Connection connection =  ds.getDataSource().getConnection();
+    		PreparedStatement stmt = connection.prepareStatement(sql))
+    	{
+    		try(ResultSet result = stmt.executeQuery()){
+    			return Offer.listEnchantedOffers(result);
+    		}
+    	} catch (SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;
     	}

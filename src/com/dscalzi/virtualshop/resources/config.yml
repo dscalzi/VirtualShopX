@@ -75,6 +75,7 @@ chat_settings:
   
   details:
     #Prefix that will be prepended to each Virtual Shop message.
+    #To add colors to this you must use the format "&<code>".
     #If the header on commands such as /find, stock, sell, vs, or shop
     #is too long after changing this, you may need to adjust the pack
     #sizing below.
@@ -128,7 +129,7 @@ chat_settings:
       default:
         sizing: 70
       atherys:
-        sizing: 100
+        sizing: 78
   
     #Specify a pack id from the supported_packs list.
     selected_pack: default

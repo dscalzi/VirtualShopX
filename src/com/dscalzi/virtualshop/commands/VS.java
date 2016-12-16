@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.dscalzi.virtualshop.VirtualShop;
-import com.dscalzi.virtualshop.managers.ChatManager;
+import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
@@ -28,15 +28,15 @@ import javafx.util.Pair;
 public class VS implements CommandExecutor{
 
 	private VirtualShop plugin;
-	private final ChatManager cm;
-	private final ConfigManager configM;
+	private final MessageManager mm;
+	private final ConfigManager cm;
 	private final DatabaseManager dbm;
 	final ItemDB idb;
 	
 	public VS(VirtualShop plugin){
 		this.plugin = plugin;
-		this.cm = ChatManager.getInstance();
-		this.configM = ConfigManager.getInstance();
+		this.mm = MessageManager.getInstance();
+		this.cm = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.idb = ItemDB.getInstance();
 	}
@@ -52,7 +52,7 @@ public class VS implements CommandExecutor{
     				this.cmdList(sender, page);
     				return true;
     			} catch (NumberFormatException e){
-    				cm.invalidPage(sender);
+    				mm.invalidPage(sender);
 					return true;
     			} catch (ArrayIndexOutOfBoundsException e){
     				this.cmdList(sender, 1);
@@ -72,7 +72,7 @@ public class VS implements CommandExecutor{
 		    				this.vsList(sender, page);
 		    				return true;
 		    			} catch (NumberFormatException e){
-		    				cm.invalidPage(sender);
+		    				mm.invalidPage(sender);
 							return true;
 		    			}
 					}
@@ -124,7 +124,7 @@ public class VS implements CommandExecutor{
     				this.vsList(sender, page);
     				return true;
     			} catch (NumberFormatException e){
-    				cm.invalidPage(sender);
+    				mm.invalidPage(sender);
 					return true;
     			}
 			}
@@ -138,25 +138,25 @@ public class VS implements CommandExecutor{
 	public void cmdupdateuuid(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshop.*")){
-			cm.noPermissions(sender);
+			mm.noPermissions(sender);
             return;
 		}
 		
 		try{
 			@SuppressWarnings("deprecation")
 			Pair<Integer, Integer> sfs = dbm.updateDatabase();
-			cm.sendSuccess(sender, "Database updated. " + sfs.getKey() + " successful, " + sfs.getValue() + " failed.");
+			mm.sendSuccess(sender, "Database updated. " + sfs.getKey() + " successful, " + sfs.getValue() + " failed.");
 		} catch(Exception ex){
 			ex.printStackTrace();
-			cm.sendError(sender, "FAILED");
+			mm.sendError(sender, "FAILED");
 		}
 	}
 	
 	public void cmdList(CommandSender sender, int page){
     	final String listPrefix = ChatColor.RED + " • ";
-    	final String baseColor = configM.getBaseColor();
-    	final String trimColor = configM.getTrimColor();
-    	final String descColor = configM.getDescriptionColor();
+    	final ChatColor baseColor = mm.getBaseColor();
+    	final ChatColor trimColor = mm.getTrimColor();
+    	final ChatColor descColor = mm.getDescriptionColor();
     	
     	List<String> cmds = new ArrayList<String>();
         cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + descColor + " - Buy items.");
@@ -174,7 +174,7 @@ public class VS implements CommandExecutor{
         
         PageList<String> commands = new PageList<String>(6, cmds);
         
-        String header = cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass());
+        String header = mm.formatHeaderLength(" " + mm.getPrefix() + " ", this.getClass());
         String commandKey = trimColor + "              Command List - <Required> [Optional]";
         String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
         
@@ -182,7 +182,7 @@ public class VS implements CommandExecutor{
         try {
         	pageContent = commands.getPage(page-1);
 		} catch (IndexOutOfBoundsException e) {
-			cm.invalidPage(sender);
+			mm.invalidPage(sender);
 			return;
 		}
         
@@ -196,9 +196,9 @@ public class VS implements CommandExecutor{
 	
 	public void vsList(CommandSender sender, int page){
 		final String listPrefix = ChatColor.RED + " • ";
-		final String baseColor = configM.getBaseColor();
-    	final String trimColor = configM.getTrimColor();
-    	final String descColor = configM.getDescriptionColor();
+		final ChatColor baseColor = mm.getBaseColor();
+    	final ChatColor trimColor = mm.getTrimColor();
+    	final ChatColor descColor = mm.getDescriptionColor();
 		
 		List<String> cmds = new ArrayList<String>();
 		cmds.add(listPrefix + trimColor + "/shop " + ChatColor.GRAY + "[page]" + descColor + " - View merchant commands.");
@@ -217,7 +217,7 @@ public class VS implements CommandExecutor{
 		
 		PageList<String> commands = new PageList<String>(6, cmds);
 		
-		String header = cm.formatHeaderLength(" " + cm.getPrefix() + " ", this.getClass());
+		String header = mm.formatHeaderLength(" " + mm.getPrefix() + " ", this.getClass());
         String commandKey = trimColor + "              Command List - <Required> [Optional]";
         String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
 		
@@ -225,7 +225,7 @@ public class VS implements CommandExecutor{
         try {
         	pageContent = commands.getPage(page-1);
 		} catch (IndexOutOfBoundsException e) {
-			cm.invalidPage(sender);
+			mm.invalidPage(sender);
 			return;
 		}
         
@@ -241,19 +241,19 @@ public class VS implements CommandExecutor{
 	public void cmdLookup(CommandSender sender, String[] args){
 		
 		if(!sender.hasPermission("virtualshop.merchant.lookup")){
-			cm.noPermissions(sender);
+			mm.noPermissions(sender);
 			return;
 		}
 		
-		final String baseColor = configM.getBaseColor();
-    	final String trimColor = configM.getTrimColor();
+		final ChatColor baseColor = mm.getBaseColor();
+    	final ChatColor trimColor = mm.getTrimColor();
     	
 		ItemStack target = null;
 		
 		//Hand
 		if(args.length == 1 || (args.length > 1 && (args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand") || args[1].equalsIgnoreCase("offhand")))){
 			if(!(sender instanceof Player)){
-				cm.sendError(sender, "You must specify an item!");
+				mm.sendError(sender, "You must specify an item!");
 				return;
 			}
 			Player p = (Player)sender;
@@ -261,7 +261,7 @@ public class VS implements CommandExecutor{
 			else target = p.getInventory().getItemInMainHand();
 			
 			if(target == null){
-				cm.sendError(sender, "Lookup failed. You are not holding an item nor did you specify one.");
+				mm.sendError(sender, "Lookup failed. You are not holding an item nor did you specify one.");
 				return;
 			}
 		}
@@ -271,7 +271,7 @@ public class VS implements CommandExecutor{
 			if(target == null){
 				target = idb.unsafeLookup(args[1]);
 				if(target == null){
-					cm.sendError(sender, "Lookup failed. Could not find " + args[1] + " in the database.");
+					mm.sendError(sender, "Lookup failed. Could not find " + args[1] + " in the database.");
 					return;
 				}
 			}
@@ -279,13 +279,13 @@ public class VS implements CommandExecutor{
 		
 		//Final check for security.
 		if(target == null){
-			cm.sendError(sender, "Lookup failed, internal error has occurred.");
+			mm.sendError(sender, "Lookup failed, internal error has occurred.");
 			return;
 		}
 		
 		//Blocked items.
 		if(target.getTypeId() == 440){
-			cm.sendError(sender, "The vs does not yet support this item. Try again soon!");
+			mm.sendError(sender, "The vs does not yet support this item. Try again soon!");
 			return;
 		}
 		
@@ -294,14 +294,14 @@ public class VS implements CommandExecutor{
 		
 		
 		if(aliases.size() < 1){
-			formattedAliasList = configM.getErrorColor() + "Could not find this item in the database. It's either damaged, not included in the VS, or from a recent update!";
+			formattedAliasList = cm.getErrorColor() + "Could not find this item in the database. It's either damaged, not included in the VS, or from a recent update!";
 		} else {
 			formattedAliasList = trimColor + "Viable Names: " + aliases.toString();
 			formattedAliasList = formattedAliasList.replaceAll("\\[", trimColor + "\\[" + baseColor);
 			formattedAliasList = formattedAliasList.replaceAll("\\]", trimColor + "\\]" + baseColor);
 		}
 		
-		String topLine = cm.getPrefix() + " " + cm.formatItem(target.getType().toString()).toUpperCase() + trimColor + " - " + cm.formatItem(target.getTypeId() + ":" + target.getData().getData());
+		String topLine = mm.getPrefix() + " " + mm.formatItem(target.getType().toString()).toUpperCase() + trimColor + " - " + mm.formatItem(target.getTypeId() + ":" + target.getData().getData());
 		sender.sendMessage(topLine);
 		sender.sendMessage(baseColor + formattedAliasList);
 		
@@ -311,28 +311,28 @@ public class VS implements CommandExecutor{
 	public void formatMarket(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshop.admin.formatmarket")){
-			cm.noPermissions(sender);
+			mm.noPermissions(sender);
             return;
 		}
 		
 		int amt = 0;
 		for(Offer o : dbm.getAllOffers()){
-			if(o.getPrice() > configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData())){
-				dbm.updatePrice(o.getId(), configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
+			if(o.getPrice() > cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData())){
+				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
 				++amt;
 			}
 		}
 		if(amt == 0)
-			cm.sendSuccess(sender, "All listings are already correctly formatted!");
+			mm.sendSuccess(sender, "All listings are already correctly formatted!");
 		else
-			cm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
+			mm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void formatMarket(CommandSender sender, String itm){
 		
 		if(!sender.hasPermission("virtualshop.admin.formatmarket")){
-			cm.noPermissions(sender);
+			mm.noPermissions(sender);
             return;
 		}
 		
@@ -344,26 +344,26 @@ public class VS implements CommandExecutor{
 			itm = idb.reverseLookup(item);
 		}
 		if(item == null){
-			cm.wrongItem(sender, itm);
+			mm.wrongItem(sender, itm);
 			return;
 		}
 		for(Offer o : dbm.getAllOffers()){
 			boolean isSameItem = idb.reverseLookup(item).equalsIgnoreCase(idb.reverseLookup(o.getItem()));
-			if(o.getPrice() > configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()) && isSameItem){
-				dbm.updatePrice(o.getId(), configM.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
+			if(o.getPrice() > cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()) && isSameItem){
+				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
 				++amt;
 			}
 		}
 		if(amt == 0)
-			cm.sendSuccess(sender, "All listings are already correctly formatted!");
+			mm.sendSuccess(sender, "All listings are already correctly formatted!");
 		else
-			cm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
+			mm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
 	}
 	
 	public void cmdUUIDNameSync(CommandSender sender, Optional<String> uuid){
 		
 		if(!sender.hasPermission("virtualshop.admin.uuidnamesync")){
-			cm.noPermissions(sender);
+			mm.noPermissions(sender);
             return;
 		}
 		
@@ -372,18 +372,18 @@ public class VS implements CommandExecutor{
 			try {
 				target = UUID.fromString(uuid.get());
 			} catch(IllegalArgumentException e){
-				cm.sendError(sender, "Invalid UUID format.");
+				mm.sendError(sender, "Invalid UUID format.");
 				return;
 			}
 			Pair<Boolean, Integer> response = dbm.syncNameToUUID(target);
-			if(response.getKey()) cm.sendSuccess(sender, "The account associated with the specified UUID has been synced.");
-			else if(response.getValue() == 1) cm.sendError(sender, "The account associated with the specified UUID is already synced.");
-			else if(response.getValue() == 404) cm.sendError(sender, "The account associated with the specified UUID was not found in the database.");
-			else cm.sendError(sender, "There was an error while querying the database.");
+			if(response.getKey()) mm.sendSuccess(sender, "The account associated with the specified UUID has been synced.");
+			else if(response.getValue() == 1) mm.sendError(sender, "The account associated with the specified UUID is already synced.");
+			else if(response.getValue() == 404) mm.sendError(sender, "The account associated with the specified UUID was not found in the database.");
+			else mm.sendError(sender, "There was an error while querying the database.");
 		} else {
 			int updated = dbm.syncNameToUUID();
-			if(updated > 0) cm.sendSuccess(sender, "Successfully synced " + updated + ((updated == 1) ? " account." : " accounts."));
-			else cm.sendSuccess(sender, "All account names and UUIDs are already synced!");
+			if(updated > 0) mm.sendSuccess(sender, "Successfully synced " + updated + ((updated == 1) ? " account." : " accounts."));
+			else mm.sendSuccess(sender, "All account names and UUIDs are already synced!");
 		}
 		
 	}
@@ -402,24 +402,24 @@ public class VS implements CommandExecutor{
 		
 		if(!sender.hasPermission("virtualshop.developer.reload")){
 			if(sender.hasPermission("virtualshop.admin.reloadconfig")){
-				cm.sendError(sender, "You do not have permission to reload the plugin, reloading config instead.");
+				mm.sendError(sender, "You do not have permission to reload the plugin, reloading config instead.");
 				this.cmdReloadConfig(sender);
 				return;
 			}
-			cm.noPermissions(sender);
+			mm.noPermissions(sender);
             return;
 		}
 		if(plugin.getServer().getPluginManager().getPlugin("VSReloader") == null){
 			if(sender.hasPermission("virtualshop.admin.reloadconfig")){
-				cm.sendError(sender, "VS Reloader not found, reloading config instead.");
+				mm.sendError(sender, "VS Reloader not found, reloading config instead.");
 				cmdReloadConfig(sender);
 			} else {
-				cm.sendError(sender, "VS Reloader not found, could not reload the plugin.");
+				mm.sendError(sender, "VS Reloader not found, could not reload the plugin.");
 			}
 			return;
 		}
 		DatabaseManager.getInstance().terminate();
-		cm.sendMessage(sender, "Begining reload of VirtualShop, this may lag the server for a few seconds..");
+		mm.sendMessage(sender, "Begining reload of VirtualShop, this may lag the server for a few seconds..");
 		/* TODO Test async relaod.
 		 * 
 		 * Thread th = new Thread(() -> {
@@ -431,28 +431,28 @@ public class VS implements CommandExecutor{
 			PluginUtil.reload(plugin);
 		};
 		r.run();
-		cm.sendSuccess(sender, "Plugin successfully reloaded.");
+		mm.sendSuccess(sender, "Plugin successfully reloaded.");
 	}
 	
 	public void cmdReloadConfig(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshop.admin.reloadconfig")){
-			cm.noPermissions(sender);
+			mm.noPermissions(sender);
             return;
 		}
 		
 		try {
 			ItemDB.reload();
 		} catch (IOException e) {
-			cm.sendError(sender, "Reference file 'items.csv' not found. Shutting down!");
+			mm.sendError(sender, "Reference file 'items.csv' not found. Shutting down!");
             plugin.getPluginLoader().disablePlugin(plugin);
 		}
 		ConfigManager.reload();
-		ChatManager.reload();
+		MessageManager.reload();
 		DatabaseManager.reload();
 		Reloader.reload();
 		
-		cm.sendSuccess(sender, "Configuration successfully reloaded.");
+		mm.sendSuccess(sender, "Configuration successfully reloaded.");
 		
 	}
 	
@@ -460,6 +460,6 @@ public class VS implements CommandExecutor{
 	 *  Never restrict this command.
 	 */
 	public void cmdVersion(CommandSender sender){
-		ChatManager.getInstance().sendMessage(sender, "Virtual Shop version " + plugin.getDescription().getVersion());
+		MessageManager.getInstance().sendMessage(sender, "Virtual Shop version " + plugin.getDescription().getVersion());
 	}
 }
