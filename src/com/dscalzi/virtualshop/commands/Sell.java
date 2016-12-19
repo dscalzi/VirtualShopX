@@ -175,9 +175,9 @@ public class Sell implements CommandExecutor, Confirmable{
 		
 		if(!(invM.contains(item))){
 			if(item.getAmount() == 0)
-				mm.sendError(player, "You do not have any " + mm.formatItem(args[1]) + mm.getErrorColor() + ".");
+				mm.sendError(player, "You do not have any " + mm.formatItem(args[1], true) + mm.getErrorColor() + ".");
 			else
-				mm.sendError(player, "You do not have " + mm.formatAmount(item.getAmount()) + " " + mm.formatItem(args[1]) + mm.getErrorColor() + ".");
+				mm.sendError(player, "You do not have " + mm.formatAmount(item.getAmount()) + " " + mm.formatItem(args[1], true) + mm.getErrorColor() + ".");
 			return false;
 		}
 		//Database checks
@@ -190,7 +190,7 @@ public class Sell implements CommandExecutor, Confirmable{
         
         if(samePrice){
         	if(oldPrice == -1){
-        		mm.sendError(player, "You are not selling any " + mm.formatItem(args[1]) + mm.getErrorColor() + " and must specify a price.");
+        		mm.sendError(player, "You are not selling any " + mm.formatItem(args[1], true) + mm.getErrorColor() + " and must specify a price.");
         		return false;
         	}
         	price = oldPrice;

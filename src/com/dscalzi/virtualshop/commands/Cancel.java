@@ -178,7 +178,7 @@ public class Cancel implements CommandExecutor, Confirmable{
         	Offer o = new Offer(player.getUniqueId(), item, oPrice);
         	dbm.addOffer(o);
         }
-        mm.sendSuccess(player, "Removed " + mm.formatAmount(cancelAmt) + " " + mm.formatItem(data.getArgs()[1]) + mm.getSuccessColor() + ".");
+        mm.sendSuccess(player, "Removed " + mm.formatAmount(cancelAmt) + " " + mm.formatItem(data.getArgs()[1], true) + mm.getSuccessColor() + ".");
     }
     
     private void confirm(Player player){

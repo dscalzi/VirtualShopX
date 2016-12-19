@@ -130,6 +130,11 @@ public class ESell implements CommandExecutor, Confirmable{
 			return false;
 		}
 		
+		if(item.getAmount() > 1){
+			mm.sendError(player, "Please sell each item separately.");
+			return false;
+		}
+		
 		if(price < 0){
 			mm.numberFormat(player);
 			return false;
@@ -137,9 +142,9 @@ public class ESell implements CommandExecutor, Confirmable{
 		
 		if(!(invM.contains(item))){
 			if(item.getAmount() == 0)
-				mm.sendError(player, "You do not have any " + mm.formatItem(args[1]) + mm.getErrorColor() + ".");
+				mm.sendError(player, "You do not have any " + mm.formatItem(args[1], true) + mm.getErrorColor() + ".");
 			else
-				mm.sendError(player, "You do not have " + mm.formatAmount(item.getAmount()) + " " + mm.formatItem(args[1]) + mm.getErrorColor() + ".");
+				mm.sendError(player, "You do not have " + mm.formatAmount(item.getAmount()) + " " + mm.formatItem(args[1], true) + mm.getErrorColor() + ".");
 			return false;
 		}
         

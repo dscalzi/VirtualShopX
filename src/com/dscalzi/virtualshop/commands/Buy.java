@@ -144,7 +144,7 @@ public class Buy implements CommandExecutor, Confirmable{
 		//Check for listings
 		List<Offer> offers = dbm.getItemOffers(item);
         if(offers.size()==0) {
-            mm.sendError(player,"There is no " + mm.formatItem(args[1])+ cm.getErrorColor() + " for sale.");
+            mm.sendError(player,"There is no " + mm.formatItem(args[1], true)+ cm.getErrorColor() + " for sale.");
             return false;
         }
         
@@ -209,7 +209,7 @@ public class Buy implements CommandExecutor, Confirmable{
 					break;
                 } else {
                 	if(!finalize)
-                		mm.sendError(player, "You only have enough money for " + mm.formatAmount(bought+canbuy) + " " + mm.formatItem(args[1]) + cm.getErrorColor() + ".");
+                		mm.sendError(player, "You only have enough money for " + mm.formatAmount(bought+canbuy) + " " + mm.formatItem(args[1], true) + cm.getErrorColor() + ".");
                 }
             }
             bought += canbuy;
@@ -217,7 +217,7 @@ public class Buy implements CommandExecutor, Confirmable{
             if(finalize){
             	VirtualShop.econ.withdrawPlayer(player.getName(), cost);
             	VirtualShop.econ.depositPlayer(o.getSeller(), cost);
-            	mm.sendSuccess(o.getSeller(), mm.formatSeller(player.getName()) + cm.getSuccessColor() + " just bought " + mm.formatAmount(canbuy) + " " + mm.formatItem(args[1]) + cm.getSuccessColor() + " for " + mm.formatPrice(cost));
+            	mm.sendSuccess(o.getSeller(), mm.formatSeller(player.getName()) + cm.getSuccessColor() + " just bought " + mm.formatAmount(canbuy) + " " + mm.formatItem(args[1], true) + cm.getSuccessColor() + " for " + mm.formatPrice(cost));
             	int left = o.getItem().getAmount() - canbuy;
             	if(left < 1) 
             		dbm.deleteItem(o.getId());
@@ -233,22 +233,22 @@ public class Buy implements CommandExecutor, Confirmable{
         }
         if(!tooHigh && !finalize){
         	if(bought == 0){
-            	mm.sendError(player,"There is no " + mm.formatItem(args[1]) + cm.getErrorColor() + " for sale.");
+            	mm.sendError(player,"There is no " + mm.formatItem(args[1], true) + cm.getErrorColor() + " for sale.");
             	canContinue = false;
             }
         	if(bought < amount && bought > 0)
-        		mm.sendError(player, "There's only " + mm.formatAmount(bought) + " " + mm.formatItem(args[1]) + cm.getErrorColor() + " for sale.");
+        		mm.sendError(player, "There's only " + mm.formatAmount(bought) + " " + mm.formatItem(args[1], true) + cm.getErrorColor() + " for sale.");
         }
         item.setAmount(bought);
         if(finalize){
         	if(bought > 0) im.addItem(item);
         }
         if(tooHigh && bought == 0 && args.length > 2 && !anyLessThanMax){
-        	mm.sendError(player,"No one is selling " + mm.formatItem(args[1]) + cm.getErrorColor() + " cheaper than " + mm.formatPrice(maxprice));
+        	mm.sendError(player,"No one is selling " + mm.formatItem(args[1], true) + cm.getErrorColor() + " cheaper than " + mm.formatPrice(maxprice));
         	canContinue = false;
         }else{
         	if(finalize)
-        		mm.sendSuccess(player,"Managed to buy " + mm.formatAmount(bought) + " " + mm.formatItem(args[1]) + cm.getSuccessColor() + " for " + mm.formatPrice(spent));
+        		mm.sendSuccess(player,"Managed to buy " + mm.formatAmount(bought) + " " + mm.formatItem(args[1], true) + cm.getSuccessColor() + " for " + mm.formatPrice(spent));
         }
         return new TransactionData(bought, item, spent, maxprice, offers, System.currentTimeMillis(), args, canContinue);
 	}

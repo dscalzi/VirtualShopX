@@ -154,10 +154,6 @@ public final class ConfigManager {
 	public List<String> getAllowedWorlds(){
 		return this.config.getStringList("general_settings.allowed_worlds");
 	}
-	
-    public int getPort(){
-        return this.config.getInt("MySQL.port",3306);
-    }
 
 	public boolean usingMySQL(){
 		return this.config.getBoolean("database_settings.using_MySQL", false);

@@ -213,7 +213,7 @@ public final class MessageManager {
 	}
 	
 	public void notEnchanted(CommandSender sender){
-		sendError(sender, "That item is not enchanted, please sell it using /sell instead.");
+		sendError(sender, "That item is not enchanted, please use /sell instead.");
 	}
 	
 	public void holdingNothing(CommandSender sender){
@@ -326,7 +326,11 @@ public final class MessageManager {
 	}
 
 	public String formatItem(String item){
-		return ChatColor.BLUE + item.toLowerCase() + this.color;
+		return formatItem(item, true);
+	}
+	
+	public String formatItem(String item, boolean forceCase){
+		return ChatColor.BLUE + (forceCase ? item.toLowerCase() : item) + this.color;
 	}
 	
 	public BaseComponent formatEnchantedItem(String item, ItemStack itemStack){

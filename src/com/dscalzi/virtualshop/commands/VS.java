@@ -301,7 +301,7 @@ public class VS implements CommandExecutor{
 			formattedAliasList = formattedAliasList.replaceAll("\\]", trimColor + "\\]" + baseColor);
 		}
 		
-		String topLine = mm.getPrefix() + " " + mm.formatItem(target.getType().toString()).toUpperCase() + trimColor + " - " + mm.formatItem(target.getTypeId() + ":" + target.getData().getData());
+		String topLine = mm.getPrefix() + " " + mm.formatItem(target.getType().toString(), true).toUpperCase() + trimColor + " - " + mm.formatItem(target.getTypeId() + ":" + target.getData().getData(), true);
 		sender.sendMessage(topLine);
 		sender.sendMessage(baseColor + formattedAliasList);
 		

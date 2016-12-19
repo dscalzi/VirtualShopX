@@ -23,7 +23,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
@@ -41,16 +40,29 @@ public class EFind implements CommandExecutor, Listener{
 	private final ItemDB idb;
 	
 	private VirtualShop plugin;
-	private Map<Player, Inventory> activeInventories;
+	private Map<Player, InventoryCache> activeInventories;
+	
+	private ItemStack[] utility;
 	
 	public EFind(VirtualShop plugin){
 		this.plugin = plugin;
 		this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
-		this.activeInventories = new HashMap<Player, Inventory>();
+		this.activeInventories = new HashMap<Player, InventoryCache>();
 		this.mm = MessageManager.getInstance();
 		this.cm = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.idb = ItemDB.getInstance();
+		
+		this.utility = new ItemStack[2];
+		utility[0] = new ItemStack(Material.NETHER_STAR, 1);
+		ItemMeta npmeta = utility[0].getItemMeta();
+		npmeta.setDisplayName(mm.getBaseColor() + "Next page");
+		utility[0].setItemMeta(npmeta);
+		
+		utility[1] = new ItemStack(Material.NETHER_STAR, 1);
+		ItemMeta ppmeta = utility[1].getItemMeta();
+		ppmeta.setDisplayName(mm.getBaseColor() + "Previous page");
+		utility[1].setItemMeta(ppmeta);
 	}
 	
 	@Override
@@ -91,17 +103,28 @@ public class EFind implements CommandExecutor, Listener{
     		mm.wrongItem(player, args[0]);
     		return;
     	}
+		
+		this.goToPage(player, item, 1);
+	}
+	
+	private void goToPage(Player player, ItemStack item, int page){	
+		if(activeInventories.containsKey(player)) activeInventories.remove(player);
+		
 		List<Offer> offers = dbm.getEnchantedOffers(item);
 		if(offers.size() == 0){
-			mm.noListings(player, args[0]);
+			mm.noListings(player, idb.reverseLookup(item));
 			return;
 		}
+		
 		final ChatColor baseColor = mm.getBaseColor();
 		final ChatColor trimColor = mm.getTrimColor();
 		String name = idb.reverseLookup(item);
-		String header = trimColor + "" + ChatColor.BOLD + "< " + baseColor + "" + ChatColor.BOLD + "L" + baseColor + "istings ◄► " + ChatColor.BOLD + Character.toUpperCase(name.charAt(0)) + baseColor + name.substring(1).toLowerCase() + trimColor + ChatColor.BOLD + " >";
 		
-		String title = mm.formatHeaderLength(header, EFind.class);
+		double div = 14.0;
+		
+		int totalPages = (int) ((offers.size()/div > (int)(offers.size()/div)) ? (offers.size()/div)+1 : offers.size()/div);
+		
+		String title = trimColor + mm.formatItem(MessageManager.capitalize(name), false) + ChatColor.DARK_GRAY + " (" + page + " of " + totalPages + ")";
 		Inventory inventory = Bukkit.createInventory(player, 36, title);
 		
 		ItemStack crown = removeAttributes(item);
@@ -117,39 +140,38 @@ public class EFind implements CommandExecutor, Listener{
 				)));
 		crown.setItemMeta(cmeta);
 		
-		ItemStack nextPage = new ItemStack(Material.NETHER_STAR, 1);
-		ItemMeta npmeta = nextPage.getItemMeta();
-		npmeta.setDisplayName(baseColor + "Next page");
-		nextPage.setItemMeta(npmeta);
-		
-		ItemStack previousPage = new ItemStack(Material.NETHER_STAR, 1);
-		ItemMeta ppmeta = previousPage.getItemMeta();
-		ppmeta.setDisplayName(baseColor + "Previous page");
-		previousPage.setItemMeta(ppmeta);
-		
-		inventory.setItem(2, previousPage);
+		inventory.setItem(2, utility[1]);
 		inventory.setItem(4, crown);
-		inventory.setItem(6, nextPage);
+		inventory.setItem(6, utility[0]);
 		
-		int itemCount = 0;
-		for(int i=19; i<offers.size()+19; ++i){
+		int itemCount = 14*(page-1);
+		for(int i=19; i<offers.size()+19 && i<36 && itemCount < offers.size(); ++i){
+			if((i+1)%9 == 0) i+=2;
 			if(i<inventory.getSize())
 				inventory.setItem(i, offers.get(itemCount).getItem());
 			++itemCount;
 		}
 		player.openInventory(inventory);
-		activeInventories.put(player, inventory);
+		activeInventories.put(player, new InventoryCache(inventory, item, page));
 	}
 	
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
-		if(!(event.getWhoClicked() instanceof Player)){
-			return;
-		}
+		if(!(event.getWhoClicked() instanceof Player)) return;
+		if(event.getCurrentItem() == null) return;
 		Player player = (Player)event.getWhoClicked();
 		if(activeInventories.containsKey(player)){
-			if(activeInventories.containsValue(event.getInventory())){
+			if(activeInventories.get(player).getInventory().equals(event.getInventory())){
 				event.setResult(Result.DENY);
+				if(event.getCurrentItem().equals(utility[0])){
+					InventoryCache ic = activeInventories.get(player);
+					goToPage(player, ic.getItem(), ic.getPage()+1);
+				}
+				if(event.getCurrentItem().equals(utility[1])){
+					InventoryCache ic = activeInventories.get(player);
+					if(ic.getPage()-1 < 1) return;
+					goToPage(player, ic.getItem(), ic.getPage()-1);
+				}
 			}
 		}
 	}
@@ -166,12 +188,8 @@ public class EFind implements CommandExecutor, Listener{
 	}
 	
 	public ItemStack removeAttributes(ItemStack i){
-        if(i == null) {
-        	return i;
-        }
-	    if(i.getType() == Material.BOOK_AND_QUILL) {
-	    	return i;
-	    }
+        if(i == null) return i;
+        if(i.getType() == Material.BOOK_AND_QUILL) return i;
 	    ItemStack item = i.clone();
 	    
 	    Class<?> craftItemStackClazz = ReflectionUtil.getOCBClass("inventory.CraftItemStack");
@@ -203,9 +221,29 @@ public class EFind implements CommandExecutor, Listener{
         	setTag.invoke(nmsStack, tag);
         	return (ItemStack)asCraftMirror.invoke(null, nmsStack);
         } catch(Throwable t){
-        	mm.logError("Failed to serialize itemstack to nms item", true);
-        	return null;
+        	mm.logError("Failed to remove attributes while opening eFind inventory.", true);
+        	return i;
         }
+	}
+	
+	private class InventoryCache {
+		
+		private Inventory inventory;
+		private ItemStack item;
+		private int page;
+		
+		public InventoryCache(Inventory inventory, ItemStack item, int page){
+			this.inventory = inventory;
+			this.item = item;
+			this.page = page;
+		}
+		
+		public Inventory getInventory() { return inventory; }
+
+		public ItemStack getItem() { return item; }
+
+		public int getPage() { return page; }
+		
 	}
 	
 }
