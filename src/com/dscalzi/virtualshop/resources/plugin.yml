@@ -9,6 +9,9 @@ commands:
   buy:
     description: Buy goods for sale on the VirtualShop.
     usage: /<command> <amount> <item> [maxprice]
+  ebuy:
+    description: Browse and purchase enchanted goods on the VirtualShop.
+    usage: /<command> <item>
   sell:
     description: Put goods up for sale on the VirtualShop.
     usage: /<command> <amount> <item> <price> | /<command> <amount> <hand/mainhand/offhand> <price>
@@ -20,9 +23,6 @@ commands:
     usage: /<command> <item>
   find:
     description: Find offers for an item.
-    usage: /<command> <item>
-  efind:
-    description: Find offers for an enchanted item.
     usage: /<command> <item>
   stock:
     description: List items for sale.
@@ -44,20 +44,27 @@ permissions:
     children:
       virtualshop.merchant.*:
         children:
-          virtualshop.merchant.buy: true
-          virtualshop.merchant.cancel: true
+          virtualshop.merchant.buy.*:
+            children:
+              virtualshop.merchant.buy.regular: true
+              virtualshop.merchant.buy.enchanted: true
+          virtualshop.merchant.cancel.*:
+            children:
+              virtualshop.merchant.cancel.regular: true
+              virtualshop.merchant.cancel.enchanted: true
           virtualshop.merchant.find: true
-          virtualshop.merchant.efind: true
           virtualshop.merchant.lookup: true
           virtualshop.merchant.sales.*:
             children:
-              virtualshop.merchant.sales: true
+              virtualshop.merchant.sales.individual: true
               virtualshop.merchant.sales.server: true
-          virtualshop.merchant.sell: true
-          virtualshop.merchant.esell: true
+          virtualshop.merchant.sell.*:
+            children:
+              virtualshop.merchant.sell.regular: true
+              virtualshop.merchant.sell.enchanted: true
           virtualshop.merchant.stock.*:
             children:
-              virtualshop.merchant.stock: true
+              virtualshop.merchant.stock.individual: true
               virtualshop.merchant.stock.server: true
           virtualshop.merchant.reprice: true
       virtualshop.admin.*:

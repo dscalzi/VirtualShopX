@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.commands;
 
 import org.bukkit.GameMode;
@@ -7,8 +12,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
@@ -48,7 +51,7 @@ public class ESell implements CommandExecutor, Confirmable{
             mm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.merchant.sell")){
+		if(!sender.hasPermission("virtualshop.merchant.sell.enchanted")){
             mm.noPermissions(sender);
             return true;
         }
@@ -153,13 +156,6 @@ public class ESell implements CommandExecutor, Confirmable{
 			return false;
 		}
         
-        if(item.hasItemMeta()){
-        	ItemMeta meta = item.getItemMeta();
-        	if(meta.hasDisplayName()) meta.setDisplayName(null);
-        	if(meta.hasLore()) meta.setLore(null);
-        	item.setItemMeta(meta);
-        }
-        
         //Submit data
         EListingData data = new EListingData(item, price, price, System.currentTimeMillis(), args);
         this.confirmations.register(this.getClass(), player, data);
@@ -174,11 +170,12 @@ public class ESell implements CommandExecutor, Confirmable{
 	 */
 	private void createListing(Player player, EListingData data){
 		ItemStack item = data.getItem();
+		ItemStack cleanedItem = data.getCleanedItem();
 		double price = data.getPrice();
 		InventoryManager im = new InventoryManager(player);
 		im.removeItem(item);
-        Offer o = new Offer(player.getUniqueId(), item, price);
-        String edata = idb.formatEnchantData(idb.getEnchantments(item));
+        Offer o = new Offer(player.getUniqueId(), cleanedItem, price);
+        String edata = idb.formatEnchantData(idb.getEnchantments(cleanedItem));
 		dbm.addEOffer(o, edata);
 		confirmations.unregister(this.getClass(), player);
         if(cm.broadcastOffers())

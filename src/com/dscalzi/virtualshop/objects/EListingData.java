@@ -1,8 +1,14 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.objects;
 
 import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class EListingData implements VsDataCache{
 
@@ -27,6 +33,17 @@ private static final long serialVersionUID = -8546925459706301446L;
 	
 	public ItemStack getItem(){
 		return this.ITEM;
+	}
+	
+	public ItemStack getCleanedItem(){
+		ItemStack i = ITEM.clone();
+		if(i.hasItemMeta()){
+        	ItemMeta meta = i.getItemMeta();
+        	if(meta.hasDisplayName()) meta.setDisplayName(null);
+        	if(meta.hasLore()) meta.setLore(null);
+        	i.setItemMeta(meta);
+        }
+		return i;
 	}
 	
 	public double getPrice(){

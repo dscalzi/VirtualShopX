@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.managers;
 
 import java.lang.reflect.Method;
@@ -15,7 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
-import com.dscalzi.virtualshop.commands.EFind;
+import com.dscalzi.virtualshop.commands.EBuy;
 import com.dscalzi.virtualshop.commands.ESell;
 import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
@@ -298,7 +303,7 @@ public final class MessageManager {
 		TextComponent confirm2 = new TextComponent(confirmLine2);
 		confirm2.setColor(this.color.asBungee());
 		
-    	sendFormattedMessage(player, before, formatEnchantedItem(idb.reverseLookup(data.getItem()), data.getItem()), after);
+    	sendFormattedMessage(player, before, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getItem()), after);
     	player.spigot().sendMessage(confirm, confirm2);
 	}
 	
@@ -399,14 +404,14 @@ public final class MessageManager {
 		if(clazz == Find.class)	length = ChatColor.stripColor(header).length()+17;
 		if(clazz == Stock.class) length = ChatColor.stripColor(header).length()+17;
 		if(clazz == Sales.class) length = ChatColor.stripColor(header).length()+18;
-		if(clazz == EFind.class) length = ChatColor.stripColor(header).length()+40;
+		if(clazz == EBuy.class) length = ChatColor.stripColor(header).length()+40;
 		int textLength = cm.getPackSpacing()-length;
 		String left = this.bColor + "";
         String right = this.tColor + "";
         int halfLength = textLength/2;
         for(int i=0; i<halfLength; ++i) left += "-";
         for(int i=0; i<halfLength; ++i) right += "-";
-        if(header.length() % 2 == 0 && clazz != EFind.class) right = right.substring(0, right.length()-1);
+        if(header.length() % 2 == 0 && clazz != EBuy.class) right = right.substring(0, right.length()-1);
         if(header.length() % 2 == 1 && clazz == Find.class) right = right.substring(0, right.length()-1);
         return left + header + right;
     }
@@ -417,6 +422,12 @@ public final class MessageManager {
 		if(s.length() < 1)
 			return s;
 		return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+	}
+	
+	public static String hideString(String s){
+		String hidden = "";
+        for (char c : s.toCharArray()) hidden += ChatColor.COLOR_CHAR + c;
+        return hidden;
 	}
 	
 	public static List<String> getStringsWithPrefix(String prefix, List<String> args){

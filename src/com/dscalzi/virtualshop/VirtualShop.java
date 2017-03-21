@@ -1,15 +1,21 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop;
 
 import java.io.IOException;
 import net.milkbowl.vault.economy.Economy;
 
+import org.bstats.Metrics;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
-import com.dscalzi.virtualshop.commands.EFind;
+import com.dscalzi.virtualshop.commands.EBuy;
 import com.dscalzi.virtualshop.commands.ESell;
 import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
@@ -28,12 +34,15 @@ import com.dscalzi.virtualshop.util.Reloader;
 
 public class VirtualShop extends JavaPlugin {
     
-    public static Economy econ = null;
+    private static Economy econ = null;
+    @SuppressWarnings("unused")
+	private Metrics metrics;
     
     public void onDisable(){
     	ConfirmationManager.getInstance().serialize();
     	if(ConfigManager.getInstance().uuidSyncOnDisable()) this.syncNameToUUID();
     	DatabaseManager.getInstance().terminate();
+    	this.metrics = new Metrics(this);
         System.gc();
     }
 
@@ -75,9 +84,9 @@ public class VirtualShop extends JavaPlugin {
     
     private void registerCommands(){
     	this.getCommand("buy").setExecutor(new Buy(this));
+    	this.getCommand("ebuy").setExecutor(new EBuy(this));
     	this.getCommand("cancel").setExecutor(new Cancel(this));
     	this.getCommand("find").setExecutor(new Find(this));
-    	this.getCommand("efind").setExecutor(new EFind(this));
     	this.getCommand("shop").setExecutor(new VS(this));
     	this.getCommand("sales").setExecutor(new Sales(this));
     	this.getCommand("sell").setExecutor(new Sell(this));
@@ -101,5 +110,9 @@ public class VirtualShop extends JavaPlugin {
         } else {
             return false;
         }
+    }
+    
+    public static Economy getEconomy(){
+    	return econ;
     }
 }

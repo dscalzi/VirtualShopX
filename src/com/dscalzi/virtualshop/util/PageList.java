@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.util;
 
 import java.util.ArrayList;
@@ -17,7 +22,7 @@ public class PageList<T> implements Iterable<List<T>>{
 	}
 	
 	public PageList(List<T> list){
-		this(GLOBAL_DEFAULT_PAGE_SIZE);
+		this(GLOBAL_DEFAULT_PAGE_SIZE, list);
 	}
 	
 	public PageList(int pageSize){

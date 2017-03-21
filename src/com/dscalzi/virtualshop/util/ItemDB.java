@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.util;
 
 import java.io.BufferedReader;
@@ -5,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -22,6 +28,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
+import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.objects.ItemMetaData;
 
 @SuppressWarnings("deprecation")
@@ -201,7 +208,7 @@ public final class ItemDB {
 			item.setItemMeta(meta);
 			return;
 		}
-		item.addEnchantments(enchantments);
+		item.addUnsafeEnchantments(enchantments);
 	}
 	
 	public List<String> getAliases(ItemStack item){
@@ -219,6 +226,49 @@ public final class ItemDB {
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * This NMS workaround was added to the API, therefore it is deprecated.
+	 */
+	@Deprecated
+	public ItemStack removeAttributes(ItemStack i){
+        if(i == null) return i;
+        if(i.getType() == Material.BOOK_AND_QUILL) return i;
+	    ItemStack item = i.clone();
+	    
+	    Class<?> craftItemStackClazz = ReflectionUtil.getOCBClass("inventory.CraftItemStack");
+        Method asNMSCopyMethod = ReflectionUtil.getMethod(craftItemStackClazz, "asNMSCopy", ItemStack.class);
+
+        Class<?> nmsItemStackClazz = ReflectionUtil.getNMSClass("ItemStack");
+        Class<?> nbtTagCompoundClazz = ReflectionUtil.getNMSClass("NBTTagCompound");
+        Class<?> nbtBase = ReflectionUtil.getNMSClass("NBTBase");
+        Class<?> nbtTagListClazz = ReflectionUtil.getNMSClass("NBTTagList");
+        Method hasTag = ReflectionUtil.getMethod(nmsItemStackClazz, "hasTag");
+        Method setTag = ReflectionUtil.getMethod(nmsItemStackClazz, "setTag", nbtTagCompoundClazz);
+        Method getTag = ReflectionUtil.getMethod(nmsItemStackClazz, "getTag");
+        Method set = ReflectionUtil.getMethod(nbtTagCompoundClazz, "set", String.class, nbtBase);
+        Method asCraftMirror = ReflectionUtil.getMethod(craftItemStackClazz, "asCraftMirror", nmsItemStackClazz);
+	    
+        try{
+        	Object nmsStack = asNMSCopyMethod.invoke(null, item);
+        	Object tag;
+        	
+        	if(!((Boolean)hasTag.invoke(nmsStack))){
+        		tag = nbtTagCompoundClazz.newInstance();
+        		setTag.invoke(nmsStack, tag);
+        	} else {
+        		tag = getTag.invoke(nmsStack);
+        	}
+        	
+        	Object am = nbtTagListClazz.newInstance();
+        	set.invoke(tag, "AttributeModifiers", am);
+        	setTag.invoke(nmsStack, tag);
+        	return (ItemStack)asCraftMirror.invoke(null, nmsStack);
+        } catch(Throwable t){
+        	MessageManager.getInstance().logError("Failed to remove attributes while opening eFind inventory.", true);
+        	return i;
+        }
 	}
 	
 }

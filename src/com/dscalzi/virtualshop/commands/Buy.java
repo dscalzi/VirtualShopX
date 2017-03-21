@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.commands;
 
 import org.bukkit.GameMode;
@@ -52,7 +57,7 @@ public class Buy implements CommandExecutor, Confirmable{
 			mm.denyConsole(sender);
 			return true;
 		}
-		if(!sender.hasPermission("virtualshop.merchant.buy")){
+		if(!sender.hasPermission("virtualshop.merchant.buy.regular")){
             mm.noPermissions(sender);
             return true;
         }
@@ -199,7 +204,7 @@ public class Buy implements CommandExecutor, Confirmable{
             
             //Revise amounts if not enough money.
             if(!VirtualShop.hasEnough(player, cost)){
-            	canbuy = (int)(VirtualShop.econ.getBalance(player) / o.getPrice());
+            	canbuy = (int)(VirtualShop.getEconomy().getBalance(player) / o.getPrice());
                 cost = canbuy*o.getPrice();
                 amount = bought+canbuy;
                 tooHigh = true;
@@ -215,8 +220,8 @@ public class Buy implements CommandExecutor, Confirmable{
             bought += canbuy;
             spent += cost;
             if(finalize){
-            	VirtualShop.econ.withdrawPlayer(player.getName(), cost);
-            	VirtualShop.econ.depositPlayer(o.getSeller(), cost);
+            	VirtualShop.getEconomy().withdrawPlayer(player, cost);
+            	VirtualShop.getEconomy().depositPlayer(o.getSeller(), cost);
             	mm.sendSuccess(o.getSeller(), mm.formatSeller(player.getName()) + cm.getSuccessColor() + " just bought " + mm.formatAmount(canbuy) + " " + mm.formatItem(args[1], true) + cm.getSuccessColor() + " for " + mm.formatPrice(cost));
             	int left = o.getItem().getAmount() - canbuy;
             	if(left < 1) 

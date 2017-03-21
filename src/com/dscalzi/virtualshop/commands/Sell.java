@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.commands;
 
 import org.bukkit.GameMode;
@@ -55,7 +60,7 @@ public class Sell implements CommandExecutor, Confirmable{
             mm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.merchant.sell")){
+		if(!sender.hasPermission("virtualshop.merchant.sell.regular")){
             mm.noPermissions(sender);
             return true;
         }

@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.managers;
 
 import java.sql.Connection;
@@ -322,13 +327,7 @@ public final class DatabaseManager {
     	Optional<String> name = uuidm.getPlayerName(merchantUUID);
     	if(name.isPresent()) merchant = name.get();
     	String sql = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,cancelconfirm,repriceconfirm,uuid) values('" + merchant + "',1,1,1,1,'" + merchantUUID.toString() + "')";
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
     }
     
     public void updateToggle(UUID merchantUUID, Class<? extends Confirmable> clazz, boolean value){
@@ -339,12 +338,7 @@ public final class DatabaseManager {
     	
     	int dataval = value ? 1 : 0;
     	String sql = "update vshop_toggles set " + togglesKey.get(clazz) + "=" + dataval + " where uuid='" + merchantUUID.toString() + "'";
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql)){
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
     }
     
     public boolean getToggle(UUID merchantUUID, Class<? extends Confirmable> clazz){
@@ -355,12 +349,10 @@ public final class DatabaseManager {
     	
     	String sql = "select * from vshop_toggles where uuid='" + merchantUUID.toString() + "'";
     	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			result.next();    		
-    			return result.getBoolean(togglesKey.get(clazz));
-    		}
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		result.next();    		
+    		return result.getBoolean(togglesKey.get(clazz));
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     		return true;
@@ -370,35 +362,21 @@ public final class DatabaseManager {
     @SuppressWarnings("deprecation")
 	public void addOffer(Offer offer){
     	String sql = "insert into vshop_stock(seller,item,amount,price,damage,uuid) values('" +offer.getSeller() +"',"+ offer.getItem().getType().getId() + ","+offer.getItem().getAmount() +","+offer.getPrice()+"," + offer.getItem().getDurability()+",'"+offer.getSellerUUID().toString()+"')";
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
     }
     
     @SuppressWarnings("deprecation")
     public void addEOffer(Offer offer, String edata){
 		String sql = "insert into vshop_estock(merchant,item,data,price,edata,uuid) values('" +offer.getSeller() +"',"+ offer.getItem().getType().getId() + ","+offer.getItem().getDurability() +","+offer.getPrice()+",'" + edata +"','"+offer.getSellerUUID().toString()+"')";
-    	try(Connection connection = ds.getDataSource().getConnection();
-        	PreparedStatement stmt = connection.prepareStatement(sql))
-        {
-        	stmt.executeUpdate();
-        } catch(SQLException e){
-        	cm.logError(e.getMessage(), true);
-        }
+    	executeUpdate(sql);
     }
     
     public List<Offer> getAllOffers(){
     	String sql = "select * from vshop_stock order by price asc";
     	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			return Offer.listOffers(result);
-    		}
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listOffers(result);
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;
@@ -409,11 +387,9 @@ public final class DatabaseManager {
 	public List<Offer> getItemOffers(ItemStack item){
     	String sql = "select * from vshop_stock where item=" + item.getTypeId()+ " and damage=" + item.getDurability() + " order by price asc";
     	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			return Offer.listOffers(result);
-    		}
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listOffers(result);
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;
@@ -423,12 +399,23 @@ public final class DatabaseManager {
     @SuppressWarnings("deprecation")
 	public List<Offer> getEnchantedOffers(ItemStack item){
     	String sql = "select * from vshop_estock where item=" + item.getTypeId() + " and data=" + item.getDurability() + " order by price asc";
-    	try(Connection connection =  ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			return Offer.listEnchantedOffers(result);
-    		}
+    	try(Connection connection = ds.getDataSource().getConnection();
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listEnchantedOffers(result);
+    	} catch (SQLException e){
+    		cm.logError(e.getMessage(), true);
+    		return null;
+    	}
+    }
+    
+    @SuppressWarnings("deprecation")
+	public List<Offer> getSpecificEnchantedOffer(ItemStack item, String edata, double price){
+    	String sql = "select * from vshop_estock where item=" + item.getTypeId() + " and data=" + item.getDurability() + " and edata='" + edata + "' and price=" + price;
+    	try(Connection connection = ds.getDataSource().getConnection();
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listEnchantedOffers(result);
     	} catch (SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;
@@ -439,11 +426,9 @@ public final class DatabaseManager {
 	public List<Offer> getSellerOffers(UUID merchantUUID, ItemStack item){
     	String sql = "select * from vshop_stock where uuid = '" + merchantUUID.toString() + "' and item =" + item.getTypeId() + " and damage=" + item.getDurability();
     	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			return Offer.listOffers(result);
-    		}
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listOffers(result);
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;
@@ -453,79 +438,41 @@ public final class DatabaseManager {
     @SuppressWarnings("deprecation")
 	public void removeSellerOffers(UUID merchantUUID, ItemStack item){
     	String sql = "delete from vshop_stock where uuid = '" + merchantUUID.toString() + "' and item =" + item.getTypeId() + " and damage = " + item.getDurability();
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
     }
 
     public void deleteItem(int id){
     	String sql = "delete from vshop_stock where id="+id;
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
 	}
 
     public void updateQuantity(int id, int quantity){
     	String sql = "update vshop_stock set amount="+quantity+" where id=" + id;
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
 	}
 
     public void updatePrice(int id, double price){
     	String sql = "update vshop_stock set price="+price+" where id=" + id;
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
     }
     @SuppressWarnings("deprecation")
 	public void updatePrice(UUID merchantUUID, double price, ItemStack item){
     	String sql = "update vshop_stock set price="+price+" where uuid='" + merchantUUID + "' and item =" + item.getTypeId() + " and damage = " + item.getDurability();
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
     }
     
     @SuppressWarnings("deprecation")
 	public void logTransaction(Transaction transaction){
     	String sql = "insert into vshop_transactions(seller,buyer,item,amount,cost,damage,buyer_uuid,seller_uuid) values('" +transaction.getSeller() +"','"+ transaction.getBuyer() + "'," + transaction.getItem().getTypeId() + ","+ transaction.getItem().getAmount() +","+transaction.getCost()+","+transaction.getItem().getDurability()+",'"+transaction.getBuyerUUID().toString()+"','"+transaction.getSellerUUID().toString()+"')";
-    	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		stmt.executeUpdate();
-    	} catch(SQLException e){
-    		cm.logError(e.getMessage(), true);
-    	}
+    	executeUpdate(sql);
     }
 
     public List<Offer> getBestPrices(){
     	String sql = "select f.* from (select item,min(price) as minprice from vshop_stock group by item) as x inner join vshop_stock as f on f.item = x.item and f.price = x.minprice";
     	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			return Offer.listOffers(result);
-    		}
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listOffers(result);
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;
@@ -535,11 +482,9 @@ public final class DatabaseManager {
     public List<Offer> searchBySeller(UUID merchantUUID){
     	String sql = "select * from vshop_stock where uuid like '%" + merchantUUID.toString() +  "%'";
     	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			return Offer.listOffers(result);
-    		}
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listOffers(result);
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;
@@ -549,11 +494,9 @@ public final class DatabaseManager {
     public List<Transaction> getTransactions(){
     	String sql = "select * from vshop_transactions order by id desc";
     	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			return Transaction.listTransactions(result);
-    		}
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Transaction.listTransactions(result);
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;
@@ -563,11 +506,9 @@ public final class DatabaseManager {
 	public List<Transaction> getTransactions(UUID targetUUID){
 		String sql = "select * from vshop_transactions where seller_uuid like '%" + targetUUID.toString() +"%' OR buyer_uuid like '%" + targetUUID.toString() +"%' order by id";
 		try(Connection connection = ds.getDataSource().getConnection();
-			PreparedStatement stmt = connection.prepareStatement(sql))
-		{
-			try(ResultSet result = stmt.executeQuery()){
-				return Transaction.listTransactions(result);
-			}
+	    	PreparedStatement stmt = connection.prepareStatement(sql);
+	    	ResultSet result = stmt.executeQuery()){
+			return Transaction.listTransactions(result);
 		} catch(SQLException e){
 			cm.logError(e.getMessage(), true);
 			return null;
@@ -578,14 +519,22 @@ public final class DatabaseManager {
 	public List<Offer> getPrices(ItemStack item){
     	String sql = "select * from vshop_stock where item=" + item.getTypeId() + " AND damage=" + item.getDurability() + " order by price asc limit 0,10";
     	try(Connection connection = ds.getDataSource().getConnection();
-    		PreparedStatement stmt = connection.prepareStatement(sql))
-    	{
-    		try(ResultSet result = stmt.executeQuery()){
-    			return Offer.listOffers(result);
-    		}
-    	} catch(SQLException e){
+    		PreparedStatement stmt = connection.prepareStatement(sql);
+    		ResultSet result = stmt.executeQuery()){
+    		return Offer.listOffers(result);
+    	} catch (SQLException e) {
     		cm.logError(e.getMessage(), true);
     		return null;
+		}
+    }
+    
+    private void executeUpdate(String sql){
+    	try(Connection connection = ds.getDataSource().getConnection();
+    		PreparedStatement stmt = connection.prepareStatement(sql))
+    	{
+    		stmt.executeUpdate();
+    	} catch(SQLException e){
+    		cm.logError(e.getMessage(), true);
     	}
     }
 	

@@ -79,23 +79,23 @@ chat_settings:
     #If the header on commands such as /find, stock, sell, vs, or shop
     #is too long after changing this, you may need to adjust the pack
     #sizing below.
-    msg_prefix: '&5[&dOShop&5]&e'
+    msg_prefix: '&7| &2VShop &7|&e'
 
     #The name of the server, will be used in several messages.
-    server_name: ObsidianCraft
+    server_name: Server
 
     #Localization for number formating. The two supported values are 'US' and 'EU'.
     #US Format: 1,000.00 | EU Format: 1.000,00 | Symbols are handled by your economy plugin.
     localization: 'US'
 
     #This is the base color of the Virtual Shop interface. Usually lighter.
-    base_color: '&d'
+    base_color: '&7'
 
     #This is the trim color of the Virtual Shop interface. Usually darker.
-    trim_color: '&5'
+    trim_color: '&2'
 
     #This will be the color of command help descriptions.
-    description_color: '&d'
+    description_color: '&f'
 
     #Specify the color of message content.
     message_color: '&e'

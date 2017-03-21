@@ -1,12 +1,15 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.commands;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,13 +32,14 @@ import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.ItemDB;
-import com.dscalzi.virtualshop.util.ReflectionUtil;
 
-public class EFind implements CommandExecutor, Listener{
+public class EBuy implements CommandExecutor, Listener{
 
+	private static final String priceString = "Price: ";
+	
 	private final MessageManager mm;
-	@SuppressWarnings("unused")
 	private final ConfigManager cm;
 	private final DatabaseManager dbm;
 	private final ItemDB idb;
@@ -44,7 +49,7 @@ public class EFind implements CommandExecutor, Listener{
 	
 	private ItemStack[] utility;
 	
-	public EFind(VirtualShop plugin){
+	public EBuy(VirtualShop plugin){
 		this.plugin = plugin;
 		this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.activeInventories = new HashMap<Player, InventoryCache>();
@@ -68,7 +73,7 @@ public class EFind implements CommandExecutor, Listener{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
-		if(!sender.hasPermission("virtualshop.merchant.find")){
+		if(!sender.hasPermission("virtualshop.merchant.buy.enchanted")){
             mm.noPermissions(sender);
             return true;
         }
@@ -124,12 +129,15 @@ public class EFind implements CommandExecutor, Listener{
 		
 		int totalPages = (int) ((offers.size()/div > (int)(offers.size()/div)) ? (offers.size()/div)+1 : offers.size()/div);
 		
+		page = page > totalPages ? totalPages : (page < 1) ? 1 : page;
+		
 		String title = trimColor + mm.formatItem(MessageManager.capitalize(name), false) + ChatColor.DARK_GRAY + " (" + page + " of " + totalPages + ")";
 		Inventory inventory = Bukkit.createInventory(player, 36, title);
 		
-		ItemStack crown = removeAttributes(item);
+		ItemStack crown = item;
 		crown.setAmount(1);
 		ItemMeta cmeta = crown.getItemMeta();
+		cmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_PLACED_ON, ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_UNBREAKABLE);
 		cmeta.setDisplayName(trimColor + "" + ChatColor.BOLD + "Browsing " + MessageManager.capitalize(name));
 		cmeta.setLore(new ArrayList<String>(Arrays.asList(
 				null,
@@ -155,6 +163,21 @@ public class EFind implements CommandExecutor, Listener{
 		activeInventories.put(player, new InventoryCache(inventory, item, page));
 	}
 	
+	private Offer validateData(ItemStack item){
+		List<String> lore = item.getItemMeta().getLore();
+		Double price = null;
+		for(String s : lore){
+			if(s.toLowerCase().contains(priceString)){
+				String sprice = s.replace(priceString, "");
+				Number n = cm.getLocalization().parse(sprice);
+				price = n == null ? null : n.doubleValue();
+			}
+		}
+		if(price == null) return null;
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(item, ItemDB.getInstance().formatEnchantData(item.getEnchantments()), price);
+		return matches.size() > 0 ? matches.get(0) : null;
+	}
+	
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
 		if(!(event.getWhoClicked() instanceof Player)) return;
@@ -163,14 +186,26 @@ public class EFind implements CommandExecutor, Listener{
 		if(activeInventories.containsKey(player)){
 			if(activeInventories.get(player).getInventory().equals(event.getInventory())){
 				event.setResult(Result.DENY);
+				//Next button
 				if(event.getCurrentItem().equals(utility[0])){
 					InventoryCache ic = activeInventories.get(player);
 					goToPage(player, ic.getItem(), ic.getPage()+1);
 				}
+				//Previous button
 				if(event.getCurrentItem().equals(utility[1])){
 					InventoryCache ic = activeInventories.get(player);
-					if(ic.getPage()-1 < 1) return;
 					goToPage(player, ic.getItem(), ic.getPage()-1);
+				}
+				if(idb.hasEnchantments(event.getCurrentItem())){
+					Offer match = this.validateData(event.getCurrentItem());
+					if(match != null){
+						DatabaseManager.getInstance().deleteItem(match.getId());
+						InventoryManager im = new InventoryManager(player);
+						im.addItem(match.getItem());
+						mm.sendSuccess(player, "Bought");
+					}
+					player.closeInventory();
+					activeInventories.remove(player);
 				}
 			}
 		}
@@ -185,45 +220,6 @@ public class EFind implements CommandExecutor, Listener{
 		if(activeInventories.containsKey(player))
 			if(activeInventories.containsValue(event.getInventory()))
 				activeInventories.remove(player);
-	}
-	
-	public ItemStack removeAttributes(ItemStack i){
-        if(i == null) return i;
-        if(i.getType() == Material.BOOK_AND_QUILL) return i;
-	    ItemStack item = i.clone();
-	    
-	    Class<?> craftItemStackClazz = ReflectionUtil.getOCBClass("inventory.CraftItemStack");
-        Method asNMSCopyMethod = ReflectionUtil.getMethod(craftItemStackClazz, "asNMSCopy", ItemStack.class);
-
-        Class<?> nmsItemStackClazz = ReflectionUtil.getNMSClass("ItemStack");
-        Class<?> nbtTagCompoundClazz = ReflectionUtil.getNMSClass("NBTTagCompound");
-        Class<?> nbtBase = ReflectionUtil.getNMSClass("NBTBase");
-        Class<?> nbtTagListClazz = ReflectionUtil.getNMSClass("NBTTagList");
-        Method hasTag = ReflectionUtil.getMethod(nmsItemStackClazz, "hasTag");
-        Method setTag = ReflectionUtil.getMethod(nmsItemStackClazz, "setTag", nbtTagCompoundClazz);
-        Method getTag = ReflectionUtil.getMethod(nmsItemStackClazz, "getTag");
-        Method set = ReflectionUtil.getMethod(nbtTagCompoundClazz, "set", String.class, nbtBase);
-        Method asCraftMirror = ReflectionUtil.getMethod(craftItemStackClazz, "asCraftMirror", nmsItemStackClazz);
-	    
-        try{
-        	Object nmsStack = asNMSCopyMethod.invoke(null, item);
-        	Object tag;
-        	
-        	if(!((Boolean)hasTag.invoke(nmsStack))){
-        		tag = nbtTagCompoundClazz.newInstance();
-        		setTag.invoke(nmsStack, tag);
-        	} else {
-        		tag = getTag.invoke(nmsStack);
-        	}
-        	
-        	Object am = nbtTagListClazz.newInstance();
-        	set.invoke(tag, "AttributeModifiers", am);
-        	setTag.invoke(nmsStack, tag);
-        	return (ItemStack)asCraftMirror.invoke(null, nmsStack);
-        } catch(Throwable t){
-        	mm.logError("Failed to remove attributes while opening eFind inventory.", true);
-        	return i;
-        }
 	}
 	
 	private class InventoryCache {

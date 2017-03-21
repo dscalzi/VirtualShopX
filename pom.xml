@@ -11,13 +11,22 @@
   </properties>
   
   <developers>
-      <developer>
-         <name>Daniel Scalzi (TheKraken7)</name>
-         <roles>
-           <role>Project Lead</role>
-         </roles>
-      </developer>
-   </developers>
+    <developer>
+      <name>Daniel Scalzi (TheKraken7)</name>
+        <roles>
+          <role>Project Lead</role>
+        </roles>
+    </developer>
+  </developers>
+  
+  <contributors>
+    <contributor>
+      <name>SwearWords</name>
+      <roles>
+        <role>Original Idea</role>
+      </roles>
+    </contributor>
+  </contributors>
   
   <build>
     <defaultGoal>package</defaultGoal>
@@ -67,6 +76,10 @@
                   <pattern>org.slf4j</pattern>
                   <shadedPattern>lib.org.slf4j</shadedPattern>
                 </relocation>
+                <relocation>
+              		<pattern>org.bstats</pattern>
+              		<shadedPattern>lib.org.bstats</shadedPattern>
+              	</relocation>
               </relocations>
             </configuration>
           </execution>
@@ -85,6 +98,10 @@
         <id>vault-repo</id>
         <url>http://nexus.hc.to/content/repositories/pub_releases</url>
     </repository>
+    <repository>
+  		<id>bstats-repo</id>
+  		<url>http://repo.bstats.org/content/repositories/releases/</url>
+	</repository>
   </repositories>
   
   <dependencies>
@@ -111,6 +128,11 @@
 		<version>LATEST</version>
 		<scope>system</scope>
 		<systemPath>${basedir}/depend/VSReloader.jar</systemPath>
+	</dependency>
+	<dependency>
+  		<groupId>org.bstats</groupId>
+ 		<artifactId>bstats-bukkit</artifactId>
+  		<version>1.1</version>
 	</dependency>
   </dependencies>
   

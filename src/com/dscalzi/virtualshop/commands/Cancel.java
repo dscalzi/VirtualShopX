@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.commands;
 
 import org.bukkit.GameMode;
@@ -47,7 +52,7 @@ public class Cancel implements CommandExecutor, Confirmable{
             mm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.merchant.cancel")){
+		if(!sender.hasPermission("virtualshop.merchant.cancel.regular")){
             mm.noPermissions(sender);
             return true;
         }

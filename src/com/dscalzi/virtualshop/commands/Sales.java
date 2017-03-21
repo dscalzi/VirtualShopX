@@ -1,3 +1,8 @@
+/*
+ * VirtualShop
+ * Copyright (C) 2015-2017 Daniel D. Scalzi
+ * See LICENSE.txt for license information.
+ */
 package com.dscalzi.virtualshop.commands;
 
 import org.bukkit.ChatColor;
@@ -35,7 +40,7 @@ public class Sales implements CommandExecutor{
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!sender.hasPermission("virtualshop.merchant.sales")){
+		if(!sender.hasPermission("virtualshop.merchant.sales.individual")){
             mm.noPermissions(sender);
             return true;
         }
