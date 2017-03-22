@@ -417,7 +417,7 @@ public final class MessageManager {
     			sendMessage(player, common + getString(" for a higher price of {0} each.", formatPrice(data.getPrice())));
     	}
     	
-    	confirmationMessage(player, label, Sell.class);
+    	confirmationMsg(player, label, Sell.class);
     }
     
 	public void eSellConfirmation(Player player, String label, EListingData data){
@@ -431,13 +431,13 @@ public final class MessageManager {
 		
     	sendFormattedMessage(player, a);
     	
-    	confirmationMessage(player, label, ESell.class);
+    	confirmationMsg(player, label, ESell.class);
 	}
 	
     public void buyConfirmation(Player player, String label, TransactionData data){
     	sendMessage(player, getString("You are about to buy {0} {1} for a total price of {2}.",
     			formatAmount(data.getAmount()), formatItem(idb.reverseLookup(data.getItem())), formatPrice(data.getPrice())));
-    	confirmationMessage(player, label, Buy.class);
+    	confirmationMsg(player, label, Buy.class);
     }
     
     public void cancelConfirmation(Player player, String label, CancelData data){
@@ -445,17 +445,17 @@ public final class MessageManager {
     	if(data.getAmount() > data.getInventorySpace())
     			sendError(player, getString("Currently, you have space for {0}. Excess will be dropped around you.", (data.getInventorySpace() == 0 ? "none" : "only " + formatAmount(data.getInventorySpace()) + getErrorColor())));
     	
-    	confirmationMessage(player, label, Cancel.class);
+    	confirmationMsg(player, label, Cancel.class);
     }
     
     public void repriceConfirmation(Player player, String label, ListingData data){
     	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
     	sendMessage(player, getString("You are about to update the price of your {0} for a {1} price of {2} each.", formatItem(idb.reverseLookup(data.getItem())), quantity, formatPrice(data.getPrice())));
     	
-    	confirmationMessage(player, label, Reprice.class);
+    	confirmationMsg(player, label, Reprice.class);
     }
     
-    public void confirmationMessage(Player player, String label, Class<? extends Confirmable> origin){
+    public void confirmationMsg(Player player, String label, Class<? extends Confirmable> origin){
     	
     	String type = origin == Reprice.class || origin == Cancel.class ? "request" : "transaction";
     	
@@ -471,6 +471,18 @@ public final class MessageManager {
     	sendFormattedMessage(player, b.create());
     }
 	
+    public void confirmationToggleMsg(Player player, String label, boolean enabled, Class<? extends Confirmable> origin){
+    	String name = origin == ESell.class ? "Sell" : origin.getSimpleName();
+    	
+    	ComponentBuilder b = new ComponentBuilder(getString("{0} confirmations turned {1}. To undo this ", name, enabled ? "on" : "off")).color(getSuccessColor().asBungee());
+    	b.append(getString("/{0} confirm toggle", label));
+    	b.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + label + " confirm toggle"));
+    	b.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to toggle!").color(getSuccessColor().asBungee()).create()));
+    	b.append(".", FormatRetention.FORMATTING);
+    	
+    	sendFormattedMessage(player, b.create());
+    }
+    
     public void versionMessage(CommandSender sender){
 		sendMessage(sender, "VirtualShop Version " + plugin.getDescription().getVersion() + 
 				"\n" + bColor + "| " + sColor + "Metrics" + bColor+ " | " + color + "https://bstats.org/plugin/bukkit/VirtualShop" + 

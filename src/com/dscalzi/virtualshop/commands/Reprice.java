@@ -188,11 +188,11 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
 	private void toggleConfirmations(Player player, String label, String[] args){
 		boolean enabled = dbm.getToggle(player.getUniqueId(), this.getClass());
 		if(!enabled){
-			mm.sendSuccess(player, "Reprice confirmations turned on. To undo this /" + label + " confirm toggle.");
+			mm.confirmationToggleMsg(player, label, true, this.getClass());
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
 		} else {
-			mm.sendSuccess(player, "Reprice confirmations turned off. To undo this /" + label + " confirm toggle.");
+			mm.confirmationToggleMsg(player, label, false, this.getClass());
 			confirmations.unregister(this.getClass(), player);
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;

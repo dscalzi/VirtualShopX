@@ -213,7 +213,7 @@ public class EBuy implements CommandExecutor, Listener{
 							im.addItem(match.getItem());
 							mm.sendSuccess(player, "Bought " + mm.formatEnchantedItem(idb.reverseLookup(match.getItem()), match.getItem()));
 						} else {
-							mm.sendError(player, "Ran out of money.");
+							mm.ranOutOfMoney(player);
 						}
 					}
 					player.closeInventory();

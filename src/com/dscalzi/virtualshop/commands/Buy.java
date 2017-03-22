@@ -251,7 +251,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
         	canContinue = false;
         }else{
         	if(finalize)
-        		mm.sendSuccess(player,"Managed to buy " + mm.formatAmount(bought) + " " + mm.formatItem(args[1], true) + cm.getSuccessColor() + " for " + mm.formatPrice(spent));
+        		mm.sendSuccess(player,"Managed to buy " + mm.formatAmount(bought) + " " + mm.formatItem(args[1], true) + cm.getSuccessColor() + " for " + mm.formatPrice(spent) + cm.getSuccessColor() + ".");
         }
         return new TransactionData(bought, item, spent, maxprice, offers, System.currentTimeMillis(), args, canContinue);
 	}
@@ -281,11 +281,11 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 	private void toggleConfirmations(Player player, String label, String[] args){
 		boolean enabled = dbm.getToggle(player.getUniqueId(), this.getClass());
 		if(!enabled){
-			mm.sendSuccess(player, "Buy confirmations turned on. To undo this /" + label + " confirm toggle.");
+			mm.confirmationToggleMsg(player, label, true, this.getClass());
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
 		} else {
-			mm.sendSuccess(player, "Buy confirmations turned off. To undo this /" + label + " confirm toggle.");
+			mm.confirmationToggleMsg(player, label, false, this.getClass());
 			confirmations.unregister(this.getClass(), player);
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;
