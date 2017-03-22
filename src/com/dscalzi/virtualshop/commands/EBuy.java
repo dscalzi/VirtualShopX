@@ -164,13 +164,19 @@ public class EBuy implements CommandExecutor, Listener{
 	}
 	
 	private Offer validateData(ItemStack item){
+		System.out.println("validating");
 		List<String> lore = item.getItemMeta().getLore();
+		System.out.println(lore);
 		Double price = null;
 		for(String s : lore){
-			if(s.toLowerCase().contains(priceString)){
-				String sprice = s.replace(priceString, "");
+			s = ChatColor.stripColor(s);
+			System.out.println(s);
+			if(s.contains(priceString)){
+				String sprice = s.replace(priceString + VirtualShop.getEconSymbol(), "");
+				System.out.println(sprice);
 				Number n = cm.getLocalization().parse(sprice);
 				price = n == null ? null : n.doubleValue();
+				System.out.println(price);
 			}
 		}
 		if(price == null) return null;
@@ -196,13 +202,19 @@ public class EBuy implements CommandExecutor, Listener{
 					InventoryCache ic = activeInventories.get(player);
 					goToPage(player, ic.getItem(), ic.getPage()-1);
 				}
+				System.out.println("Hi");
 				if(idb.hasEnchantments(event.getCurrentItem())){
+					System.out.println("has enchants");
 					Offer match = this.validateData(event.getCurrentItem());
 					if(match != null){
-						DatabaseManager.getInstance().deleteItem(match.getId());
-						InventoryManager im = new InventoryManager(player);
-						im.addItem(match.getItem());
-						mm.sendSuccess(player, "Bought");
+						if(VirtualShop.hasEnough(player, match.getPrice())){
+							DatabaseManager.getInstance().deleteItem(match.getId());
+							InventoryManager im = new InventoryManager(player);
+							im.addItem(match.getItem());
+							mm.sendSuccess(player, "Bought " + mm.formatEnchantedItem(idb.reverseLookup(match.getItem()), match.getItem()));
+						} else {
+							mm.sendError(player, "Ran out of money.");
+						}
 					}
 					player.closeInventory();
 					activeInventories.remove(player);

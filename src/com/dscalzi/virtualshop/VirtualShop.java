@@ -37,14 +37,6 @@ public class VirtualShop extends JavaPlugin {
     private static Economy econ = null;
     @SuppressWarnings("unused")
 	private Metrics metrics;
-    
-    public void onDisable(){
-    	ConfirmationManager.getInstance().serialize();
-    	if(ConfigManager.getInstance().uuidSyncOnDisable()) this.syncNameToUUID();
-    	DatabaseManager.getInstance().terminate();
-    	this.metrics = new Metrics(this);
-        System.gc();
-    }
 
     public void onEnable(){
         if (!this.setupEconomy()){
@@ -65,6 +57,14 @@ public class VirtualShop extends JavaPlugin {
         Reloader.initialize(this);
         this.registerCommands();
         if(ConfigManager.getInstance().uuidSyncOnEnable()) this.syncNameToUUID();
+        this.metrics = new Metrics(this);
+    }
+    
+    public void onDisable(){
+    	ConfirmationManager.getInstance().serialize();
+    	if(ConfigManager.getInstance().uuidSyncOnDisable()) this.syncNameToUUID();
+    	DatabaseManager.getInstance().terminate();
+        System.gc();
     }
     
     private boolean setupEconomy(){
@@ -114,5 +114,9 @@ public class VirtualShop extends JavaPlugin {
     
     public static Economy getEconomy(){
     	return econ;
+    }
+    
+    public static String getEconSymbol(){
+    	return VirtualShop.getEconomy().format(0.0).replaceFirst("0", "loc").split("loc")[0];
     }
 }

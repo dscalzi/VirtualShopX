@@ -28,7 +28,7 @@ public enum Localization {
 	}
 	
 	public String formatPrice(Double price){
-		String symbol = VirtualShop.getEconomy().format(0.0).replaceFirst("0", "loc").split("loc")[0];
+		String symbol = VirtualShop.getEconSymbol();
 		int symbolLength = NumberFormat.getCurrencyInstance(locale).format(new Double(0.0)).replaceFirst("0", "loc").split("loc")[0].length();
 		return symbol + NumberFormat.getCurrencyInstance(locale).format(price).substring(symbolLength);
 	}

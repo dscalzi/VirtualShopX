@@ -254,6 +254,10 @@ public final class DatabaseManager {
     	}
     }
     
+    /**
+     * There should no longer be any legacy databases in existence.
+     * 
+     */
     @Deprecated
     public Pair<Integer, Integer> updateDatabase(){
     	try(Connection connection = ds.getDataSource().getConnection();

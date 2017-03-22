@@ -209,7 +209,7 @@ public class Buy implements CommandExecutor, Confirmable{
                 amount = bought+canbuy;
                 tooHigh = true;
                 if(canbuy < 1){
-                	mm.sendError(player, "Ran out of money!");
+                	mm.ranOutOfMoney(player);
                 	canContinue = false;
 					break;
                 } else {

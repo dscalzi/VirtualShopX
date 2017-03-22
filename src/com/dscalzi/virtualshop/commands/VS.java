@@ -6,12 +6,9 @@
 package com.dscalzi.virtualshop.commands;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +21,6 @@ import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDB;
-import com.dscalzi.virtualshop.util.PageList;
 import com.dscalzi.virtualshop.util.Reloader;
 import com.dscalzi.vsreloader.PluginUtil;
 
@@ -158,88 +154,11 @@ public class VS implements CommandExecutor{
 	}
 	
 	public void cmdList(CommandSender sender, int page){
-    	final String listPrefix = ChatColor.RED + " • ";
-    	final ChatColor baseColor = mm.getBaseColor();
-    	final ChatColor trimColor = mm.getTrimColor();
-    	final ChatColor descColor = mm.getDescriptionColor();
-    	
-    	List<String> cmds = new ArrayList<String>();
-        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "[maxprice]" + descColor + " - Buy items.");
-        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + descColor + " - Sell items.");
-        cmds.add(listPrefix + trimColor + "/reprice " + ChatColor.BLUE + "<item> " + ChatColor.YELLOW + "<price>" + descColor + " - Reprice a listing.");
-        cmds.add(listPrefix + trimColor + "/cancel "  + ChatColor.GOLD + "<amount> " + ChatColor.BLUE + "<item>" + descColor + " - Remove item from shop.");
-        cmds.add(listPrefix + trimColor + "/find " + ChatColor.BLUE + "<item> " + ChatColor.GRAY + "[page]" + descColor + " - Find offers for the item.");
-        cmds.add(listPrefix + trimColor + "/stock " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page]" + descColor + " - Browse offers.");
-        cmds.add(listPrefix + trimColor + "/sales " + ChatColor.AQUA + "[player] " + ChatColor.GRAY + "[page]" + descColor + " - View transaction log.");
-        cmds.add(listPrefix + trimColor + "/vs" + descColor + " - Virtual Shop's technical commands.");
-        cmds.add(listPrefix + trimColor + "/buy " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle buy confirms.");
-        cmds.add(listPrefix + trimColor + "/sell " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle sell confirms.");
-        cmds.add(listPrefix + trimColor + "/cancel " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle cancel confirms.");
-        cmds.add(listPrefix + trimColor + "/reprice " + ChatColor.GREEN + "confirm " + ChatColor.DARK_GREEN + "[toggle " + ChatColor.YELLOW + "<on/off>" + ChatColor.DARK_GREEN + "]" + descColor + " - Toggle reprice confirms.");
-        
-        PageList<String> commands = new PageList<String>(6, cmds);
-        
-        String header = mm.formatHeaderLength(" " + mm.getPrefix() + " ", this.getClass());
-        String commandKey = trimColor + "              Command List - <Required> [Optional]";
-        String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
-        
-        List<String> pageContent = null;
-        try {
-        	pageContent = commands.getPage(page-1);
-		} catch (IndexOutOfBoundsException e) {
-			mm.invalidPage(sender);
-			return;
-		}
-        
-        sender.sendMessage(header);
-        sender.sendMessage(commandKey);
-        for(String s : pageContent)
-        	sender.sendMessage(s);
-        sender.sendMessage(footer);
-        
+        mm.shopList(sender, page);
 	}
 	
 	public void vsList(CommandSender sender, int page){
-		final String listPrefix = ChatColor.RED + " • ";
-		final ChatColor baseColor = mm.getBaseColor();
-    	final ChatColor trimColor = mm.getTrimColor();
-    	final ChatColor descColor = mm.getDescriptionColor();
-		
-		List<String> cmds = new ArrayList<String>();
-		cmds.add(listPrefix + trimColor + "/shop " + ChatColor.GRAY + "[page]" + descColor + " - View merchant commands.");
-		cmds.add(listPrefix + trimColor + "/vs help " + ChatColor.GRAY + "[page]" + descColor + " - VirtualShop's technical commands.");
-		cmds.add(listPrefix + trimColor + "/vs lookup " + ChatColor.BLUE + "[item]" + descColor + " - Browse item name information.");
-		cmds.add(listPrefix + trimColor + "/vs version" + descColor + " - View plugin's version.");
-		if(sender.hasPermission("virtualshop.admin.formatmarket"))
-			cmds.add(listPrefix + trimColor + "/vs formatmarket " + ChatColor.BLUE + "[item]" + descColor + " - Reprice all items who's market price exceeds the set limit.");
-		if(sender.hasPermission("virtualshop.developer.reload"))
-			cmds.add(listPrefix + trimColor + "/vs reload" + descColor + " - Reload the entire plugin's jar file.");
-		if(sender.hasPermission("virtualshop.admin.reloadconfig"))
-			cmds.add(listPrefix + trimColor + "/vs reloadconfig" + descColor + " - Reload the plugin's configuration.");
-		if(sender.hasPermission("virtualshop.admin.uuidnamesync"))
-			cmds.add(listPrefix + trimColor + "/vs uuidnamesync [uuid]" + descColor + " - Syncs database names with uuids.");
-		
-		
-		PageList<String> commands = new PageList<String>(6, cmds);
-		
-		String header = mm.formatHeaderLength(" " + mm.getPrefix() + " ", this.getClass());
-        String commandKey = trimColor + "              Command List - <Required> [Optional]";
-        String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + page + " of " + commands.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
-		
-        List<String> pageContent = null;
-        try {
-        	pageContent = commands.getPage(page-1);
-		} catch (IndexOutOfBoundsException e) {
-			mm.invalidPage(sender);
-			return;
-		}
-        
-        sender.sendMessage(header);
-        sender.sendMessage(commandKey);
-        for(String s : pageContent)
-        	sender.sendMessage(s);
-        sender.sendMessage(footer);
-        
+		mm.vsList(sender, page);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -249,16 +168,13 @@ public class VS implements CommandExecutor{
 			mm.noPermissions(sender);
 			return;
 		}
-		
-		final ChatColor baseColor = mm.getBaseColor();
-    	final ChatColor trimColor = mm.getTrimColor();
     	
 		ItemStack target = null;
 		
 		//Hand
 		if(args.length == 1 || (args.length > 1 && (args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand") || args[1].equalsIgnoreCase("offhand")))){
 			if(!(sender instanceof Player)){
-				mm.sendError(sender, "You must specify an item!");
+				mm.mustSpecifyItem(sender);
 				return;
 			}
 			Player p = (Player)sender;
@@ -266,7 +182,7 @@ public class VS implements CommandExecutor{
 			else target = p.getInventory().getItemInMainHand();
 			
 			if(target == null){
-				mm.sendError(sender, "Lookup failed. You are not holding an item nor did you specify one.");
+				mm.lookupFailedNull(sender);
 				return;
 			}
 		}
@@ -276,7 +192,7 @@ public class VS implements CommandExecutor{
 			if(target == null){
 				target = idb.unsafeLookup(args[1]);
 				if(target == null){
-					mm.sendError(sender, "Lookup failed. Could not find " + args[1] + " in the database.");
+					mm.lookupFailedNotFound(sender, args[1]);
 					return;
 				}
 			}
@@ -284,32 +200,17 @@ public class VS implements CommandExecutor{
 		
 		//Final check for security.
 		if(target == null){
-			mm.sendError(sender, "Lookup failed, internal error has occurred.");
+			mm.lookupFailedUnknown(sender);
 			return;
 		}
 		
 		//Blocked items.
 		if(target.getTypeId() == 440){
-			mm.sendError(sender, "The vs does not yet support this item. Try again soon!");
+			mm.lookupUnsuported(sender);
 			return;
 		}
 		
-		List<String> aliases = idb.getAliases(target);
-		String formattedAliasList;
-		
-		
-		if(aliases.size() < 1){
-			formattedAliasList = cm.getErrorColor() + "Could not find this item in the database. It's either damaged, not included in the VS, or from a recent update!";
-		} else {
-			formattedAliasList = trimColor + "Viable Names: " + aliases.toString();
-			formattedAliasList = formattedAliasList.replaceAll("\\[", trimColor + "\\[" + baseColor);
-			formattedAliasList = formattedAliasList.replaceAll("\\]", trimColor + "\\]" + baseColor);
-		}
-		
-		String topLine = mm.getPrefix() + " " + mm.formatItem(target.getType().toString(), true).toUpperCase() + trimColor + " - " + mm.formatItem(target.getTypeId() + ":" + target.getData().getData(), true);
-		sender.sendMessage(topLine);
-		sender.sendMessage(baseColor + formattedAliasList);
-		
+		mm.formatLookupResults(sender, target, idb.getAliases(target));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -328,9 +229,9 @@ public class VS implements CommandExecutor{
 			}
 		}
 		if(amt == 0)
-			mm.sendSuccess(sender, "All listings are already correctly formatted!");
+			mm.listingsAlreadyFormatted(sender);
 		else
-			mm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
+			mm.listingsFormatted(sender, amt);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -360,9 +261,9 @@ public class VS implements CommandExecutor{
 			}
 		}
 		if(amt == 0)
-			mm.sendSuccess(sender, "All listings are already correctly formatted!");
+			mm.listingsAlreadyFormatted(sender);
 		else
-			mm.sendSuccess(sender, "Successfully formatted " + amt + " listings.");
+			mm.listingsFormatted(sender, amt);
 	}
 	
 	public void cmdUUIDNameSync(CommandSender sender, Optional<String> uuid){
@@ -377,18 +278,18 @@ public class VS implements CommandExecutor{
 			try {
 				target = UUID.fromString(uuid.get());
 			} catch(IllegalArgumentException e){
-				mm.sendError(sender, "Invalid UUID format.");
+				mm.invalidUUIDFormat(sender);
 				return;
 			}
 			Pair<Boolean, Integer> response = dbm.syncNameToUUID(target);
-			if(response.getKey()) mm.sendSuccess(sender, "The account associated with the specified UUID has been synced.");
-			else if(response.getValue() == 1) mm.sendError(sender, "The account associated with the specified UUID is already synced.");
-			else if(response.getValue() == 404) mm.sendError(sender, "The account associated with the specified UUID was not found in the database.");
-			else mm.sendError(sender, "There was an error while querying the database.");
+			if(response.getKey()) mm.accountSynced(sender);
+			else if(response.getValue() == 1) mm.accountAlreadySynced(sender);
+			else if(response.getValue() == 404) mm.accountNotFound(sender);
+			else mm.queryError(sender);
 		} else {
 			int updated = dbm.syncNameToUUID();
-			if(updated > 0) mm.sendSuccess(sender, "Successfully synced " + updated + ((updated == 1) ? " account." : " accounts."));
-			else mm.sendSuccess(sender, "All account names and UUIDs are already synced!");
+			if(updated > 0) mm.accountsSynced(sender, updated);
+			else mm.accountsAlreadySynced(sender);
 		}
 		
 	}
@@ -465,6 +366,6 @@ public class VS implements CommandExecutor{
 	 *  Never restrict this command.
 	 */
 	public void cmdVersion(CommandSender sender){
-		MessageManager.getInstance().sendMessage(sender, "Virtual Shop version " + plugin.getDescription().getVersion());
+		mm.versionMessage(sender);
 	}
 }

@@ -105,6 +105,21 @@ chat_settings:
 
     #The color of success messages.
     success_color: '&a'
+    
+    #The color of amounts.
+    amount_color: '&6'
+    
+    #The color of items.
+    item_color: '&9'
+    
+    #The color of prices.
+    price_color: '&e'
+    
+    #The color of buyer names.
+    buyer_color: '&b'
+    
+    #The color of seller names.
+    seller_color: '&c'
 
   #-----------------------------------------------
   # VirtualShop automatically centers some listing 

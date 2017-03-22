@@ -109,6 +109,26 @@ public final class ConfigManager {
     	return getChatColor("chat_settings.details.success_color", ChatColor.GREEN);
     }
     
+    public ChatColor getAmountColor(){
+    	return getChatColor("chat_settings.details.amount_color", ChatColor.GOLD);
+    }
+    
+    public ChatColor getItemColor(){
+    	return getChatColor("chat_settings.details.item_color", ChatColor.BLUE);
+    }
+
+    public ChatColor getPriceColor(){
+    	return getChatColor("chat_settings.details.price_color", ChatColor.YELLOW);
+    }
+
+    public ChatColor getBuyerColor(){
+    	return getChatColor("chat_settings.details.buyer_color", ChatColor.AQUA);
+	}
+
+    public ChatColor getSellerColor(){
+    	return getChatColor("chat_settings.details.seller_color", ChatColor.RED);
+    }
+    
     private ChatColor getChatColor(String path, ChatColor def){
     	String s = this.config.getString(path);
     	s = s.replaceAll("\\&", "");
