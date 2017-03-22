@@ -75,6 +75,10 @@ public final class ConfigManager {
     	return (this.config.getString("chat_settings.details.server_name", "Server")).trim();
     }
     
+    public boolean enableVSR(){
+    	return config.getBoolean("general_settings.enable_vsr", true);
+    }
+    
     public Localization getLocalization(){
     	String setting = (this.config.getString("chat_settings.details.localization")).trim();
     	for(Localization lc : Localization.values()){

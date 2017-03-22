@@ -6,12 +6,15 @@
 package com.dscalzi.virtualshop.commands;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,7 +29,7 @@ import com.dscalzi.vsreloader.PluginUtil;
 
 import javafx.util.Pair;
 
-public class VS implements CommandExecutor{
+public class VS implements CommandExecutor, TabCompleter{
 
 	private VirtualShop plugin;
 	private final MessageManager mm;
@@ -108,12 +111,12 @@ public class VS implements CommandExecutor{
 					this.cmdupdateuuid(sender);
 					return true;
 				}
-				if(args[0].equalsIgnoreCase("reload")){
-					this.cmdReload(sender);
+				if(args[0].equalsIgnoreCase("fullreload")){
+					this.cmdFullReload(sender);
 					return true;
 				}
-				if(args[0].equalsIgnoreCase("reloadconfig")){
-					this.cmdReloadConfig(sender);
+				if(args[0].equalsIgnoreCase("reload")){
+					this.cmdReload(sender);
 					return true;
 				}
 				if(args[0].equalsIgnoreCase("version")){
@@ -304,12 +307,12 @@ public class VS implements CommandExecutor{
 		}
 	}
 	
-	public void cmdReload(CommandSender sender){
+	public void cmdFullReload(CommandSender sender){
 		
-		if(!sender.hasPermission("virtualshop.developer.reload")){
-			if(sender.hasPermission("virtualshop.admin.reloadconfig")){
+		if(!sender.hasPermission("virtualshop.developer.fullreload")){
+			if(sender.hasPermission("virtualshop.admin.reload")){
 				mm.sendError(sender, "You do not have permission to reload the plugin, reloading config instead.");
-				this.cmdReloadConfig(sender);
+				this.cmdReload(sender);
 				return;
 			}
 			mm.noPermissions(sender);
@@ -318,7 +321,7 @@ public class VS implements CommandExecutor{
 		if(plugin.getServer().getPluginManager().getPlugin("VSReloader") == null){
 			if(sender.hasPermission("virtualshop.admin.reloadconfig")){
 				mm.sendError(sender, "VS Reloader not found, reloading config instead.");
-				cmdReloadConfig(sender);
+				cmdReload(sender);
 			} else {
 				mm.sendError(sender, "VS Reloader not found, could not reload the plugin.");
 			}
@@ -340,9 +343,9 @@ public class VS implements CommandExecutor{
 		mm.sendSuccess(sender, "Plugin successfully reloaded.");
 	}
 	
-	public void cmdReloadConfig(CommandSender sender){
+	public void cmdReload(CommandSender sender){
 		
-		if(!sender.hasPermission("virtualshop.admin.reloadconfig")){
+		if(!sender.hasPermission("virtualshop.admin.reload")){
 			mm.noPermissions(sender);
             return;
 		}
@@ -367,5 +370,52 @@ public class VS implements CommandExecutor{
 	 */
 	public void cmdVersion(CommandSender sender){
 		mm.versionMessage(sender);
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		
+		List<String> ret = new ArrayList<String>();
+		
+		if(args.length == 1){
+			if(sender.hasPermission("virtualshop.merchant.buy.regular") && "buy".startsWith(args[0].toLowerCase())) 
+				ret.add("buy");
+			if(sender.hasPermission("virtualshop.merchant.sell.regular") && "sell".startsWith(args[0].toLowerCase())) 
+				ret.add("sell");
+			if(sender.hasPermission("virtualshop.merchant.cancel.regular") && "cancel".startsWith(args[0].toLowerCase())) 
+				ret.add("cancel");
+			boolean a = sender.hasPermission("virtualshop.merchant.sales.individual") || sender.hasPermission("virtualshop.merchant.sales.server");
+			if(a && "sales".startsWith(args[0].toLowerCase())) 
+				ret.add("sales");
+			boolean b = sender.hasPermission("virtualshop.merchant.stock.individual") || sender.hasPermission("virtualshop.merchant.stock.server");
+			if(b && "stock".startsWith(args[0].toLowerCase())) 
+				ret.add("stock");
+			if(sender.hasPermission("virtualshop.merchant.find") && "find".startsWith(args[0].toLowerCase())) 
+				ret.add("find");
+			if(sender.hasPermission("virtualshop.merchant.lookup") && "lookup".startsWith(args[0].toLowerCase())) 
+				ret.add("lookup");
+			if(sender.hasPermission("virtualshop.merchant.reprice") && "reprice".startsWith(args[0].toLowerCase())) 
+				ret.add("reprice");
+			if(sender.hasPermission("virtualshop.admin.formatmarket") && "formatmarket".startsWith(args[0].toLowerCase())) 
+				ret.add("formatmarket");
+			if(sender.hasPermission("virtualshop.admin.reload") && "reload".startsWith(args[0].toLowerCase())) 
+				ret.add("reload");
+			if(sender.hasPermission("virtualshop.admin.uuidnamesync") && "uuidnamesync".startsWith(args[0].toLowerCase())) 
+				ret.add("uuidnamesync");
+			if(sender.hasPermission("virtualshop.developer.fullreload") && "fullreload".startsWith(args[0].toLowerCase())) 
+				ret.add("fullreload");
+		}
+		
+		if(args.length == 2){
+			boolean a = sender.hasPermission("virtualshop.merchant.sales.server") && "sales".startsWith(args[0].toLowerCase());
+			boolean b = sender.hasPermission("virtualshop.merchant.stock.server") && "stock".startsWith(args[0].toLowerCase());
+			if(a | b){
+				plugin.getServer().getOnlinePlayers().forEach(player -> {if(player.getName().toLowerCase().startsWith(args[1].toLowerCase())) ret.add(player.getName());});
+				if("@s".startsWith(args[1].toLowerCase()))
+					ret.add("@s");
+			}
+		}
+		
+		return ret.size() > 0 ? ret : null;
 	}
 }

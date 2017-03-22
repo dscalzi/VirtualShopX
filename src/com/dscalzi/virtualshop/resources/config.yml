@@ -25,6 +25,13 @@ general_settings:
     sell: 15000
     reprice: 15000
     cancel: 15000
+    
+  # Choose whether or not to load VS Reloader.
+  # If this is false you cannot use /vs fullreload.
+  # Note that if you disable this you will need to
+  # manually delete VS Reloader from your plugins folder
+  # or it will still be loaded by spigot and be usable.
+  enable_vsr: true
 
 #--------------[Database Settings]--------------
 # Indicate whether you want to use a MySQL database
@@ -33,11 +40,11 @@ general_settings:
 
 database_settings:
 
-  #True for MySQL, false for SQLite.
+  # True for MySQL, false for SQLite.
   using_MySQL: false
   
-  #MySQL Credentials.
-  #If using SQLite, this will be ignored.
+  # MySQL Credentials.
+  # If using SQLite, this will be ignored.
   MySQL:
     port: 3306
     username: username
@@ -45,24 +52,24 @@ database_settings:
     password: password
     database: minecraft
 
-  #User data is stored based on UUID to prevent data loss
-  #through name changes. For database readability, the user's
-  #name is also listed, although it is not used at all for
-  #identification by the plugin. The names are not upated
-  #regularly, therefore if a user changes their name their old
-  #name will be listed in the databse. THE UUID WILL REMAIN THE
-  #SAME THEREFORE IT WILL NOT IMPACT THE PLUGIN OR ITS DATA.
+  # User data is stored based on UUID to prevent data loss
+  # through name changes. For database readability, the user's
+  # name is also listed, although it is not used at all for
+  # identification by the plugin. The names are not upated
+  # regularly, therefore if a user changes their name their old
+  # name will be listed in the databse. THE UUID WILL REMAIN THE
+  # SAME THEREFORE IT WILL NOT IMPACT THE PLUGIN OR ITS DATA.
   #
-  #Below you can choose if you want the plugin to sync the names
-  #stored in the databases automatically. It is recommended NOT to 
-  #turn these on as it can slow down startup/shutdown time as 
-  #the databases get filled with more data.
+  # Below you can choose if you want the plugin to sync the names
+  # stored in the databases automatically. It is recommended NOT to 
+  # turn these on as it can slow down startup/shutdown time as 
+  # the databases get filled with more data.
   #
-  #Manual syncs can be done ingame via /vs uuidnamesync [uuid]
+  # Manual syncs can be done ingame via /vs uuidnamesync [uuid]
   UUID_name_syncs:
-    #Sync stored names when the server starts.
+    # Sync stored names when the server starts.
     on_startup: false
-    #Sync stored names when the server shuts down.
+    # Sync stored names when the server shuts down.
     on_shutdown: false
 
 #----------------[Chat Settings]----------------
@@ -70,55 +77,55 @@ database_settings:
 
 chat_settings:
 
-  #Broadcast when a user sells an item.
+  # Broadcast when a user sells an item.
   broadcast_offers: true
   
   details:
-    #Prefix that will be prepended to each Virtual Shop message.
-    #To add colors to this you must use the format "&<code>".
-    #If the header on commands such as /find, stock, sell, vs, or shop
-    #is too long after changing this, you may need to adjust the pack
-    #sizing below.
+    # Prefix that will be prepended to each Virtual Shop message.
+    # To add colors to this you must use the format "&<code>".
+    # If the header on commands such as /find, stock, sell, vs, or shop
+    # is too long after changing this, you may need to adjust the pack
+    # sizing below.
     msg_prefix: '&7| &2VShop &7|&e'
 
-    #The name of the server, will be used in several messages.
+    # The name of the server, will be used in several messages.
     server_name: Server
 
-    #Localization for number formating. The two supported values are 'US' and 'EU'.
-    #US Format: 1,000.00 | EU Format: 1.000,00 | Symbols are handled by your economy plugin.
+    # Localization for number formating. The two supported values are 'US' and 'EU'.
+    # US Format: 1,000.00 | EU Format: 1.000,00 | Symbols are handled by your economy plugin.
     localization: 'US'
 
-    #This is the base color of the Virtual Shop interface. Usually lighter.
+    # This is the base color of the Virtual Shop interface. Usually lighter.
     base_color: '&7'
 
-    #This is the trim color of the Virtual Shop interface. Usually darker.
+    # This is the trim color of the Virtual Shop interface. Usually darker.
     trim_color: '&2'
 
-    #This will be the color of command help descriptions.
+    # This will be the color of command help descriptions.
     description_color: '&f'
 
-    #Specify the color of message content.
+    # Specify the color of message content.
     message_color: '&e'
 
-    #The color of error messages.
+    # The color of error messages.
     error_color: '&c'
 
-    #The color of success messages.
+    # The color of success messages.
     success_color: '&a'
     
-    #The color of amounts.
+    # The color of amounts.
     amount_color: '&6'
     
-    #The color of items.
+    # The color of items.
     item_color: '&9'
     
-    #The color of prices.
+    # The color of prices.
     price_color: '&e'
     
-    #The color of buyer names.
+    # The color of buyer names.
     buyer_color: '&b'
     
-    #The color of seller names.
+    # The color of seller names.
     seller_color: '&c'
 
   #-----------------------------------------------
@@ -146,7 +153,7 @@ chat_settings:
       atherys:
         sizing: 78
   
-    #Specify a pack id from the supported_packs list.
+    # Specify a pack id from the supported_packs list.
     selected_pack: default
 
 #----------------[Item Settings]----------------

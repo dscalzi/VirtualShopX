@@ -37,7 +37,7 @@ public final class Reloader {
 	
 	/* Method to load this Reloader */
 	private void load(){
-		File dest = new File(new File("plugins") + "/VSReloader.jar");
+		File dest = new File(new File("plugins") + File.separator + "VSReloader.jar");
 		boolean checkForUpdate = true;
 		if(!dest.exists())
 			checkForUpdate = this.loadVSR(dest);

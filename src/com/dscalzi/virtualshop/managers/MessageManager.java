@@ -527,10 +527,10 @@ public final class MessageManager {
 		cmds.add(listPrefix + tColor + "/vs version" + dColor + " - View plugin's version.");
 		if(sender.hasPermission("virtualshop.admin.formatmarket"))
 			cmds.add(listPrefix + tColor + "/vs formatmarket " + iColor + "[item]" + dColor + " - Reprice all items who's market price exceeds the set limit.");
-		if(sender.hasPermission("virtualshop.developer.reload"))
-			cmds.add(listPrefix + tColor + "/vs reload" + dColor + " - Reload the entire plugin's jar file.");
-		if(sender.hasPermission("virtualshop.admin.reloadconfig"))
-			cmds.add(listPrefix + tColor + "/vs reloadconfig" + dColor + " - Reload the plugin's configuration.");
+		if(sender.hasPermission("virtualshop.admin.reload"))
+			cmds.add(listPrefix + tColor + "/vs reload" + dColor + " - Reload the plugin's configuration.");
+		if(sender.hasPermission("virtualshop.developer.fullreload"))
+			cmds.add(listPrefix + tColor + "/vs fullreload" + dColor + " - Reload the entire plugin's jar file.");
 		if(sender.hasPermission("virtualshop.admin.uuidnamesync"))
 			cmds.add(listPrefix + tColor + "/vs uuidnamesync [uuid]" + dColor + " - Syncs database names with uuids.");
 		

@@ -70,7 +70,7 @@ permissions:
       virtualshop.admin.*:
         children:
           virtualshop.admin.formatmarket: true
-          virtualshop.admin.reloadconfig: true
+          virtualshop.admin.reload: true
           virtualshop.admin.uuidnamesync: true
           virtualshop.admin.reprice.others: true
-      virtualshop.developer.reload: true
+      virtualshop.developer.fullreload: true

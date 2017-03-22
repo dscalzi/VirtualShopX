@@ -10,6 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import com.dscalzi.virtualshop.VirtualShop;
@@ -20,9 +21,10 @@ import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.util.PageList;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Sales implements CommandExecutor{
+public class Sales implements CommandExecutor, TabCompleter{
 	
 	private VirtualShop plugin;
 	private final MessageManager mm;
@@ -140,7 +142,21 @@ public class Sales implements CommandExecutor{
 			sender.sendMessage(mm.formatTransaction(t));
 		}
 		sender.sendMessage(footer);
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		List<String> ret = new ArrayList<String>();
 		
+		if(args.length == 1){
+			if(sender.hasPermission("virtualshop.merchant.sales.server")){
+				plugin.getServer().getOnlinePlayers().forEach(player -> {if(player.getName().toLowerCase().startsWith(args[0].toLowerCase())) ret.add(player.getName());});
+				if("@s".startsWith(args[0].toLowerCase()))
+					ret.add("@s");
+			}
+		}
+		
+		return ret.size() > 0 ? ret : null;
 	}
 
 }

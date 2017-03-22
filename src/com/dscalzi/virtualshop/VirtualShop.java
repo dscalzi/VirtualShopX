@@ -54,7 +54,8 @@ public class VirtualShop extends JavaPlugin {
         DatabaseManager.initialize(this);
         if(DatabaseManager.getInstance().getConnectionType() == ConnectionType.VOID)
         	this.getPluginLoader().disablePlugin(this);
-        Reloader.initialize(this);
+        if(ConfigManager.getInstance().enableVSR())
+        	Reloader.initialize(this);
         this.registerCommands();
         if(ConfigManager.getInstance().uuidSyncOnEnable()) this.syncNameToUUID();
         this.metrics = new Metrics(this);

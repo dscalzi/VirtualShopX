@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -27,9 +28,10 @@ import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.Numbers;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Buy implements CommandExecutor, Confirmable{
+public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
@@ -73,10 +75,6 @@ public class Buy implements CommandExecutor, Confirmable{
 		if(args.length > 0){
 			if(args[0].equalsIgnoreCase("confirm")){
 				if(args.length > 1){
-					if(args.length > 2 && args[1].equalsIgnoreCase("toggle") ){
-						toggleConfirmations(player, label, args);
-						return true;
-					}
 					if(args[1].equalsIgnoreCase("toggle")){
 						toggleConfirmations(player, label, args);
 						return true;
@@ -281,23 +279,31 @@ public class Buy implements CommandExecutor, Confirmable{
 	}
 	
 	private void toggleConfirmations(Player player, String label, String[] args){
-		if(args.length < 3){
-			mm.sendMessage(player, "You may turn buy confirmations on or off using /" + label + " confirm toggle <on/off>");
-			return;
-		}
-		String value = args[2];
-		if(value.equalsIgnoreCase("on")){
-			mm.sendSuccess(player, "Buy confirmations turned on. To undo this /" + label + " confirm toggle off");
+		boolean enabled = dbm.getToggle(player.getUniqueId(), this.getClass());
+		if(!enabled){
+			mm.sendSuccess(player, "Buy confirmations turned on. To undo this /" + label + " confirm toggle.");
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
 			return;
-		}
-			
-		if(value.equalsIgnoreCase("off")){
-			mm.sendSuccess(player, "Buy confirmations turned off. To undo this /" + label + " confirm toggle on");
+		} else {
+			mm.sendSuccess(player, "Buy confirmations turned off. To undo this /" + label + " confirm toggle.");
 			confirmations.unregister(this.getClass(), player);
 			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
 			return;
 		}
-		mm.sendMessage(player, "You may turn buy confirmations on or off using /" + label + " confirm toggle <on/off>");
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		List<String> ret = new ArrayList<String>();
+		
+		if(args.length == 1)
+			if("confirm".startsWith(args[0].toLowerCase()))
+				ret.add("confirm");
+		
+		if(args.length == 2)
+			if("toggle".startsWith(args[1].toLowerCase()))
+				ret.add("toggle");
+		
+		return ret.size() > 0 ? ret : null;
 	}
 }
