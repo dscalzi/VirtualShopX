@@ -107,12 +107,7 @@ public class VirtualShop extends JavaPlugin {
     }
     
     public static boolean hasEnough(Player player, double money){
-        double balance = econ.getBalance(player) - money;
-        if (balance > 0){
-            return true;
-        } else {
-            return false;
-        }
+    	return econ.getBalance(player) - money >= 0;
     }
     
     public static Economy getEconomy(){

@@ -202,20 +202,28 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 		return price;
 	}
 	
-	private Offer validateData(ItemStack item){
-		return validateData(item, parsePrice(item));
+	private Offer validateData(Player player, ItemStack item){
+		return validateData(player, item, parsePrice(item));
 	}
 	
-	private Offer validateData(ItemStack item, Double price){
+	private Offer validateData(Player player, ItemStack item, Double price){
 		if(price == null) return null;
-		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(item, ItemDB.formatEnchantData(item.getEnchantments()), price);
+		ItemStack i = ItemDB.getCleanedItem(item);
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price);
+		for(Offer o : matches)
+			if(!o.getSellerUUID().equals(player.getUniqueId()))
+				return o;
+		
 		return matches.size() > 0 ? matches.get(0) : null;
 	}
 	
 	private void finalizeTransaction(Player p, Offer o){
+		ItemStack cleaned = ItemDB.getCleanedItem(o.getItem());
+		VirtualShop.getEconomy().withdrawPlayer(p, o.getPrice());
+		VirtualShop.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(o.getSellerUUID()), o.getPrice());
+		mm.ebuySuccessVendor(p, o.getSellerUUID(), cleaned, o.getPrice());
 		DatabaseManager.getInstance().deleteEnchantedItem(o.getId());
 		InventoryManager im = new InventoryManager(p);
-		ItemStack cleaned = ItemDB.getCleanedItem(o.getItem());
 		im.addItem(cleaned);
 		mm.ebuySuccess(p, cleaned);
 	}
@@ -240,18 +248,22 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 					return;
 				}
 				if(ItemDB.hasEnchantments(event.getCurrentItem())){
-					Offer match = this.validateData(event.getCurrentItem());
+					Offer match = this.validateData(player, event.getCurrentItem());
 					if(match != null){
-						if(VirtualShop.hasEnough(player, match.getPrice())){
-							if(dbm.getToggle(player.getUniqueId(), this.getClass())){
-								ETransactionData d = new ETransactionData(match.getItem(), match.getPrice(), System.currentTimeMillis());
-								confirmations.register(this.getClass(), player, d);
-								mm.eBuyConfirmation(player, latestLabel.get(player), d);
+						if(!match.getSellerUUID().equals(player.getUniqueId())){
+							if(VirtualShop.hasEnough(player, match.getPrice())){
+								if(dbm.getToggle(player.getUniqueId(), this.getClass())){
+									ETransactionData d = new ETransactionData(match.getItem(), match.getPrice(), System.currentTimeMillis());
+									confirmations.register(this.getClass(), player, d);
+									mm.eBuyConfirmation(player, latestLabel.get(player), d);
+								} else {
+									finalizeTransaction(player, match);
+								}
 							} else {
-								finalizeTransaction(player, match);
+								mm.ranOutOfMoney(player);
 							}
 						} else {
-							mm.ranOutOfMoney(player);
+							mm.cantBuyOwnItem(player);
 						}
 					} else {
 						mm.invalidConfirmData(player);
@@ -268,9 +280,13 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 			return;
 		}
 		ETransactionData d = (ETransactionData)confirmations.retrieve(this.getClass(), player);
-		Offer match = validateData(d.getItem(), d.getPrice());
+		Offer match = validateData(player, d.getItem(), d.getPrice());
 		if(match == null){
 			mm.invalidConfirmData(player);
+			return;
+		}
+		if(match.getSellerUUID().equals(player.getUniqueId())){
+			mm.cantBuyOwnItem(player);
 			return;
 		}
 		ItemStack cM = ItemDB.getCleanedItem(match.getItem());

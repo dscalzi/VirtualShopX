@@ -246,6 +246,8 @@ public final class DatabaseManager {
 	    		stmt.executeUpdate("update vshop_toggles set merchant='" + newName.get() + "' where uuid='" + uuid.toString() + "'");
 				//Update stock table
 	    		stmt.executeUpdate("update vshop_stock set seller='" + newName.get() + "' where uuid='" + uuid.toString() + "'");
+	    		//Update estock table
+	    		stmt.executeUpdate("update vshop_estock set merchant='" + newName.get() + "' where uuid='" + uuid.toString() + "'");
 				//Update transaction table'
 	    		stmt.executeUpdate("update vshop_transactions set buyer='" + newName.get() + "' where buyer_uuid='" + uuid.toString() + "'");
 	    		stmt.executeUpdate("update vshop_transactions set seller='" + newName.get() + "' where seller_uuid='" + uuid.toString() + "'");

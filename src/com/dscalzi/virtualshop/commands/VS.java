@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,6 +32,9 @@ import javafx.util.Pair;
 
 public class VS implements CommandExecutor, TabCompleter{
 
+	private static final Pattern redirects = Pattern.compile("^(?iu)(buy|sell|cancel|find|reprice|stock|sales|ebuy|esell|ecancel)");
+	private static final Pattern confirmables = Pattern.compile("^(?iu)(buy|sell|cancel|reprice|ebuy|esell|ecancel)");
+	
 	private VirtualShop plugin;
 	private final MessageManager mm;
 	private final ConfigManager cm;
@@ -83,7 +87,7 @@ public class VS implements CommandExecutor, TabCompleter{
 					this.vsList(sender, 1);
 					return true;
 				}
-				if(args[0].matches("^(?iu)(buy|sell|cancel|find|reprice|stock|sales)")){
+				if(redirects.matcher(args[0]).matches()){
 					this.redirectCommand(sender, args);
 					return true;
 				}
@@ -380,10 +384,16 @@ public class VS implements CommandExecutor, TabCompleter{
 		if(args.length == 1){
 			if(sender.hasPermission("virtualshop.merchant.regular.buy") && "buy".startsWith(args[0].toLowerCase())) 
 				ret.add("buy");
+			if(sender.hasPermission("virtualshop.merchant.enchanted.buy") && "buy".startsWith(args[0].toLowerCase())) 
+				ret.add("ebuy");
 			if(sender.hasPermission("virtualshop.merchant.regular.sell") && "sell".startsWith(args[0].toLowerCase())) 
 				ret.add("sell");
+			if(sender.hasPermission("virtualshop.merchant.enchanted.sell") && "sell".startsWith(args[0].toLowerCase())) 
+				ret.add("ssell");
 			if(sender.hasPermission("virtualshop.merchant.regular.cancel") && "cancel".startsWith(args[0].toLowerCase())) 
 				ret.add("cancel");
+			if(sender.hasPermission("virtualshop.merchant.enchanted.cancel") && "cancel".startsWith(args[0].toLowerCase())) 
+				ret.add("ecancel");
 			if(sender.hasPermission("virtualshop.merchant.sales.individual") && "sales".startsWith(args[0].toLowerCase())) 
 				ret.add("sales");
 			if(sender.hasPermission("virtualshop.merchant.stock.individual") && "stock".startsWith(args[0].toLowerCase())) 
@@ -412,6 +422,16 @@ public class VS implements CommandExecutor, TabCompleter{
 				if("@s".startsWith(args[1].toLowerCase()))
 					ret.add("@s");
 			}
+		}
+		
+		if(confirmables.matcher(args[0]).matches()){
+			if(args.length == 2)
+				if("confirm".startsWith(args[1].toLowerCase()))
+					ret.add("confirm");
+			
+			if(args.length == 3)
+				if("toggle".startsWith(args[2].toLowerCase()))
+					ret.add("toggle");
 		}
 		
 		return ret.size() > 0 ? ret : null;

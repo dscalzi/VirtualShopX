@@ -10,6 +10,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -290,6 +291,10 @@ public final class MessageManager {
 		sendError(sender, "You must specify an item!");
 	}
 	
+	public void cantBuyOwnItem(CommandSender sender){
+		sendError(sender, "You cannot buy your own item!");
+	}
+	
 	public void lookupFailedNull(CommandSender sender){
 		sendError(sender, "Lookup failed. You are not holding an item nor did you specify one.");
 	}
@@ -521,6 +526,21 @@ public final class MessageManager {
     	sendFormattedMessage(player, a);
     }
     
+    public void ebuySuccessVendor(Player buyer, UUID sellerUUID, ItemStack item, double price){
+    	Player p = plugin.getServer().getPlayer(sellerUUID);
+    	if(p == null) return;
+    	ComponentBuilder b = new ComponentBuilder(buyer.getName()).color(getBuyerColor().asBungee());
+    	b.append(" just bought your enchanted ", FormatRetention.NONE).color(getSuccessColor().asBungee());
+    	b.append(" for ");
+    	b.append(formatPrice(price), FormatRetention.NONE).color(getPriceColor().asBungee());
+    	b.append(".", FormatRetention.NONE).color(getSuccessColor().asBungee());
+    	
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(2, formatEnchantedItem(idb.reverseLookup(item), item));
+    	
+    	sendFormattedMessage(p, a);
+    }
+        
     public void ecancelSuccess(Player player, ItemStack item){
     	ComponentBuilder b = new ComponentBuilder("Removed an enchanted ").color(getSuccessColor().asBungee());
     	b.append(".");
@@ -542,6 +562,7 @@ public final class MessageManager {
     	final String listPrefix = ChatColor.RED.toString() + b + " ";
     	
     	List<String> cmds = new ArrayList<String>();
+        cmds.add(listPrefix + tColor + "/vs" + dColor + " - Virtual Shop's technical commands.");
         cmds.add(listPrefix + tColor + "/buy " + aColor + "<amount> " + iColor + "<item> " + pColor + "[maxprice]" + dColor + " - Buy items.");
         cmds.add(listPrefix + tColor + "/sell " + aColor + "<amount> " + iColor + "<item> " + pColor + "<price>" + dColor + " - Sell items.");
         cmds.add(listPrefix + tColor + "/reprice " + iColor + "<item> " + pColor + "<price>" + dColor + " - Reprice a listing.");
@@ -549,11 +570,10 @@ public final class MessageManager {
         cmds.add(listPrefix + tColor + "/find " + iColor + "<item> " + ChatColor.GRAY + "[page]" + dColor + " - Find offers for the item.");
         cmds.add(listPrefix + tColor + "/stock " + seColor + "[player] " + ChatColor.GRAY + "[page]" + dColor + " - Browse offers.");
         cmds.add(listPrefix + tColor + "/sales " + seColor + "[player] " + ChatColor.GRAY + "[page]" + dColor + " - View transaction log.");
-        cmds.add(listPrefix + tColor + "/vs" + dColor + " - Virtual Shop's technical commands.");
-        cmds.add(listPrefix + tColor + "/buy " + sColor + "confirm " + ChatColor.DARK_GREEN + "toggle " + dColor + " - Toggle buy confirms.");
-        cmds.add(listPrefix + tColor + "/sell " + sColor + "confirm " + ChatColor.DARK_GREEN + "toggle " + dColor + " - Toggle sell confirms.");
-        cmds.add(listPrefix + tColor + "/cancel " + sColor + "confirm " + ChatColor.DARK_GREEN + "toggle " + dColor + " - Toggle cancel confirms.");
-        cmds.add(listPrefix + tColor + "/reprice " + sColor + "confirm " + ChatColor.DARK_GREEN + "toggle " + dColor + " - Toggle reprice confirms.");
+        cmds.add(listPrefix + tColor + "/ebuy " + iColor + "<item> " + dColor + " - Browse and buy enchanted items.");
+        cmds.add(listPrefix + tColor + "/esell " + iColor + "<item> " + dColor + " - Sell enchanted items." );
+        cmds.add(listPrefix + tColor + "/ecancel " + "<item> " + dColor + " - Cancel enchanted items.");
+        cmds.add(listPrefix + tColor + "/<command> " + sColor + "confirm " + ChatColor.DARK_GREEN + "toggle " + dColor + " - Toggle confirmations for <command>.");
         
         PageList<String> commands = new PageList<String>(6, cmds);
         

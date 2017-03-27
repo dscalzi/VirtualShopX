@@ -5,6 +5,7 @@
  */
 package com.dscalzi.virtualshop.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -218,8 +219,8 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
             spent += cost;
             if(finalize){
             	VirtualShop.getEconomy().withdrawPlayer(player, cost);
-            	VirtualShop.getEconomy().depositPlayer(o.getSeller(), cost);
-            	mm.sendSuccess(o.getSeller(), mm.formatSeller(player.getName()) + cm.getSuccessColor() + " just bought " + mm.formatAmount(canbuy) + " " + mm.formatItem(args[1], true) + cm.getSuccessColor() + " for " + mm.formatPrice(cost));
+            	VirtualShop.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(o.getSellerUUID()), cost);
+            	mm.sendSuccess(o.getSeller(), mm.formatBuyer(player.getName()) + cm.getSuccessColor() + " just bought " + mm.formatAmount(canbuy) + " " + mm.formatItem(args[1], true) + cm.getSuccessColor() + " for " + mm.formatPrice(cost));
             	int left = o.getItem().getAmount() - canbuy;
             	if(left < 1) 
             		dbm.deleteItem(o.getId());

@@ -210,7 +210,8 @@ public class ECancel implements CommandExecutor, Listener, Confirmable, TabCompl
 	
 	private Offer validateData(Player player, ItemStack item, Double price){
 		if(price == null) return null;
-		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(item, ItemDB.formatEnchantData(item.getEnchantments()), price);
+		ItemStack i = ItemDB.getCleanedItem(item);
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price);
 		for(Offer o : matches)
 			if(o.getSellerUUID().equals(player.getUniqueId()))
 				return o;
