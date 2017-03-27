@@ -119,11 +119,19 @@ public class InventoryManager {
     			openNum += 64;
     			continue;
     		} else if(inv[i].isSimilar(item)){
-    			openNum += (64-inv[i].getAmount());
+    			int m = inv[i].getMaxStackSize();
+    			if(m < 0) m = 64;
+    			int guess = m-inv[i].getAmount();
+    			if(guess < 0) guess = 0;
+    			openNum += guess;
     		}
     	}
         if(_inv.getItemInOffHand().isSimilar(item)){
-        	openNum += (64-_inv.getItemInOffHand().getAmount());
+        	int m = _inv.getItemInOffHand().getMaxStackSize();
+			if(m < 0) m = 64;
+			int guess = m-_inv.getItemInOffHand().getAmount();
+			if(guess < 0) guess = 0;
+        	openNum += guess;
         } else if(_inv.getItemInOffHand().getType() == Material.AIR){
         	openNum += 64;
         }

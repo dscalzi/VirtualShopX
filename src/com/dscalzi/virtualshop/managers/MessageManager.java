@@ -29,11 +29,13 @@ import com.dscalzi.virtualshop.commands.Stock;
 import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.commands.enchanted.EBuy;
+import com.dscalzi.virtualshop.commands.enchanted.ECancel;
 import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.objects.dataimpl.CancelData;
+import com.dscalzi.virtualshop.objects.dataimpl.ECancelData;
 import com.dscalzi.virtualshop.objects.dataimpl.EListingData;
 import com.dscalzi.virtualshop.objects.dataimpl.ETransactionData;
 import com.dscalzi.virtualshop.objects.dataimpl.ListingData;
@@ -461,6 +463,20 @@ public final class MessageManager {
     	confirmationMsg(player, label, Cancel.class);
     }
     
+    public void eCancelConfirmation(Player player, String label, ECancelData data){
+    	ComponentBuilder b = new ComponentBuilder("You are about to cancel an enchanted ").color(getColor().asBungee());
+    	b.append(".", FormatRetention.NONE).color(getColor().asBungee());
+    	
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getCleanedItem()));
+    	
+    	sendFormattedMessage(player, a);
+    	
+    	if(1 > data.getInventorySpace())
+			sendError(player, getString("Currently, you have space for none. Excess will be dropped around you."));
+    	confirmationMsg(player, label, ECancel.class);
+    }
+    
     public void repriceConfirmation(Player player, String label, ListingData data){
     	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
     	sendMessage(player, getString("You are about to update the price of your {0} for a {1} price of {2} each.", formatItem(idb.reverseLookup(data.getItem())), quantity, formatPrice(data.getPrice())));
@@ -470,7 +486,7 @@ public final class MessageManager {
     
     public void confirmationMsg(Player player, String label, Class<? extends Confirmable> origin){
     	
-    	String type = origin == Reprice.class || origin == Cancel.class ? "request" : "transaction";
+    	String type = origin == Reprice.class || origin == Cancel.class || origin == ECancel.class ? "request" : "transaction";
     	
     	ComponentBuilder b = new ComponentBuilder("Please type ");
     	b.color(getColor().asBungee());
@@ -485,7 +501,7 @@ public final class MessageManager {
     }
 	
     public void confirmationToggleMsg(Player player, String label, boolean enabled, Class<? extends Confirmable> origin){
-    	String name = origin == ESell.class ? "Sell" : origin == EBuy.class ? "Buy" : origin.getSimpleName();
+    	String name = origin.getSimpleName();
     	
     	ComponentBuilder b = new ComponentBuilder(getString("{0} confirmations turned {1}. To undo this ", name, enabled ? "on" : "off")).color(getSuccessColor().asBungee());
     	b.append(getString("/{0} confirm toggle", label));
@@ -497,7 +513,16 @@ public final class MessageManager {
     }
     
     public void ebuySuccess(Player player, ItemStack item){
-    	ComponentBuilder b = new ComponentBuilder("Managed to buy a ").color(getSuccessColor().asBungee());
+    	ComponentBuilder b = new ComponentBuilder("Managed to buy an enchanted ").color(getSuccessColor().asBungee());
+    	b.append(".");
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), item));
+    	
+    	sendFormattedMessage(player, a);
+    }
+    
+    public void ecancelSuccess(Player player, ItemStack item){
+    	ComponentBuilder b = new ComponentBuilder("Removed an enchanted ").color(getSuccessColor().asBungee());
     	b.append(".");
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
     	a.add(1, formatEnchantedItem(idb.reverseLookup(item), item));

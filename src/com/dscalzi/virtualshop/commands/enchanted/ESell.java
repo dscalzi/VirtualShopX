@@ -52,7 +52,7 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
             mm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.merchant.sell.enchanted")){
+		if(!sender.hasPermission("virtualshop.merchant.enchanted.sell")){
             mm.noPermissions(sender);
             return true;
         }

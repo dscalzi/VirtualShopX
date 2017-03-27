@@ -28,9 +28,12 @@ general_settings:
   # 0 < time, otherwise it will be set to 15 seconds.
   confirmation_timeouts:
     buy: 15000
+    ebuy: 15000
     sell: 15000
+    esell: 15000
     reprice: 15000
     cancel: 15000
+    ecancel: 15000
     
   # Choose whether or not to load VS Reloader.
   # If this is false you cannot use /vs fullreload.

@@ -12,23 +12,29 @@ import org.bukkit.inventory.ItemStack;
 import com.dscalzi.virtualshop.objects.VsDataCache;
 import com.dscalzi.virtualshop.util.ItemDB;
 
-public class ETransactionData implements VsDataCache{
+public class ECancelData implements VsDataCache{
 
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = -6990185031969663445L;
+	
 	private Map<String,Object> serializedItem;
 	private long timeSince;
 	
+	private final int INVENTORYSPACE;
+	private final double PRICE;
 	private transient ItemStack ITEM;
 	private transient ItemStack CLEANEDITEM;
-	private final double PRICE;
 	private long TIME;
 	
-	public ETransactionData(ItemStack item, double price, long time){
+	public ECancelData(ItemStack item, double price, int inventorySpace, long systemTime){
 		this.ITEM = item;
 		this.CLEANEDITEM = ItemDB.getCleanedItem(item);
 		this.PRICE = price;
-		this.TIME = time;
+		this.INVENTORYSPACE = inventorySpace;
+		this.TIME = systemTime;
+	}
+	
+	public int getInventorySpace(){
+		return this.INVENTORYSPACE;
 	}
 	
 	public ItemStack getItem(){
@@ -44,7 +50,7 @@ public class ETransactionData implements VsDataCache{
 	}
 	
 	@Override
-	public long getTransactionTime(){
+	public long getTransactionTime() {
 		return this.TIME;
 	}
 
@@ -61,18 +67,18 @@ public class ETransactionData implements VsDataCache{
 		TIME = System.currentTimeMillis() - timeSince;
 	}
 	
-	/** 
-	 * Compares the transaction data excluding the system time.
-	 */
+	@Override
 	public boolean equals(Object other){
-		if(!(other instanceof ETransactionData))
+		if(!(other instanceof ECancelData))
 			return false;
-		ETransactionData o = (ETransactionData) other;
-		if (this == other) 
-            return true;
-		if(!this.getItem().equals(o.getItem()))
-			return false;
+		ECancelData o = (ECancelData) other;
+		if(this == other) 
+			return true;
 		if(this.getPrice() != o.getPrice())
+			return false;
+		if(this.getInventorySpace() != o.getInventorySpace())
+			return false;
+		if(!this.getItem().equals(o.getItem()))
 			return false;
 		return true;
 	}

@@ -15,10 +15,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
-import com.dscalzi.virtualshop.commands.Buy;
-import com.dscalzi.virtualshop.commands.Sell;
-import com.dscalzi.virtualshop.commands.enchanted.EBuy;
-import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.util.Localization;
 
@@ -170,8 +166,6 @@ public final class ConfigManager {
 	}
 	
 	public int getConfirmationTimeout(Class<? extends Confirmable> clazz){
-		if(clazz == ESell.class) clazz = Sell.class;
-		if(clazz == EBuy.class) clazz = Buy.class;
 		int time = this.config.getInt("general_settings.confirmation_timeouts." + (clazz.getSimpleName().toLowerCase()), 15000);
 		return (time > 0) ? time : 15000;
 	}

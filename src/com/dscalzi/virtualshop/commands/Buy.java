@@ -58,7 +58,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 			mm.denyConsole(sender);
 			return true;
 		}
-		if(!sender.hasPermission("virtualshop.merchant.buy.regular")){
+		if(!sender.hasPermission("virtualshop.merchant.regular.buy")){
             mm.noPermissions(sender);
             return true;
         }

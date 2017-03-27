@@ -55,7 +55,7 @@ public class Cancel implements CommandExecutor, Confirmable, TabCompleter{
             mm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.merchant.cancel.regular")){
+		if(!sender.hasPermission("virtualshop.merchant.regular.cancel")){
             mm.noPermissions(sender);
             return true;
         }

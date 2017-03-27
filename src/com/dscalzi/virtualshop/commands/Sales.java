@@ -80,7 +80,7 @@ public class Sales implements CommandExecutor, TabCompleter{
 	        		target = plugin.getServer().getOfflinePlayer(args[0]);
 	        	}
 	        	if(args[0].equalsIgnoreCase(serverConstant)){
-	        		if(!sender.hasPermission("virtualshop.merchant.sales.server")){
+	        		if(!sender.hasPermission("virtualshop.merchant.sales.*")){
 	        			mm.sendError(sender, "You do not have permission to lookup the full server transaction log.");
 	        			return;
 	        		}
@@ -147,7 +147,7 @@ public class Sales implements CommandExecutor, TabCompleter{
 		List<String> ret = new ArrayList<String>();
 		
 		if(args.length == 1){
-			if(sender.hasPermission("virtualshop.merchant.sales.server")){
+			if(sender.hasPermission("virtualshop.merchant.sales.*")){
 				plugin.getServer().getOnlinePlayers().forEach(player -> {if(player.getName().toLowerCase().startsWith(args[0].toLowerCase())) ret.add(player.getName());});
 				if("@s".startsWith(args[0].toLowerCase()))
 					ret.add("@s");

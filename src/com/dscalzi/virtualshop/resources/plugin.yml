@@ -21,6 +21,9 @@ commands:
   cancel:
     description: Removes items from VirtualShop.
     usage: /<command> <item>
+  ecancel:
+    description: Remove enchanted items from the VirtualShop.
+    usage: /<command> <item>
   find:
     description: Find offers for an item.
     usage: /<command> <item>
@@ -44,29 +47,25 @@ permissions:
     children:
       virtualshop.merchant.*:
         children:
-          virtualshop.merchant.buy.*:
-            children:
-              virtualshop.merchant.buy.regular: true
-              virtualshop.merchant.buy.enchanted: true
-          virtualshop.merchant.cancel.*:
-            children:
-              virtualshop.merchant.cancel.regular: true
-              virtualshop.merchant.cancel.enchanted: true
-          virtualshop.merchant.find: true
           virtualshop.merchant.lookup: true
+          virtualshop.merchant.find: true
+          virtualshop.merchant.reprice: true
+          virtualshop.merchant.regular.*:
+            children:
+              virtualshop.merchant.regular.buy: true
+              virtualshop.merchant.regular.cancel: true
+              virtualshop.merchant.sell.regular: true
+          virtualshop.merchant.enchanted.*:
+            children:
+              virtualshop.merchant.enchanted.buy: true
+              virtualshop.merchant.enchanted.cancel: true
+              virtualshop.merchant.enchanted.sell: true
           virtualshop.merchant.sales.*:
             children:
               virtualshop.merchant.sales.individual: true
-              virtualshop.merchant.sales.server: true
-          virtualshop.merchant.sell.*:
-            children:
-              virtualshop.merchant.sell.regular: true
-              virtualshop.merchant.sell.enchanted: true
           virtualshop.merchant.stock.*:
             children:
               virtualshop.merchant.stock.individual: true
-              virtualshop.merchant.stock.server: true
-          virtualshop.merchant.reprice: true
       virtualshop.admin.*:
         children:
           virtualshop.admin.formatmarket: true

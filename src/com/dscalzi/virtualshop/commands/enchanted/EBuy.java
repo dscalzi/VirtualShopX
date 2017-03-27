@@ -22,7 +22,6 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -30,10 +29,12 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.MessageManager;
+import com.dscalzi.virtualshop.managers.UIManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Confirmable;
+import com.dscalzi.virtualshop.objects.InventoryCache;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.dataimpl.ETransactionData;
 import com.dscalzi.virtualshop.util.InventoryManager;
@@ -45,12 +46,12 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 	
 	private final MessageManager mm;
 	private final ConfigManager cm;
+	private final UIManager uim;
 	private final ConfirmationManager confirmations;
 	private final DatabaseManager dbm;
 	private final ItemDB idb;
 	
 	private VirtualShop plugin;
-	private Map<Player, InventoryCache> activeInventories;
 	private Map<Player, String> latestLabel;
 	
 	private ItemStack[] utility;
@@ -58,10 +59,10 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 	public EBuy(VirtualShop plugin){
 		this.plugin = plugin;
 		this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
-		this.activeInventories = new HashMap<Player, InventoryCache>();
 		this.latestLabel = new HashMap<Player, String>();
 		this.mm = MessageManager.getInstance();
 		this.cm = ConfigManager.getInstance();
+		this.uim = UIManager.getInstance();
 		this.confirmations = ConfirmationManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.idb = ItemDB.getInstance();
@@ -81,7 +82,7 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
-		if(!sender.hasPermission("virtualshop.merchant.buy.enchanted")){
+		if(!sender.hasPermission("virtualshop.merchant.enchanted.buy")){
             mm.noPermissions(sender);
             return true;
         }
@@ -90,7 +91,6 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 			return true;
 		}
 		Player player = (Player)sender;
-		if(activeInventories.containsKey(player)) this.activeInventories.remove(player);
 		if(!cm.getAllowedWorlds().contains(player.getWorld().getName())){
 			mm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
@@ -141,8 +141,6 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 	}
 	
 	private void goToPage(Player player, ItemStack item, int page){	
-		if(activeInventories.containsKey(player)) activeInventories.remove(player);
-		
 		List<Offer> offers = dbm.getEnchantedOffers(item);
 		if(offers.size() == 0){
 			mm.noListings(player, idb.reverseLookup(item));
@@ -181,17 +179,16 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 		inventory.setItem(6, utility[0]);
 		
 		int itemCount = 14*(page-1);
-		for(int i=19; i<offers.size()+19 && i<36 && itemCount < offers.size(); ++i){
+		for(int i=19; i<36 && itemCount < offers.size(); ++i){
 			if((i+1)%9 == 0) i+=2;
 			if(i<inventory.getSize())
 				inventory.setItem(i, offers.get(itemCount).getItem());
 			++itemCount;
 		}
-		player.openInventory(inventory);
-		activeInventories.put(player, new InventoryCache(inventory, item, page));
+		uim.openUI(player, inventory, item, this.getClass(), page);
 	}
 	
-	private Offer validateData(ItemStack item){
+	private Double parsePrice(ItemStack item){
 		List<String> lore = item.getItemMeta().getLore();
 		Double price = null;
 		for(String s : lore){
@@ -202,6 +199,14 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 				price = n == null ? null : n.doubleValue();
 			}
 		}
+		return price;
+	}
+	
+	private Offer validateData(ItemStack item){
+		return validateData(item, parsePrice(item));
+	}
+	
+	private Offer validateData(ItemStack item, Double price){
 		if(price == null) return null;
 		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(item, ItemDB.formatEnchantData(item.getEnchantments()), price);
 		return matches.size() > 0 ? matches.get(0) : null;
@@ -220,18 +225,19 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 		if(!(event.getWhoClicked() instanceof Player)) return;
 		if(event.getCurrentItem() == null) return;
 		Player player = (Player)event.getWhoClicked();
-		if(activeInventories.containsKey(player)){
-			if(activeInventories.get(player).getInventory().equals(event.getInventory())){
+		if(uim.contains(player, this.getClass())){
+			InventoryCache c = uim.retrieve(player, this.getClass());
+			if(c.getInventory().equals(event.getInventory())){
 				event.setResult(Result.DENY);
 				//Next button
 				if(event.getCurrentItem().equals(utility[0])){
-					InventoryCache ic = activeInventories.get(player);
-					goToPage(player, ic.getItem(), ic.getPage()+1);
+					goToPage(player, c.getItem(), c.getPage()+1);
+					return;
 				}
 				//Previous button
 				if(event.getCurrentItem().equals(utility[1])){
-					InventoryCache ic = activeInventories.get(player);
-					goToPage(player, ic.getItem(), ic.getPage()-1);
+					goToPage(player, c.getItem(), c.getPage()-1);
+					return;
 				}
 				if(ItemDB.hasEnchantments(event.getCurrentItem())){
 					Offer match = this.validateData(event.getCurrentItem());
@@ -247,23 +253,13 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 						} else {
 							mm.ranOutOfMoney(player);
 						}
+					} else {
+						mm.invalidConfirmData(player);
 					}
 					player.closeInventory();
-					activeInventories.remove(player);
 				}
 			}
 		}
-	}
-	
-	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent event) {
-		if(!(event.getPlayer() instanceof Player)){
-			return;
-		}
-		Player player = (Player)event.getPlayer();
-		if(activeInventories.containsKey(player))
-			if(activeInventories.containsValue(event.getInventory()))
-				activeInventories.remove(player);
 	}
 	
 	public void confirm(Player player){
@@ -272,9 +268,13 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 			return;
 		}
 		ETransactionData d = (ETransactionData)confirmations.retrieve(this.getClass(), player);
-		Offer match = validateData(d.getItem());
+		Offer match = validateData(d.getItem(), d.getPrice());
+		if(match == null){
+			mm.invalidConfirmData(player);
+			return;
+		}
 		ItemStack cM = ItemDB.getCleanedItem(match.getItem());
-		ItemStack oM = ItemDB.getCleanedItem(d.getItem());
+		ItemStack oM = d.getCleanedItem();
 		long timeElapsed = System.currentTimeMillis() - d.getTransactionTime();
 		if(timeElapsed > cm.getConfirmationTimeout(this.getClass()))
 			mm.confirmationExpired(player);
@@ -312,26 +312,6 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 				ret.add("toggle");
 		
 		return ret.size() > 0 ? ret : null;
-	}
-	
-	private class InventoryCache {
-		
-		private Inventory inventory;
-		private ItemStack item;
-		private int page;
-		
-		public InventoryCache(Inventory inventory, ItemStack item, int page){
-			this.inventory = inventory;
-			this.item = item;
-			this.page = page;
-		}
-		
-		public Inventory getInventory() { return inventory; }
-
-		public ItemStack getItem() { return item; }
-
-		public int getPage() { return page; }
-		
 	}
 	
 }

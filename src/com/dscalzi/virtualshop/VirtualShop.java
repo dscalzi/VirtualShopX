@@ -22,8 +22,10 @@ import com.dscalzi.virtualshop.commands.Stock;
 import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.commands.enchanted.EBuy;
+import com.dscalzi.virtualshop.commands.enchanted.ECancel;
 import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.managers.MessageManager;
+import com.dscalzi.virtualshop.managers.UIManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
@@ -77,6 +79,7 @@ public class VirtualShop extends JavaPlugin {
     
     private void initializeManagers(){
         ConfigManager.initialize(this);
+        UIManager.initialize(this);
         ConfirmationManager.initialize(this);
 		MessageManager.initialize(this);
     }
@@ -85,6 +88,7 @@ public class VirtualShop extends JavaPlugin {
     	this.getCommand("buy").setExecutor(new Buy(this));
     	this.getCommand("ebuy").setExecutor(new EBuy(this));
     	this.getCommand("cancel").setExecutor(new Cancel(this));
+    	this.getCommand("ecancel").setExecutor(new ECancel(this));
     	this.getCommand("find").setExecutor(new Find(this));
     	this.getCommand("shop").setExecutor(new VS(this));
     	this.getCommand("sales").setExecutor(new Sales(this));

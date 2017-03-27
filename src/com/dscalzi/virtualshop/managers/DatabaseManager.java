@@ -25,6 +25,7 @@ import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.enchanted.EBuy;
+import com.dscalzi.virtualshop.commands.enchanted.ECancel;
 import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.connection.ConnectionWrapper;
 import com.dscalzi.virtualshop.connection.MySQLWrapper;
@@ -47,11 +48,12 @@ public final class DatabaseManager {
 		DEFAULTNAME = "sync_required";
 		togglesKey = new HashMap<Class<? extends Confirmable>, String>();
 		togglesKey.put(Buy.class, "buyconfirm");
-		togglesKey.put(EBuy.class, "buyconfirm");
+		togglesKey.put(EBuy.class, "ebuyconfirm");
 		togglesKey.put(Sell.class, "sellconfirm");
-		togglesKey.put(ESell.class, "sellconfirm");
+		togglesKey.put(ESell.class, "esellconfirm");
 		togglesKey.put(Reprice.class, "repriceconfirm");
 		togglesKey.put(Cancel.class, "cancelconfirm");
+		togglesKey.put(ECancel.class, "ecancelconfirm");
 	}
 	
 	public enum ConnectionType{
@@ -162,7 +164,7 @@ public final class DatabaseManager {
 		}
 		if(!ds.checkTable("vshop_toggles")){
 			++desired;
-			String query = "create table vshop_toggles(`id` integer primary key" + autoIncrement + ",`merchant` varchar(80) not null,`buyconfirm` bit not null,`sellconfirm` bit not null, `cancelconfirm` bit not null, `repriceconfirm` bit not null, `uuid` varchar(80) not null)";
+			String query = "create table vshop_toggles(`id` integer primary key" + autoIncrement + ",`merchant` varchar(80) not null,`buyconfirm` bit not null, `ebuyconfirm` bit not null,`sellconfirm` bit not null, `esellconfirm` bit not null, `cancelconfirm` bit not null, `ecancelconfirm` bit not null, `repriceconfirm` bit not null, `uuid` varchar(80) not null)";
 			if(createTable(query)){
 				cm.logInfo("Successfully created table vshop_toggles.");
 				++checksum;
@@ -435,6 +437,19 @@ public final class DatabaseManager {
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
     		return Offer.listOffers(result);
+    	} catch(SQLException e){
+    		cm.logError(e.getMessage(), true);
+    		return null;
+    	}
+    }
+    
+    @SuppressWarnings("deprecation")
+	public List<Offer> getEnchantedSellerOffers(UUID merchantUUID, ItemStack item){
+    	String sql = "select * from vshop_estock where uuid = '" + merchantUUID.toString() + "' and item =" + item.getTypeId() + " and data =" + item.getDurability() + " order by price asc";
+    	try(Connection connection = ds.getDataSource().getConnection();
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listEnchantedOffers(result);
     	} catch(SQLException e){
     		cm.logError(e.getMessage(), true);
     		return null;

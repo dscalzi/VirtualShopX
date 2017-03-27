@@ -63,7 +63,7 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
             mm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.merchant.sell.regular")){
+		if(!sender.hasPermission("virtualshop.merchant.regular.sell")){
             mm.noPermissions(sender);
             return true;
         }

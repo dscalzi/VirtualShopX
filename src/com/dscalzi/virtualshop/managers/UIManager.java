@@ -71,7 +71,7 @@ public class UIManager implements Listener{
 	
 	public InventoryCache retrieve(Player player, Class<?> origin){
 		Pair<Class<?>, InventoryCache> c = retrieve(player);
-		if(c != null && c.getKey() != null && c.getKey() == origin.getClass()) return c.getValue();
+		if(c != null && c.getKey() != null && c.getKey() == origin) return c.getValue();
 		return null;
 	}
 	
@@ -80,7 +80,7 @@ public class UIManager implements Listener{
 	}
 	
 	public boolean contains(Player player, Class<?> origin){
-		Pair<Class<?>, InventoryCache> c = cache.get(player);
+		Pair<Class<?>, InventoryCache> c = retrieve(player);
 		return c != null && c.getKey() != null && c.getKey() == origin;
 	}
 	

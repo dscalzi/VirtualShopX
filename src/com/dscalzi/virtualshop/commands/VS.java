@@ -319,7 +319,7 @@ public class VS implements CommandExecutor, TabCompleter{
             return;
 		}
 		if(plugin.getServer().getPluginManager().getPlugin("VSReloader") == null){
-			if(sender.hasPermission("virtualshop.admin.reloadconfig")){
+			if(sender.hasPermission("virtualshop.admin.reload")){
 				mm.sendError(sender, "VS Reloader not found, reloading config instead.");
 				cmdReload(sender);
 			} else {
@@ -378,17 +378,15 @@ public class VS implements CommandExecutor, TabCompleter{
 		List<String> ret = new ArrayList<String>();
 		
 		if(args.length == 1){
-			if(sender.hasPermission("virtualshop.merchant.buy.regular") && "buy".startsWith(args[0].toLowerCase())) 
+			if(sender.hasPermission("virtualshop.merchant.regular.buy") && "buy".startsWith(args[0].toLowerCase())) 
 				ret.add("buy");
-			if(sender.hasPermission("virtualshop.merchant.sell.regular") && "sell".startsWith(args[0].toLowerCase())) 
+			if(sender.hasPermission("virtualshop.merchant.regular.sell") && "sell".startsWith(args[0].toLowerCase())) 
 				ret.add("sell");
-			if(sender.hasPermission("virtualshop.merchant.cancel.regular") && "cancel".startsWith(args[0].toLowerCase())) 
+			if(sender.hasPermission("virtualshop.merchant.regular.cancel") && "cancel".startsWith(args[0].toLowerCase())) 
 				ret.add("cancel");
-			boolean a = sender.hasPermission("virtualshop.merchant.sales.individual") || sender.hasPermission("virtualshop.merchant.sales.server");
-			if(a && "sales".startsWith(args[0].toLowerCase())) 
+			if(sender.hasPermission("virtualshop.merchant.sales.individual") && "sales".startsWith(args[0].toLowerCase())) 
 				ret.add("sales");
-			boolean b = sender.hasPermission("virtualshop.merchant.stock.individual") || sender.hasPermission("virtualshop.merchant.stock.server");
-			if(b && "stock".startsWith(args[0].toLowerCase())) 
+			if(sender.hasPermission("virtualshop.merchant.stock.individual") && "stock".startsWith(args[0].toLowerCase())) 
 				ret.add("stock");
 			if(sender.hasPermission("virtualshop.merchant.find") && "find".startsWith(args[0].toLowerCase())) 
 				ret.add("find");
@@ -407,8 +405,8 @@ public class VS implements CommandExecutor, TabCompleter{
 		}
 		
 		if(args.length == 2){
-			boolean a = sender.hasPermission("virtualshop.merchant.sales.server") && "sales".startsWith(args[0].toLowerCase());
-			boolean b = sender.hasPermission("virtualshop.merchant.stock.server") && "stock".startsWith(args[0].toLowerCase());
+			boolean a = sender.hasPermission("virtualshop.merchant.sales.*") && "sales".startsWith(args[0].toLowerCase());
+			boolean b = sender.hasPermission("virtualshop.merchant.stock.*") && "stock".startsWith(args[0].toLowerCase());
 			if(a | b){
 				plugin.getServer().getOnlinePlayers().forEach(player -> {if(player.getName().toLowerCase().startsWith(args[1].toLowerCase())) ret.add(player.getName());});
 				if("@s".startsWith(args[1].toLowerCase()))
