@@ -29,6 +29,7 @@ public class SQLiteWrapper extends ConnectionWrapper{
 		this.initialized = false;
 	}
 	
+	@Override
 	public boolean initialize(){
 		if(initialized) return true;
 		initialized = true;

@@ -22,21 +22,22 @@ import org.bukkit.inventory.ItemStack;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
-import com.dscalzi.virtualshop.commands.EBuy;
-import com.dscalzi.virtualshop.commands.ESell;
 import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.Stock;
 import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.commands.VS;
-import com.dscalzi.virtualshop.objects.CancelData;
+import com.dscalzi.virtualshop.commands.enchanted.EBuy;
+import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.objects.Confirmable;
-import com.dscalzi.virtualshop.objects.EListingData;
-import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
-import com.dscalzi.virtualshop.objects.TransactionData;
+import com.dscalzi.virtualshop.objects.dataimpl.CancelData;
+import com.dscalzi.virtualshop.objects.dataimpl.EListingData;
+import com.dscalzi.virtualshop.objects.dataimpl.ETransactionData;
+import com.dscalzi.virtualshop.objects.dataimpl.ListingData;
+import com.dscalzi.virtualshop.objects.dataimpl.TransactionData;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.PageList;
 import com.dscalzi.virtualshop.util.ReflectionUtil;
@@ -275,7 +276,7 @@ public final class MessageManager {
 		sendError(sender, "You are not holding anything in that hand.");
 	}
 	
-	public void priceTooHigh(CommandSender sender, String item, long priceLimit){
+	public void priceTooHigh(CommandSender sender, String item, double priceLimit){
     	sendError(sender, getString("Woah, you're selling your {0} for a rather high price. To avoid scamming, we've set the limit for that item to {1}.", formatItem(item)+getErrorColor(), formatPrice(priceLimit)+getErrorColor()));
     }
 	
@@ -427,10 +428,9 @@ public final class MessageManager {
 		b.append(" each.", FormatRetention.NONE).color(getColor().asBungee());
 		
 		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-		a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getItem()));
+		a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getCleanedItem()));
 		
     	sendFormattedMessage(player, a);
-    	
     	confirmationMsg(player, label, ESell.class);
 	}
 	
@@ -438,6 +438,19 @@ public final class MessageManager {
     	sendMessage(player, getString("You are about to buy {0} {1} for a total price of {2}.",
     			formatAmount(data.getAmount()), formatItem(idb.reverseLookup(data.getItem())), formatPrice(data.getPrice())));
     	confirmationMsg(player, label, Buy.class);
+    }
+    
+    public void eBuyConfirmation(Player player, String label, ETransactionData data){
+    	ComponentBuilder b = new ComponentBuilder("You are about to buy an enchanted ").color(getColor().asBungee());
+    	b.append(" for ");
+    	b.append(formatPrice(data.getPrice()), FormatRetention.NONE).color(getPriceColor().asBungee());
+    	b.append(".", FormatRetention.NONE).color(getColor().asBungee());
+    	
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getCleanedItem()));
+    	
+    	sendFormattedMessage(player, a);
+    	confirmationMsg(player, label, EBuy.class);
     }
     
     public void cancelConfirmation(Player player, String label, CancelData data){
@@ -472,7 +485,7 @@ public final class MessageManager {
     }
 	
     public void confirmationToggleMsg(Player player, String label, boolean enabled, Class<? extends Confirmable> origin){
-    	String name = origin == ESell.class ? "Sell" : origin.getSimpleName();
+    	String name = origin == ESell.class ? "Sell" : origin == EBuy.class ? "Buy" : origin.getSimpleName();
     	
     	ComponentBuilder b = new ComponentBuilder(getString("{0} confirmations turned {1}. To undo this ", name, enabled ? "on" : "off")).color(getSuccessColor().asBungee());
     	b.append(getString("/{0} confirm toggle", label));
@@ -481,6 +494,15 @@ public final class MessageManager {
     	b.append(".", FormatRetention.FORMATTING);
     	
     	sendFormattedMessage(player, b.create());
+    }
+    
+    public void ebuySuccess(Player player, ItemStack item){
+    	ComponentBuilder b = new ComponentBuilder("Managed to buy a ").color(getSuccessColor().asBungee());
+    	b.append(".");
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), item));
+    	
+    	sendFormattedMessage(player, a);
     }
     
     public void versionMessage(CommandSender sender){
@@ -597,6 +619,20 @@ public final class MessageManager {
 	public String formatOffer(Offer o){
         return formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " " + formatItem(idb.reverseLookup(o.getItem())) + " for " + formatPrice(o.getPrice()) + " each.";
     }
+	
+	public BaseComponent[] formatOffer0(Offer o){
+		ComponentBuilder b = new ComponentBuilder(o.getSeller()).color(getSellerColor().asBungee());
+		b.append(": ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(formatAmount(o.getItem().getAmount()) + " ", FormatRetention.NONE).color(getAmountColor().asBungee());
+		String item = idb.reverseLookup(o.getItem());
+		b.append(item, FormatRetention.NONE).color(getItemColor().asBungee());
+		b.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/vs find " + item));
+    	b.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(getItemColor() + "Click to view other\n" + getItemColor() + "listings for this item.")));
+		b.append(" for ", FormatRetention.NONE).color(getPriceColor().asBungee());
+		b.append(formatPrice(o.getPrice()), FormatRetention.NONE).color(getPriceColor().asBungee());
+		b.append(" each.", FormatRetention.NONE).color(getColor().asBungee());
+		return b.create();
+	}
 	
 	public String formatTransaction(Transaction t){
 		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(idb.reverseLookup(t.getItem())) + " for "+ formatPrice(t.getCost());

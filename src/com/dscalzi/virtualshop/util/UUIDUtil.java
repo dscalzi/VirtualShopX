@@ -3,60 +3,23 @@
  * Copyright (C) 2015-2017 Daniel D. Scalzi
  * See LICENSE.txt for license information.
  */
-package com.dscalzi.virtualshop.managers;
+package com.dscalzi.virtualshop.util;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.plugin.Plugin;
 
-import com.dscalzi.virtualshop.VirtualShop;
-
-public final class UUIDManager {
-
-	private static boolean initialized;
-	private static UUIDManager instance;
+public final class UUIDUtil {
 	
-	@SuppressWarnings("unused")
-	private VirtualShop plugin;
-	
-	private UUIDManager(Plugin plugin){
-		this.plugin = (VirtualShop)plugin;
-		load();
-	}
-	
-	private void load(){
-		//Add dependent variables here
-	}
-	
-	public static void initialize(Plugin plugin){
-		if(!initialized){
-			instance = new UUIDManager(plugin);
-			initialized = true;
-		}
-	}
-	
-	public static boolean reload(){
-		if(!initialized) return false;
-		getInstance().load();
-		return true;
-	}
-	
-	public static UUIDManager getInstance(){
-		return UUIDManager.instance;
-	}
-	
-	/* Utilities */
-	
-	public UUID formatFromInput(String uuid) throws IllegalArgumentException{
+	public static UUID formatFromInput(String uuid) throws IllegalArgumentException{
 		if(uuid == null) throw new IllegalArgumentException();
 		uuid = uuid.trim();
 		return uuid.length() == 32 ? fromTrimmed(uuid.replaceAll("-", "")) : UUID.fromString(uuid);
 	}
 	
-	public UUID fromTrimmed(String trimmedUUID) throws IllegalArgumentException{
+	public static UUID fromTrimmed(String trimmedUUID) throws IllegalArgumentException{
 		if(trimmedUUID == null) throw new IllegalArgumentException();
 		StringBuilder builder = new StringBuilder(trimmedUUID.trim());
 		/* Backwards adding to avoid index adjustments */
@@ -72,24 +35,24 @@ public final class UUIDManager {
 		return UUID.fromString(builder.toString());
 	}
 	
-	public Optional<String> getNewPlayerName(UUID uuid, String oldName){
+	public static Optional<String> getNewPlayerName(UUID uuid, String oldName){
 		String currentName = Bukkit.getOfflinePlayer(uuid).getName();
 		if(currentName == null) return Optional.empty();
 		return (currentName.equals(oldName)) ? Optional.empty() : Optional.of(currentName);
 	}
 	
-	public Optional<String> getPlayerName(UUID uuid){
+	public static Optional<String> getPlayerName(UUID uuid){
 		String name = Bukkit.getOfflinePlayer(uuid).getName();
 		return (name == null) ? Optional.empty() : Optional.of(name);
 	}
 	
-	public Optional<OfflinePlayer> getOfflinePlayer(UUID uuid){
+	public static Optional<OfflinePlayer> getOfflinePlayer(UUID uuid){
 		OfflinePlayer p = Bukkit.getOfflinePlayer(uuid);
 		return (p == null) ? Optional.empty() : Optional.of(p);
 	}
 	
 	@SuppressWarnings("deprecation")
-	public Optional<UUID> getPlayerUUID(String name){
+	public static Optional<UUID> getPlayerUUID(String name){
 		OfflinePlayer p = Bukkit.getOfflinePlayer(name);
 		return (p == null) ? Optional.empty() : Optional.of(p.getUniqueId());
 	}

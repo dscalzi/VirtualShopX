@@ -10,8 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.dscalzi.virtualshop.managers.MessageManager;
-import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.util.ItemDB;
+import com.dscalzi.virtualshop.util.UUIDUtil;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -25,8 +25,6 @@ import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 public class Offer {
-	
-	private final UUIDManager uuidm = UUIDManager.getInstance();
 	
 	private UUID sellerUUID;
     private ItemStack item;
@@ -59,13 +57,12 @@ public class Offer {
     }
     
     public static List<Offer> listEnchantedOffers(ResultSet result){
-    	final ItemDB idb = ItemDB.getInstance();
     	List<Offer> ret = new ArrayList<Offer>();
     	try{
     		while(result.next()){
     			ItemStack item = new ItemStack(result.getInt("item"), 1, (short)result.getInt("data"));
-    			Map<Enchantment, Integer> enchantments = idb.parseEnchantData(result.getString("edata"));
-    			idb.addEnchantments(item, enchantments);
+    			Map<Enchantment, Integer> enchantments = ItemDB.parseEnchantData(result.getString("edata"));
+    			ItemDB.addEnchantments(item, enchantments);
     			ItemMeta meta = item.getItemMeta();
     			Double price = result.getDouble("price");
     			Offer o = new Offer(UUID.fromString(result.getString("uuid")), item, price);
@@ -85,6 +82,20 @@ public class Offer {
     	return ret;
     }
     
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + ((item == null) ? 0 : item.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(price);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((sellerUUID == null) ? 0 : sellerUUID.hashCode());
+		return result;
+	}
+
+    @Override
     public boolean equals(Object obj){
     	if(!(obj instanceof Offer))
     		return false;
@@ -99,8 +110,8 @@ public class Offer {
     		return false;
     	return true;
     }
-    
-    public ItemStack getItem() { return item; }
+
+	public ItemStack getItem() { return item; }
 
 	public void setItem(ItemStack item) { this.item = item; }
 
@@ -110,7 +121,7 @@ public class Offer {
 
 	/* Retrieve seller name dynamically */
 	public String getSeller() {	
-		Optional<String> name = uuidm.getPlayerName(getSellerUUID());
+		Optional<String> name = UUIDUtil.getPlayerName(getSellerUUID());
 		return name.isPresent() ? name.get() : getSellerUUID().toString(); 
 	}
 	

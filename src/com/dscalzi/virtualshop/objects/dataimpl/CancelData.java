@@ -3,11 +3,13 @@
  * Copyright (C) 2015-2017 Daniel D. Scalzi
  * See LICENSE.txt for license information.
  */
-package com.dscalzi.virtualshop.objects;
+package com.dscalzi.virtualshop.objects.dataimpl;
 
 import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
+
+import com.dscalzi.virtualshop.objects.VsDataCache;
 
 public class CancelData implements VsDataCache{
 

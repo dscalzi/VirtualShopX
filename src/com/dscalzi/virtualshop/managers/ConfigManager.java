@@ -6,6 +6,7 @@
 package com.dscalzi.virtualshop.managers;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -14,8 +15,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
-import com.dscalzi.virtualshop.commands.ESell;
+import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Sell;
+import com.dscalzi.virtualshop.commands.enchanted.EBuy;
+import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.util.Localization;
 
@@ -158,21 +161,22 @@ public final class ConfigManager {
 		return this.config.getBoolean("chat_settings.broadcast_offers", true);
 	}
 
-	public long getMaxPrice(){
-		return this.config.getLong("item_settings.price_limits.default_limit");
+	public double getMaxPrice(){
+		return this.config.getDouble("item_settings.price_limits.default_limit");
 	}
 	
-	public long getMaxPrice(int itemID){
+	public double getMaxPrice(int itemID){
 		return getMaxPrice(itemID, 0);
 	}
 	
 	public int getConfirmationTimeout(Class<? extends Confirmable> clazz){
 		if(clazz == ESell.class) clazz = Sell.class;
+		if(clazz == EBuy.class) clazz = Buy.class;
 		int time = this.config.getInt("general_settings.confirmation_timeouts." + (clazz.getSimpleName().toLowerCase()), 15000);
 		return (time > 0) ? time : 15000;
 	}
 	
-	public long getMaxPrice(int itemID, int dataValue){
+	public double getMaxPrice(int itemID, int dataValue){
 		if(!this.config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue)))
 			return getMaxPrice();
 		if(!this.config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price"))
@@ -182,6 +186,13 @@ public final class ConfigManager {
 	
 	public List<String> getAllowedWorlds(){
 		return this.config.getStringList("general_settings.allowed_worlds");
+	}
+	
+	public List<String> getAllowedGamemodes(){
+		List<String> a = this.config.getStringList("general_settings.allowed_gamemodes");
+		List<String> b = new ArrayList<String>();
+		for(String s : a) b.add(s.toUpperCase());
+		return b;
 	}
 
 	public boolean usingMySQL(){

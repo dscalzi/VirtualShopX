@@ -5,7 +5,6 @@
  */
 package com.dscalzi.virtualshop.commands;
 
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,10 +22,10 @@ import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
-import com.dscalzi.virtualshop.objects.TransactionData;
+import com.dscalzi.virtualshop.objects.dataimpl.TransactionData;
 import com.dscalzi.virtualshop.util.ItemDB;
+import com.dscalzi.virtualshop.util.InputUtil;
 import com.dscalzi.virtualshop.util.InventoryManager;
-import com.dscalzi.virtualshop.util.Numbers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +67,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 			mm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
-		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+		if(!(cm.getAllowedGamemodes().contains(player.getGameMode().name()))){
         	mm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
@@ -110,7 +109,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 	@SuppressWarnings("deprecation")
 	private boolean validateData(Player player, String[] args){
 		//Set data
-		int amount = Numbers.parseInteger(args[0]);
+		int amount = InputUtil.parseInt(args[0]);
 		ItemStack item = idb.get(args[1], 0);
 		PlayerInventory im = player.getInventory();
 		double maxprice;
@@ -119,7 +118,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 			mm.numberFormat(player);
 			return false;
 		}
-		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
+		if(amount == Integer.MAX_VALUE && args[0].equalsIgnoreCase("all")){
 			mm.numberFormat(player);
 			return false;
 		}
@@ -136,7 +135,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 			return false;
 		}
         if(args.length > 2){
-        	maxprice = Numbers.parseDouble(args[2]);
+        	maxprice = InputUtil.parsedDouble(args[2]);
         	if(maxprice < 0){
         		mm.numberFormat(player);
         		return false;

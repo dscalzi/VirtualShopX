@@ -23,10 +23,10 @@ import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Confirmable;
-import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.objects.dataimpl.ListingData;
+import com.dscalzi.virtualshop.util.InputUtil;
 import com.dscalzi.virtualshop.util.ItemDB;
-import com.dscalzi.virtualshop.util.Numbers;
 
 public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
 
@@ -101,7 +101,7 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
 	private boolean validateData(Player player, String[] args){
 		final int amt = 0;
 		ItemStack item = idb.get(args[0], amt);
-		double newPrice = Numbers.parseDouble(args[1]);
+		double newPrice = InputUtil.parsedDouble(args[1]);
 		PlayerInventory im = player.getInventory();
 		if(newPrice < 0){
 			mm.numberFormat(player);

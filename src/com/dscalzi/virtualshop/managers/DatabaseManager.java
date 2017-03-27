@@ -23,8 +23,9 @@ import org.bukkit.inventory.ItemStack;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
-import com.dscalzi.virtualshop.commands.ESell;
 import com.dscalzi.virtualshop.commands.Sell;
+import com.dscalzi.virtualshop.commands.enchanted.EBuy;
+import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.connection.ConnectionWrapper;
 import com.dscalzi.virtualshop.connection.MySQLWrapper;
 import com.dscalzi.virtualshop.connection.SQLiteWrapper;
@@ -32,6 +33,8 @@ import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.objects.Transaction;
+import com.dscalzi.virtualshop.util.UUIDUtil;
+
 import javafx.util.Pair;
 
 public final class DatabaseManager {
@@ -44,6 +47,7 @@ public final class DatabaseManager {
 		DEFAULTNAME = "sync_required";
 		togglesKey = new HashMap<Class<? extends Confirmable>, String>();
 		togglesKey.put(Buy.class, "buyconfirm");
+		togglesKey.put(EBuy.class, "buyconfirm");
 		togglesKey.put(Sell.class, "sellconfirm");
 		togglesKey.put(ESell.class, "sellconfirm");
 		togglesKey.put(Reprice.class, "repriceconfirm");
@@ -61,13 +65,11 @@ public final class DatabaseManager {
 	private ConnectionWrapper ds;
 	private ConfigManager configM;
 	private MessageManager cm;
-	private UUIDManager uuidm;
 	
 	private DatabaseManager(VirtualShop plugin){
 		this.plugin = plugin;
 		this.configM = ConfigManager.getInstance();
 		this.cm = MessageManager.getInstance();
-		this.uuidm = UUIDManager.getInstance();
 		if(!this.setUp())
 			this.type = ConnectionType.VOID;
 	}
@@ -203,7 +205,7 @@ public final class DatabaseManager {
 	    	Iterator<Entry<UUID, String>> it = uuidNamePairs.entrySet().iterator();
 	    	while(it.hasNext()){
 	    		Entry<UUID, String> entry = it.next();
-	    		Optional<String> newName = uuidm.getNewPlayerName(entry.getKey(), entry.getValue());
+	    		Optional<String> newName = UUIDUtil.getNewPlayerName(entry.getKey(), entry.getValue());
 	    		if(newName.isPresent())
 	    			entry.setValue(newName.get());
 	    		else
@@ -236,7 +238,7 @@ public final class DatabaseManager {
 				else loggedName = result.getString("merchant");
     		}
 			
-	    	Optional<String> newName = uuidm.getNewPlayerName(uuid, loggedName);
+	    	Optional<String> newName = UUIDUtil.getNewPlayerName(uuid, loggedName);
 	    	if(newName.isPresent()){
 	    		//Update toggles table
 	    		stmt.executeUpdate("update vshop_toggles set merchant='" + newName.get() + "' where uuid='" + uuid.toString() + "'");
@@ -278,7 +280,7 @@ public final class DatabaseManager {
 	    	int s = 0, f = 0;
 	    	
 	    	for(String n : names){
-	    		Optional<UUID> uuidOpt = uuidm.getPlayerUUID(n);
+	    		Optional<UUID> uuidOpt = UUIDUtil.getPlayerUUID(n);
 	    		if(!uuidOpt.isPresent()) {
 	    			++f;
 	    			continue;
@@ -328,7 +330,7 @@ public final class DatabaseManager {
     
     public void addPlayerToToggles(UUID merchantUUID){
     	String merchant = DatabaseManager.DEFAULTNAME;
-    	Optional<String> name = uuidm.getPlayerName(merchantUUID);
+    	Optional<String> name = UUIDUtil.getPlayerName(merchantUUID);
     	if(name.isPresent()) merchant = name.get();
     	String sql = "insert into vshop_toggles(merchant,buyconfirm,sellconfirm,cancelconfirm,repriceconfirm,uuid) values('" + merchant + "',1,1,1,1,'" + merchantUUID.toString() + "')";
     	executeUpdate(sql);
@@ -449,6 +451,11 @@ public final class DatabaseManager {
     	String sql = "delete from vshop_stock where id="+id;
     	executeUpdate(sql);
 	}
+    
+    public void deleteEnchantedItem(int id){
+    	String sql = "delete from vshop_estock where id="+id;
+    	executeUpdate(sql);
+    }
 
     public void updateQuantity(int id, int quantity){
     	String sql = "update vshop_stock set amount="+quantity+" where id=" + id;

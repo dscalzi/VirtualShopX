@@ -8,7 +8,6 @@ package com.dscalzi.virtualshop.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -24,11 +23,11 @@ import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Confirmable;
-import com.dscalzi.virtualshop.objects.ListingData;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.objects.dataimpl.ListingData;
 import com.dscalzi.virtualshop.util.ItemDB;
+import com.dscalzi.virtualshop.util.InputUtil;
 import com.dscalzi.virtualshop.util.InventoryManager;
-import com.dscalzi.virtualshop.util.Numbers;
 
 /**
  * Sell CommandExecutor to handle user requests to create listings on the Virtual Market.
@@ -73,7 +72,7 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
 			mm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
-		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+		if(!(cm.getAllowedGamemodes().contains(player.getGameMode().name()))){
         	mm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
@@ -129,9 +128,9 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
 	@SuppressWarnings("deprecation")
 	private boolean validateData(Player player, String[] args){
 		//Set Data
-		int amount = Numbers.parseInteger(args[0]);
+		int amount = InputUtil.parseInt(args[0]);
 		ItemStack item = idb.get(args[1], amount);
-		double price = Numbers.parseDouble(args[2]);
+		double price = InputUtil.parsedDouble(args[2]);
 		boolean samePrice = false;
 		PlayerInventory im = player.getInventory();
 		InventoryManager invM = new InventoryManager(player);
@@ -161,7 +160,7 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
 			mm.wrongItem(player, args[1]);
 			return false;
 		}
-		if(amount == Numbers.ALL && args[0].equalsIgnoreCase("all")){
+		if(amount == Integer.MAX_VALUE && args[0].equalsIgnoreCase("all")){
         	ItemStack[] inv = im.getContents();
         	int total = 0;
         	for(int i=0; i<inv.length-5; ++i){
@@ -231,7 +230,8 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
 		confirmations.unregister(this.getClass(), player);
         if(cm.broadcastOffers())
         {
-			mm.broadcastOffer(o);
+        	mm.sendFormattedGlobal(mm.formatOffer0(o));
+			//mm.broadcastOffer(o);
 			return;
 		}
 	}

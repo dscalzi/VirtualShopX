@@ -8,7 +8,6 @@ package com.dscalzi.virtualshop.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,9 +22,9 @@ import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
-import com.dscalzi.virtualshop.objects.CancelData;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.objects.dataimpl.CancelData;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.InventoryManager;
 
@@ -65,7 +64,7 @@ public class Cancel implements CommandExecutor, Confirmable, TabCompleter{
 			mm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
-		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+		if(!(cm.getAllowedGamemodes().contains(player.getGameMode().name()))){
         	mm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }

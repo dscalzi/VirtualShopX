@@ -16,7 +16,13 @@ general_settings:
     - world
     - world_nether
     - world_the_end
-    
+  
+  # Users will only be allowed to use the shop if
+  # they are in the following gamemodes.
+  allowed_gamemodes:
+    - survival
+    - adventure
+  
   # The amount of time in milliseconds it takes for
   # a confirmation request to expire. Must be
   # 0 < time, otherwise it will be set to 15 seconds.
@@ -172,9 +178,9 @@ item_settings:
   #       name: ItemName     //Not required but helpful for the user
   #       max-price:         //Maximum price the user can sell this item at
   price_limits:
-    default_limit: 100000
+    default_limit: 100000.0
     items:
       399-0: 
         name: NetherStar
-        max-price: 1000000
+        max-price: 1000000.0
       

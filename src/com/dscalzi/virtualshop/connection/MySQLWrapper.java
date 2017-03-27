@@ -34,6 +34,7 @@ public class MySQLWrapper extends ConnectionWrapper{
 		this.initialized = false;
 	}
 	
+	@Override
 	public boolean initialize(){
 		if(this.initialized) return true;
 		initialized = true;

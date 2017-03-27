@@ -7,7 +7,7 @@ package com.dscalzi.virtualshop.objects;
 
 import org.bukkit.inventory.ItemStack;
 
-import com.dscalzi.virtualshop.managers.UUIDManager;
+import com.dscalzi.virtualshop.util.UUIDUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,9 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings("deprecation")
-public class Transaction
-{
-	private UUIDManager uuidm = UUIDManager.getInstance();
+public class Transaction {
 	
     private UUID sellerUUID;
     private UUID buyerUUID;
@@ -47,14 +45,14 @@ public class Transaction
     }
 
 	public String getSeller() { 
-		Optional<String> name = uuidm.getPlayerName(getSellerUUID());
+		Optional<String> name = UUIDUtil.getPlayerName(getSellerUUID());
 		return name.isPresent() ? name.get() : getSellerUUID().toString();
 	}
 	
 	public UUID getSellerUUID() {	return sellerUUID; }
 	
 	public String getBuyer() { 
-		Optional<String> name = uuidm.getPlayerName(getBuyerUUID());
+		Optional<String> name = UUIDUtil.getPlayerName(getBuyerUUID());
 		return name.isPresent() ? name.get() : getBuyerUUID().toString(); 
 	}
 

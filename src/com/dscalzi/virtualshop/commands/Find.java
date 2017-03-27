@@ -19,8 +19,8 @@ import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.util.InputUtil;
 import com.dscalzi.virtualshop.util.ItemDB;
-import com.dscalzi.virtualshop.util.Numbers;
 import com.dscalzi.virtualshop.util.PageList;
 
 import java.util.List;
@@ -87,7 +87,7 @@ public class Find implements CommandExecutor{
     	}
     	
     	int requestedPage = 1;
-    	if(args.length > 1) requestedPage = Numbers.parseInteger(args[1]);
+    	if(args.length > 1) requestedPage = InputUtil.parseInt(args[1]);
     	
     	PageList<Offer> listings = new PageList<Offer>(7, offers);
     	

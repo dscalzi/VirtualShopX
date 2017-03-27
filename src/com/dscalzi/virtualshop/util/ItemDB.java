@@ -25,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 import com.dscalzi.virtualshop.VirtualShop;
@@ -107,7 +108,7 @@ public final class ItemDB {
 		ItemStack target = getUnsafe(id);
 		if(target == null) return null;
 		target.setAmount(quantity);
-		if (items.containsValue(new ItemMetaData(target.getTypeId(), target.getDurability()))) return target;
+		if(items.containsValue(new ItemMetaData(target.getTypeId(), target.getDurability()))) return target;
 		return null;
 	}
 
@@ -160,57 +161,6 @@ public final class ItemDB {
 		return new ItemStack(data.getTypeID(), data.getData());
 	}
 	
-	public Map<Enchantment, Integer> parseEnchantData(String data){
-		Map<Enchantment, Integer> converted = new HashMap<Enchantment, Integer>();
-		
-		data = data.replaceAll("\\{|\\}", "");
-		String[] sets = data.split(",");
-		for(String s : sets){
-			String[] pair = s.split(":");
-			if(pair.length == 2){
-				converted.put(Enchantment.getById(Integer.parseInt(pair[0])), Integer.parseInt(pair[1]));
-			}
-		}
-		return converted;
-	}
-	
-	public String formatEnchantData(Map<Enchantment, Integer> data){
-		//Key {EnchantmentID:Level,EnchantmentID:Level}
-		String converted = "{";
-		
-		for(Entry<Enchantment, Integer> entry : data.entrySet()){
-			if(entry.getKey() != null && entry.getValue() != null){
-				converted += entry.getKey().getId() + ":" + entry.getValue() + ",";
-			}
-		}
-		if(converted.length() > 1){
-			converted = converted.substring(0, converted.length()-1);
-		}
-		
-		return converted + "}";
-	}
-	
-	public Map<Enchantment, Integer> getEnchantments(ItemStack item){
-		if(item.getType() == Material.ENCHANTED_BOOK)
-			return ((EnchantmentStorageMeta)item.getItemMeta()).getStoredEnchants();
-		return item.getEnchantments();
-	}
-	
-	public boolean hasEnchantments(ItemStack item){
-		return getEnchantments(item).size() > 0;
-	}
-	
-	public void addEnchantments(ItemStack item, Map<Enchantment, Integer> enchantments){
-		if(item.getType() == Material.ENCHANTED_BOOK){
-			EnchantmentStorageMeta meta = (EnchantmentStorageMeta)item.getItemMeta();
-			for(Entry<Enchantment, Integer> entry : enchantments.entrySet())
-				meta.addStoredEnchant(entry.getKey(), entry.getValue(), true);
-			item.setItemMeta(meta);
-			return;
-		}
-		item.addUnsafeEnchantments(enchantments);
-	}
-	
 	public List<String> getAliases(ItemStack item){
 		List<String> ret = new ArrayList<String>();
 		int typeID = item.getTypeId();
@@ -228,11 +178,75 @@ public final class ItemDB {
 		return ret;
 	}
 	
+	/* Static Item Utility */
+	
+	public static Map<Enchantment, Integer> parseEnchantData(String data){
+		Map<Enchantment, Integer> converted = new HashMap<Enchantment, Integer>();
+		
+		data = data.replaceAll("\\{|\\}", "");
+		String[] sets = data.split(",");
+		for(String s : sets){
+			String[] pair = s.split(":");
+			if(pair.length == 2){
+				converted.put(Enchantment.getById(Integer.parseInt(pair[0])), Integer.parseInt(pair[1]));
+			}
+		}
+		return converted;
+	}
+	
+	public static String formatEnchantData(Map<Enchantment, Integer> data){
+		//Key {EnchantmentID:Level,EnchantmentID:Level}
+		String converted = "{";
+		
+		for(Entry<Enchantment, Integer> entry : data.entrySet()){
+			if(entry.getKey() != null && entry.getValue() != null){
+				converted += entry.getKey().getId() + ":" + entry.getValue() + ",";
+			}
+		}
+		if(converted.length() > 1){
+			converted = converted.substring(0, converted.length()-1);
+		}
+		
+		return converted + "}";
+	}
+	
+	public static Map<Enchantment, Integer> getEnchantments(ItemStack item){
+		if(item.getType() == Material.ENCHANTED_BOOK)
+			return ((EnchantmentStorageMeta)item.getItemMeta()).getStoredEnchants();
+		return item.getEnchantments();
+	}
+	
+	public static boolean hasEnchantments(ItemStack item){
+		return getEnchantments(item).size() > 0;
+	}
+	
+	public static void addEnchantments(ItemStack item, Map<Enchantment, Integer> enchantments){
+		if(item.getType() == Material.ENCHANTED_BOOK){
+			EnchantmentStorageMeta meta = (EnchantmentStorageMeta)item.getItemMeta();
+			for(Entry<Enchantment, Integer> entry : enchantments.entrySet())
+				meta.addStoredEnchant(entry.getKey(), entry.getValue(), true);
+			item.setItemMeta(meta);
+			return;
+		}
+		item.addUnsafeEnchantments(enchantments);
+	}
+	
+	public static ItemStack getCleanedItem(ItemStack item){
+		ItemStack i = item.clone();
+		if(i.hasItemMeta()){
+        	ItemMeta meta = i.getItemMeta();
+        	if(meta.hasDisplayName()) meta.setDisplayName(null);
+        	if(meta.hasLore()) meta.setLore(null);
+        	i.setItemMeta(meta);
+        }
+		return i;
+	}
+	
 	/**
 	 * This NMS workaround was added to the API, therefore it is deprecated.
 	 */
 	@Deprecated
-	public ItemStack removeAttributes(ItemStack i){
+	public static ItemStack removeAttributes(ItemStack i){
         if(i == null) return i;
         if(i.getType() == Material.BOOK_AND_QUILL) return i;
 	    ItemStack item = i.clone();

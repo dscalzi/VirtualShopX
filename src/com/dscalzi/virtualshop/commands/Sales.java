@@ -17,9 +17,9 @@ import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
-import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.util.PageList;
+import com.dscalzi.virtualshop.util.UUIDUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +30,12 @@ public class Sales implements CommandExecutor, TabCompleter{
 	private final MessageManager mm;
 	private final ConfigManager cm;
 	private final DatabaseManager dbm;
-	private final UUIDManager uuidm;
 	
 	public Sales(VirtualShop plugin){
 		this.plugin = plugin;
 		this.mm = MessageManager.getInstance();
 		this.cm = ConfigManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
-		this.uuidm = UUIDManager.getInstance();
 	}
 	
 	@Override
@@ -77,7 +75,7 @@ public class Sales implements CommandExecutor, TabCompleter{
 				//First try by UUID, if it fails try by player name.
 				args[0] = args[0].replaceAll("['\"]", "");
 	        	try {
-	        		target = plugin.getServer().getOfflinePlayer(uuidm.formatFromInput(args[0]));
+	        		target = plugin.getServer().getOfflinePlayer(UUIDUtil.formatFromInput(args[0]));
 	        	} catch(IllegalArgumentException e){
 	        		target = plugin.getServer().getOfflinePlayer(args[0]);
 	        	}

@@ -3,12 +3,11 @@
  * Copyright (C) 2015-2017 Daniel D. Scalzi
  * See LICENSE.txt for license information.
  */
-package com.dscalzi.virtualshop.commands;
+package com.dscalzi.virtualshop.commands.enchanted;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,11 +21,11 @@ import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Confirmable;
-import com.dscalzi.virtualshop.objects.EListingData;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.objects.dataimpl.EListingData;
+import com.dscalzi.virtualshop.util.InputUtil;
 import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.ItemDB;
-import com.dscalzi.virtualshop.util.Numbers;
 
 public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 
@@ -34,7 +33,6 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 	private final ConfigManager cm;
 	private final ConfirmationManager confirmations;
 	private final DatabaseManager dbm;
-	private final ItemDB idb;
 	
 	@SuppressWarnings("unused")
 	private VirtualShop plugin;
@@ -45,7 +43,6 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 		this.cm = ConfigManager.getInstance();
 		this.confirmations = ConfirmationManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
-		this.idb = ItemDB.getInstance();
 	}
 	
 	@Override
@@ -64,7 +61,7 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 			mm.invalidWorld(sender, command.getName(), player.getWorld());
 			return true;
 		}
-		if((player.getGameMode() != GameMode.SURVIVAL) && (player.getGameMode() != GameMode.ADVENTURE)){
+		if(!(cm.getAllowedGamemodes().contains(player.getGameMode().name()))){
         	mm.invalidGamemode(sender, command.getName(), player.getGameMode());
         	return true;
         }
@@ -128,11 +125,11 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 		//Set Data
 		PlayerInventory im = player.getInventory();
 		ItemStack item = new ItemStack(im.getItemInMainHand());
-		double price = Numbers.parseDouble(args[0]);
+		double price = InputUtil.parsedDouble(args[0]);
 		InventoryManager invM = new InventoryManager(player);
 		//Validate Data
 		
-		if(!idb.hasEnchantments(item)){
+		if(!ItemDB.hasEnchantments(item)){
 			mm.notEnchanted(player);
 			return false;
 		}
@@ -179,7 +176,7 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 		InventoryManager im = new InventoryManager(player);
 		im.removeItem(item);
         Offer o = new Offer(player.getUniqueId(), cleanedItem, price);
-        String edata = idb.formatEnchantData(idb.getEnchantments(cleanedItem));
+        String edata = ItemDB.formatEnchantData(ItemDB.getEnchantments(cleanedItem));
 		dbm.addEOffer(o, edata);
 		confirmations.unregister(this.getClass(), player);
         if(cm.broadcastOffers())

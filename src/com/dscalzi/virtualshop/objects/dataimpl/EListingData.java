@@ -3,12 +3,14 @@
  * Copyright (C) 2015-2017 Daniel D. Scalzi
  * See LICENSE.txt for license information.
  */
-package com.dscalzi.virtualshop.objects;
+package com.dscalzi.virtualshop.objects.dataimpl;
 
 import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+
+import com.dscalzi.virtualshop.objects.VsDataCache;
+import com.dscalzi.virtualshop.util.ItemDB;
 
 public class EListingData implements VsDataCache{
 
@@ -18,6 +20,7 @@ private static final long serialVersionUID = -8546925459706301446L;
 	private long timeSince;
 	
 	private transient ItemStack ITEM;
+	private transient ItemStack CLEANEDITEM;
 	private final double PRICE;
 	private final double OLDPRICE;
 	private long TIME;
@@ -25,6 +28,7 @@ private static final long serialVersionUID = -8546925459706301446L;
 	
 	public EListingData(ItemStack item, double price, double oldPrice, long systemTime, String[] args){
 		this.ITEM = item;
+		this.CLEANEDITEM = ItemDB.getCleanedItem(item);
 		this.PRICE = price;
 		this.OLDPRICE = oldPrice;
 		this.TIME = systemTime;
@@ -36,14 +40,7 @@ private static final long serialVersionUID = -8546925459706301446L;
 	}
 	
 	public ItemStack getCleanedItem(){
-		ItemStack i = ITEM.clone();
-		if(i.hasItemMeta()){
-        	ItemMeta meta = i.getItemMeta();
-        	if(meta.hasDisplayName()) meta.setDisplayName(null);
-        	if(meta.hasLore()) meta.setLore(null);
-        	i.setItemMeta(meta);
-        }
-		return i;
+		return CLEANEDITEM;
 	}
 	
 	public double getPrice(){
@@ -72,6 +69,7 @@ private static final long serialVersionUID = -8546925459706301446L;
 	@Override
 	public void deserialize() {
 		ITEM = ItemStack.deserialize(this.serializedItem);
+		CLEANEDITEM = ItemDB.getCleanedItem(ITEM);
 		TIME = System.currentTimeMillis() - timeSince;
 	}
 	

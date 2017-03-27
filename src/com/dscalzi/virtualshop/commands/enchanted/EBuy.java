@@ -3,7 +3,7 @@
  * Copyright (C) 2015-2017 Daniel D. Scalzi
  * See LICENSE.txt for license information.
  */
-package com.dscalzi.virtualshop.commands;
+package com.dscalzi.virtualshop.commands.enchanted;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -30,22 +31,27 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
+import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.objects.dataimpl.ETransactionData;
 import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.ItemDB;
 
-public class EBuy implements CommandExecutor, Listener{
+public class EBuy implements CommandExecutor, Listener, Confirmable, TabCompleter{
 
 	private static final String priceString = "Price: ";
 	
 	private final MessageManager mm;
 	private final ConfigManager cm;
+	private final ConfirmationManager confirmations;
 	private final DatabaseManager dbm;
 	private final ItemDB idb;
 	
 	private VirtualShop plugin;
 	private Map<Player, InventoryCache> activeInventories;
+	private Map<Player, String> latestLabel;
 	
 	private ItemStack[] utility;
 	
@@ -53,8 +59,10 @@ public class EBuy implements CommandExecutor, Listener{
 		this.plugin = plugin;
 		this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
 		this.activeInventories = new HashMap<Player, InventoryCache>();
+		this.latestLabel = new HashMap<Player, String>();
 		this.mm = MessageManager.getInstance();
 		this.cm = ConfigManager.getInstance();
+		this.confirmations = ConfirmationManager.getInstance();
 		this.dbm = DatabaseManager.getInstance();
 		this.idb = ItemDB.getInstance();
 		
@@ -83,7 +91,27 @@ public class EBuy implements CommandExecutor, Listener{
 		}
 		Player player = (Player)sender;
 		if(activeInventories.containsKey(player)) this.activeInventories.remove(player);
-		if(args.length < 1){
+		if(!cm.getAllowedWorlds().contains(player.getWorld().getName())){
+			mm.invalidWorld(sender, command.getName(), player.getWorld());
+			return true;
+		}
+		if(!(cm.getAllowedGamemodes().contains(player.getGameMode().name()))){
+        	mm.invalidGamemode(sender, command.getName(), player.getGameMode());
+        	return true;
+        }
+		latestLabel.put(player, label);
+		if(args.length > 0){
+			if(args[0].equalsIgnoreCase("confirm")){
+				if(args.length > 1){
+					if(args[1].equalsIgnoreCase("toggle")){
+						toggleConfirmations(player, label, args);
+						return true;
+					}
+				}
+				this.confirm(player);
+				return true;
+			}
+		} else {
 			mm.sendError(sender, "You need to specify the item.");
 			return true;
 		}
@@ -94,8 +122,8 @@ public class EBuy implements CommandExecutor, Listener{
 
 	private void execute(Player player, String[] args){
 		ItemStack item;
-    	PlayerInventory im = player.getInventory();
 		if(args[0].matches("^(?iu)(hand|mainhand|offhand)")){
+			PlayerInventory im = player.getInventory();
 			item = new ItemStack(args[0].equalsIgnoreCase("offhand") ? im.getItemInOffHand() : im.getItemInMainHand());
 			if(item.getType() == Material.AIR){
 				mm.holdingNothing(player);
@@ -164,24 +192,27 @@ public class EBuy implements CommandExecutor, Listener{
 	}
 	
 	private Offer validateData(ItemStack item){
-		System.out.println("validating");
 		List<String> lore = item.getItemMeta().getLore();
-		System.out.println(lore);
 		Double price = null;
 		for(String s : lore){
 			s = ChatColor.stripColor(s);
-			System.out.println(s);
 			if(s.contains(priceString)){
 				String sprice = s.replace(priceString + VirtualShop.getEconSymbol(), "");
-				System.out.println(sprice);
 				Number n = cm.getLocalization().parse(sprice);
 				price = n == null ? null : n.doubleValue();
-				System.out.println(price);
 			}
 		}
 		if(price == null) return null;
-		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(item, ItemDB.getInstance().formatEnchantData(item.getEnchantments()), price);
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(item, ItemDB.formatEnchantData(item.getEnchantments()), price);
 		return matches.size() > 0 ? matches.get(0) : null;
+	}
+	
+	private void finalizeTransaction(Player p, Offer o){
+		DatabaseManager.getInstance().deleteEnchantedItem(o.getId());
+		InventoryManager im = new InventoryManager(p);
+		ItemStack cleaned = ItemDB.getCleanedItem(o.getItem());
+		im.addItem(cleaned);
+		mm.ebuySuccess(p, cleaned);
 	}
 	
 	@EventHandler
@@ -202,16 +233,17 @@ public class EBuy implements CommandExecutor, Listener{
 					InventoryCache ic = activeInventories.get(player);
 					goToPage(player, ic.getItem(), ic.getPage()-1);
 				}
-				System.out.println("Hi");
-				if(idb.hasEnchantments(event.getCurrentItem())){
-					System.out.println("has enchants");
+				if(ItemDB.hasEnchantments(event.getCurrentItem())){
 					Offer match = this.validateData(event.getCurrentItem());
 					if(match != null){
 						if(VirtualShop.hasEnough(player, match.getPrice())){
-							DatabaseManager.getInstance().deleteItem(match.getId());
-							InventoryManager im = new InventoryManager(player);
-							im.addItem(match.getItem());
-							mm.sendSuccess(player, "Bought " + mm.formatEnchantedItem(idb.reverseLookup(match.getItem()), match.getItem()));
+							if(dbm.getToggle(player.getUniqueId(), this.getClass())){
+								ETransactionData d = new ETransactionData(match.getItem(), match.getPrice(), System.currentTimeMillis());
+								confirmations.register(this.getClass(), player, d);
+								mm.eBuyConfirmation(player, latestLabel.get(player), d);
+							} else {
+								finalizeTransaction(player, match);
+							}
 						} else {
 							mm.ranOutOfMoney(player);
 						}
@@ -232,6 +264,54 @@ public class EBuy implements CommandExecutor, Listener{
 		if(activeInventories.containsKey(player))
 			if(activeInventories.containsValue(event.getInventory()))
 				activeInventories.remove(player);
+	}
+	
+	public void confirm(Player player){
+		if(!confirmations.contains(this.getClass(), player)){
+			mm.invalidConfirmation(player);
+			return;
+		}
+		ETransactionData d = (ETransactionData)confirmations.retrieve(this.getClass(), player);
+		Offer match = validateData(d.getItem());
+		ItemStack cM = ItemDB.getCleanedItem(match.getItem());
+		ItemStack oM = ItemDB.getCleanedItem(d.getItem());
+		long timeElapsed = System.currentTimeMillis() - d.getTransactionTime();
+		if(timeElapsed > cm.getConfirmationTimeout(this.getClass()))
+			mm.confirmationExpired(player);
+		else if(cM.isSimilar(oM) && match.getPrice() == d.getPrice())
+			finalizeTransaction(player, match);
+		else
+			mm.invalidConfirmData(player);
+		confirmations.unregister(this.getClass(), player);
+	}
+	
+	private void toggleConfirmations(Player player, String label, String[] args){
+		boolean enabled = dbm.getToggle(player.getUniqueId(), this.getClass());
+		if(!enabled){
+			mm.confirmationToggleMsg(player, label, true, this.getClass());
+			dbm.updateToggle(player.getUniqueId(), this.getClass(), true);
+			return;
+		} else {
+			mm.confirmationToggleMsg(player, label, false, this.getClass());
+			confirmations.unregister(this.getClass(), player);
+			dbm.updateToggle(player.getUniqueId(), this.getClass(), false);
+			return;
+		}
+	}
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		List<String> ret = new ArrayList<String>();
+		
+		if(args.length == 1)
+			if("confirm".startsWith(args[0].toLowerCase()))
+				ret.add("confirm");
+		
+		if(args.length == 2)
+			if("toggle".startsWith(args[1].toLowerCase()))
+				ret.add("toggle");
+		
+		return ret.size() > 0 ? ret : null;
 	}
 	
 	private class InventoryCache {

@@ -15,20 +15,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.dscalzi.virtualshop.commands.Buy;
 import com.dscalzi.virtualshop.commands.Cancel;
-import com.dscalzi.virtualshop.commands.EBuy;
-import com.dscalzi.virtualshop.commands.ESell;
 import com.dscalzi.virtualshop.commands.Find;
 import com.dscalzi.virtualshop.commands.Sales;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.Stock;
 import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.commands.VS;
+import com.dscalzi.virtualshop.commands.enchanted.EBuy;
+import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.ConfirmationManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager.ConnectionType;
-import com.dscalzi.virtualshop.managers.UUIDManager;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Reloader;
 
@@ -77,7 +76,6 @@ public class VirtualShop extends JavaPlugin {
     }
     
     private void initializeManagers(){
-    	UUIDManager.initialize(this);
         ConfigManager.initialize(this);
         ConfirmationManager.initialize(this);
 		MessageManager.initialize(this);
