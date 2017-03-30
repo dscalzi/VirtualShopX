@@ -226,7 +226,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
             		dbm.deleteItem(o.getId());
             	else 
             		dbm.updateQuantity(o.getId(), left);
-            	Transaction t = new Transaction(o.getSellerUUID(), player.getUniqueId(), o.getItem().getTypeId(), o.getItem().getDurability(), canbuy, cost);
+            	Transaction t = new Transaction(o.getSellerUUID(), player.getUniqueId(), o.getItem().getTypeId(), o.getItem().getDurability(), canbuy, cost, System.currentTimeMillis());
             	dbm.logTransaction(t);
             }
             if(bought >= amount) 

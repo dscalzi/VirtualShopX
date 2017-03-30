@@ -7,8 +7,10 @@ package com.dscalzi.virtualshop.managers;
 
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -55,6 +57,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 public final class MessageManager {
 
 	private static final char b = (char)8226;
+	private static final char face = (char)12484;
 	private static boolean initialized;
 	private static MessageManager instance;
 	
@@ -74,6 +77,7 @@ public final class MessageManager {
     private ChatColor pColor;
     private ChatColor buColor;
     private ChatColor seColor;
+	private SimpleDateFormat f;
 	
 	private MessageManager(VirtualShop plugin){
 		this.plugin = plugin;
@@ -97,6 +101,7 @@ public final class MessageManager {
 		this.pColor = cm.getPriceColor();
 		this.buColor = cm.getBuyerColor();
 		this.seColor = cm.getSellerColor();
+		f = new SimpleDateFormat("EEE, F MMMM yyyy \n"+getBaseColor()+"'  at' hh:mm:ssa zzz");
 	}
 	
 	public static void initialize(VirtualShop plugin){
@@ -287,6 +292,10 @@ public final class MessageManager {
 	
 	public void notEnchanted(CommandSender sender){
 		sendError(sender, "That item is not enchanted, please use /sell instead.");
+	}
+	
+	public void isEnchanted(CommandSender sender){
+		sendError(sender, "That item is enchanted, please use /esell instead.");
 	}
 	
 	public void holdingNothing(CommandSender sender){
@@ -699,12 +708,30 @@ public final class MessageManager {
 		return b.create();
 	}
 	
-	public String formatTransaction(Transaction t){
-		return formatTransaction(t, false);
+	public String formatTransactionConsole(Transaction t){
+		return formatTransactionConsole(t, false);
 	}
 	
-	public String formatTransaction(Transaction t, boolean enchanted){
+	public String formatTransactionConsole(Transaction t, boolean enchanted){
 		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(idb.reverseLookup(t.getItem()), true, enchanted) + " for "+ formatPrice(t.getCost()) + ".";
+	}
+	
+	public ArrayList<BaseComponent> formatTransaction(Transaction t){
+		ComponentBuilder b = new ComponentBuilder(t.getSeller()).color(getSellerColor().asBungee());
+		b.append(" --> ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(t.getBuyer(), FormatRetention.NONE).color(getBuyerColor().asBungee());
+		b.append(": ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(t.getItem().getAmount() + " ", FormatRetention.NONE).color(getAmountColor().asBungee());
+		b.append(formatItem(idb.reverseLookup(t.getItem()))).color(getItemColor().asBungee());
+		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(t.getCost() + "", FormatRetention.NONE).color(getPriceColor().asBungee());
+		b.append(". ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append("(?)", FormatRetention.FORMATTING);
+		b.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(getBaseColor() + "- " + getTrimColor() + "Transaction Time" + getBaseColor() + " -\n  " + getBaseColor() + formatTemporal(t.getTimestamp()))));
+		
+		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+		
+    	return a;
 	}
 	
 	public ArrayList<BaseComponent> formatEnchantedTransaction(Transaction t){
@@ -717,7 +744,9 @@ public final class MessageManager {
 		//ITEM GOES HERE
 		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
 		b.append(t.getCost() + "", FormatRetention.NONE).color(getPriceColor().asBungee());
-		b.append(".", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(". ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append("(?)", FormatRetention.FORMATTING);
+		b.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(getBaseColor() + "- " + getTrimColor() + "Transaction Time" + getBaseColor() + " -\n  " + getBaseColor() + formatTemporal(t.getTimestamp()))));
 		
 		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
     	a.add(6, formatEnchantedItem(idb.reverseLookup(t.getItem()), t.getItem()));
@@ -766,7 +795,7 @@ public final class MessageManager {
 		b.append(": an enchanted ", FormatRetention.NONE).color(getColor().asBungee());
 		//b.append(o.getItem().getAmount() + " ", FormatRetention.NONE).color(getAmountColor().asBungee());
 		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
-		b.append(o.getPrice() + "", FormatRetention.NONE).color(getPriceColor().asBungee());
+		b.append(formatPrice(o.getPrice()) + "", FormatRetention.NONE).color(getPriceColor().asBungee());
 		b.append(".", FormatRetention.NONE).color(getColor().asBungee());
 		BaseComponent item = formatEnchantedItem(idb.reverseLookup(o.getItem()), o.getItem());
 		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
@@ -791,6 +820,11 @@ public final class MessageManager {
         if(header.length() % 2 == 1 && clazz == Find.class) right = right.substring(0, right.length()-1);
         return left + header + right;
     }
+	
+	public String formatTemporal(long sinceEpoch){
+		if(sinceEpoch == 0) return "    ¯\\_("+face+")_/¯";
+		return f.format(new Date(sinceEpoch)).replace("AM", "am").replace("PM","pm");
+	}
 	
 	/* Static Utility */
 	

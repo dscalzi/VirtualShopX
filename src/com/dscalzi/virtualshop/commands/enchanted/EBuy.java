@@ -227,7 +227,7 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 		DatabaseManager.getInstance().deleteEnchantedItem(o.getId());
 		InventoryManager im = new InventoryManager(p);
 		im.addItem(cleaned);
-		dbm.logTransaction(new Transaction(o.getSellerUUID(), p.getUniqueId(), cleaned.getTypeId(), cleaned.getDurability(), cleaned.getAmount(), o.getPrice(), ItemDB.formatEnchantData(ItemDB.getEnchantments(cleaned))));
+		dbm.logTransaction(new Transaction(o.getSellerUUID(), p.getUniqueId(), cleaned.getTypeId(), cleaned.getDurability(), cleaned.getAmount(), o.getPrice(), System.currentTimeMillis(), ItemDB.formatEnchantData(ItemDB.getEnchantments(cleaned))));
 		mm.ebuySuccess(p, cleaned);
 	}
 	

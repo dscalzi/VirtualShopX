@@ -155,6 +155,10 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
 			}
 			item.setAmount(amount);
 			args[1] = idb.reverseLookup(item);
+			if(item != null && ItemDB.hasEnchantments(item)){
+				mm.isEnchanted(player);
+				return false;
+			}
 		}
 		if(item==null){
 			mm.wrongItem(player, args[1]);

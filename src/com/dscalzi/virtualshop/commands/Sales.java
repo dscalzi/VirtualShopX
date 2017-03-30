@@ -136,14 +136,17 @@ public class Sales implements CommandExecutor, TabCompleter{
 		String footer = baseColor + "-" + trimColor + "Oo" + baseColor + "__________" + trimColor + "_____• " + ChatColor.GRAY + "Page " + requestedPage + " of " + sales.size() + trimColor + " •_____" + baseColor + "__________" + trimColor + "oO" + baseColor + "-";
 		
 		sender.sendMessage(header);
-		for(Transaction t : page){
-			if(t.isEnchanted()){
-				if(sender instanceof Player)
-					mm.sendRawFormattedMessage((Player)sender, mm.formatEnchantedTransaction(t));
+		if(sender instanceof Player){
+			Player p = (Player)sender;
+			for(Transaction t : page){
+				if(t.isEnchanted())
+					mm.sendRawFormattedMessage(p, mm.formatEnchantedTransaction(t));
 				else
-					sender.sendMessage(mm.formatTransaction(t, true));
-			} else
-				sender.sendMessage(mm.formatTransaction(t));
+					mm.sendRawFormattedMessage(p, mm.formatTransaction(t));
+			}
+		} else {
+			for(Transaction t : page)
+				sender.sendMessage(mm.formatTransactionConsole(t, t.isEnchanted()));
 		}
 		sender.sendMessage(footer);
 	}

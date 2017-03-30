@@ -44,6 +44,7 @@ public final class DatabaseManager {
 	public static final String QUANTITY = "quantity";
 	public static final String PRICE = "price";
 	public static final String COST = "cost";
+	public static final String TIMESTAMP = "timestamp";
 	
 	private static final Map<Class<? extends Confirmable>, String> togglesKey;
 	private static boolean initialized;
@@ -158,7 +159,7 @@ public final class DatabaseManager {
 		}
 		if(!ds.checkTable("vshop_transactions")){
 			++desired;
-			String query = "create table vshop_transactions(`" + ID + "` integer primary key" + autoIncrement + ", `" + ITEM_ID + "` integer not null, `" + ITEM_DATA + "` smallint not null, `" + ITEM_EDATA + "` varchar(255), `" + QUANTITY + "` integer not null, `" + COST + "` double not null, `" + BUYER_UUID + "` char(36) not null, `" + VENDOR_UUID + "` char(36) not null)";
+			String query = "create table vshop_transactions(`" + ID + "` integer primary key" + autoIncrement + ", `" + ITEM_ID + "` integer not null, `" + ITEM_DATA + "` smallint not null, `" + ITEM_EDATA + "` varchar(255), `" + QUANTITY + "` integer not null, `" + COST + "` double not null, `" + TIMESTAMP + "` bigint, `" + BUYER_UUID + "` char(36) not null, `" + VENDOR_UUID + "` char(36) not null)";
 			if(createTable(query)){
 				cm.logInfo("Successfully created table vshop_transaction.");
 				++checksum;
@@ -385,10 +386,10 @@ public final class DatabaseManager {
     
     //TODO HI
     @SuppressWarnings("deprecation")
-	public void logTransaction(Transaction transaction){
+	public void logTransaction(Transaction t){
     	String edata = null;
-    	if(ItemDB.hasEnchantments(transaction.getItem())) edata = ItemDB.formatEnchantData(ItemDB.getEnchantments(transaction.getItem()));
-    	String sql = "insert into vshop_transactions(" + ITEM_ID + "," + ITEM_DATA + "," + ITEM_EDATA + "," + QUANTITY + "," + COST + "," + BUYER_UUID + "," + VENDOR_UUID + ") values(" + transaction.getItem().getTypeId() + ","+ transaction.getItem().getDurability() +",'"+edata+"',"+transaction.getItem().getAmount()+","+transaction.getCost()+",'"+transaction.getBuyerUUID().toString()+"','"+transaction.getSellerUUID().toString()+"')";
+    	if(ItemDB.hasEnchantments(t.getItem())) edata = ItemDB.formatEnchantData(ItemDB.getEnchantments(t.getItem()));
+    	String sql = "insert into vshop_transactions(" + ITEM_ID + "," + ITEM_DATA + "," + ITEM_EDATA + "," + QUANTITY + "," + COST + "," + TIMESTAMP + "," + BUYER_UUID + "," + VENDOR_UUID + ") values(" + t.getItem().getTypeId() + ","+ t.getItem().getDurability() +",'"+edata+"',"+t.getItem().getAmount()+","+t.getCost()+"," + t.getTimestamp() + ",'"+t.getBuyerUUID().toString()+"','"+t.getSellerUUID().toString()+"')";
     	executeUpdate(sql);
     }
 
