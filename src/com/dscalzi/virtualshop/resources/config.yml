@@ -61,26 +61,6 @@ database_settings:
     password: password
     database: minecraft
 
-  # User data is stored based on UUID to prevent data loss
-  # through name changes. For database readability, the user's
-  # name is also listed, although it is not used at all for
-  # identification by the plugin. The names are not upated
-  # regularly, therefore if a user changes their name their old
-  # name will be listed in the databse. THE UUID WILL REMAIN THE
-  # SAME THEREFORE IT WILL NOT IMPACT THE PLUGIN OR ITS DATA.
-  #
-  # Below you can choose if you want the plugin to sync the names
-  # stored in the databases automatically. It is recommended NOT to 
-  # turn these on as it can slow down startup/shutdown time as 
-  # the databases get filled with more data.
-  #
-  # Manual syncs can be done ingame via /vs uuidnamesync [uuid]
-  UUID_name_syncs:
-    # Sync stored names when the server starts.
-    on_startup: false
-    # Sync stored names when the server shuts down.
-    on_shutdown: false
-
 #----------------[Chat Settings]----------------
 # Configure the style of the Virtual Shop's messages below.
 

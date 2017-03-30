@@ -143,7 +143,7 @@ public class ECancel implements CommandExecutor, Listener, Confirmable, TabCompl
 	}
 	
 	private void goToPage(Player player, ItemStack item, int page){	
-		List<Offer> offers = dbm.getEnchantedSellerOffers(player.getUniqueId(), item);
+		List<Offer> offers = dbm.getEnchantedSellerOffers(player.getUniqueId(), item, true);
 		if(offers.size() == 0){
 			mm.noSpecificStock(player, idb.reverseLookup(item));
 			return;
@@ -211,7 +211,7 @@ public class ECancel implements CommandExecutor, Listener, Confirmable, TabCompl
 	private Offer validateData(Player player, ItemStack item, Double price){
 		if(price == null) return null;
 		ItemStack i = ItemDB.getCleanedItem(item);
-		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price);
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price, true);
 		for(Offer o : matches)
 			if(o.getSellerUUID().equals(player.getUniqueId()))
 				return o;

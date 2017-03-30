@@ -7,6 +7,8 @@ package com.dscalzi.virtualshop.objects;
 
 import org.bukkit.inventory.ItemStack;
 
+import com.dscalzi.virtualshop.managers.DatabaseManager;
+import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.UUIDUtil;
 
 import java.sql.ResultSet;
@@ -24,19 +26,23 @@ public class Transaction {
     private ItemStack item;
     private double cost;
 
-    public Transaction(UUID sellerUUID, UUID buyerUUID, int id, int damage, int amount, double cost){
-        this.sellerUUID = sellerUUID;
+    public Transaction(UUID sellerUUID, UUID buyerUUID, int id, short damage, int amount, double cost){
+        this(sellerUUID, buyerUUID, id, damage, amount, cost, null);
+    }
+    
+    public Transaction(UUID sellerUUID, UUID buyerUUID, int id, short damage, int amount, double cost, String edata){
+    	this.sellerUUID = sellerUUID;
         this.buyerUUID = buyerUUID;
-        this.item = new ItemStack(id,amount,(short)damage);
+        this.item = new ItemStack(id,amount, damage);
+        if(edata != null) ItemDB.addEnchantments(item, ItemDB.parseEnchantData(edata));
         this.cost = cost;
     }
 
 	public static List<Transaction> listTransactions(ResultSet result){
         List<Transaction> ret = new ArrayList<Transaction>();
         try {
-            while(result.next())
-            {
-                Transaction t = new Transaction(UUID.fromString(result.getString("seller_uuid")), UUID.fromString(result.getString("buyer_uuid")), result.getInt("item"), result.getInt("damage"), result.getInt("amount"), result.getDouble("cost"));
+            while(result.next()){
+                Transaction t = new Transaction(UUID.fromString(result.getString(DatabaseManager.VENDOR_UUID)), UUID.fromString(result.getString(DatabaseManager.BUYER_UUID)), result.getInt(DatabaseManager.ITEM_ID), result.getShort(DatabaseManager.ITEM_DATA), result.getInt(DatabaseManager.QUANTITY), result.getDouble(DatabaseManager.COST), result.getString(DatabaseManager.ITEM_EDATA));
                 ret.add(t);
             }
         } catch (SQLException e) {
@@ -49,7 +55,7 @@ public class Transaction {
 		return name.isPresent() ? name.get() : getSellerUUID().toString();
 	}
 	
-	public UUID getSellerUUID() {	return sellerUUID; }
+	public UUID getSellerUUID() { return sellerUUID; }
 	
 	public String getBuyer() { 
 		Optional<String> name = UUIDUtil.getPlayerName(getBuyerUUID());
@@ -59,6 +65,8 @@ public class Transaction {
 	public UUID getBuyerUUID() { return buyerUUID; }
 
 	public ItemStack getItem() { return item; }
+	
+	public boolean isEnchanted() { return ItemDB.hasEnchantments(item); }
 
 	public double getCost() { return cost; }
 

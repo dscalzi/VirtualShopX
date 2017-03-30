@@ -213,14 +213,6 @@ public final class ConfigManager {
 		return this.config.getInt("database_settings.MySQL.port", 3306);
 	}
 	
-	public boolean uuidSyncOnEnable(){
-		return this.config.getBoolean("database_settings.UUID_name_syncs.on_startup", false);
-	}
-	
-	public boolean uuidSyncOnDisable(){
-		return this.config.getBoolean("database_settings.UUID_name_syncs.on_shutdown", false);
-	}
-	
 	public double getVersion(){
 		return this.configVersion;
 	}

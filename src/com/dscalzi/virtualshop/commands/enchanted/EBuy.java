@@ -36,6 +36,7 @@ import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Confirmable;
 import com.dscalzi.virtualshop.objects.InventoryCache;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.objects.Transaction;
 import com.dscalzi.virtualshop.objects.dataimpl.ETransactionData;
 import com.dscalzi.virtualshop.util.InventoryManager;
 import com.dscalzi.virtualshop.util.ItemDB;
@@ -141,7 +142,7 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 	}
 	
 	private void goToPage(Player player, ItemStack item, int page){	
-		List<Offer> offers = dbm.getEnchantedOffers(item);
+		List<Offer> offers = dbm.getEnchantedOffers(item, true);
 		if(offers.size() == 0){
 			mm.noListings(player, idb.reverseLookup(item));
 			return;
@@ -209,7 +210,7 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 	private Offer validateData(Player player, ItemStack item, Double price){
 		if(price == null) return null;
 		ItemStack i = ItemDB.getCleanedItem(item);
-		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price);
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price, true);
 		for(Offer o : matches)
 			if(!o.getSellerUUID().equals(player.getUniqueId()))
 				return o;
@@ -217,6 +218,7 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 		return matches.size() > 0 ? matches.get(0) : null;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void finalizeTransaction(Player p, Offer o){
 		ItemStack cleaned = ItemDB.getCleanedItem(o.getItem());
 		VirtualShop.getEconomy().withdrawPlayer(p, o.getPrice());
@@ -225,6 +227,7 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 		DatabaseManager.getInstance().deleteEnchantedItem(o.getId());
 		InventoryManager im = new InventoryManager(p);
 		im.addItem(cleaned);
+		dbm.logTransaction(new Transaction(o.getSellerUUID(), p.getUniqueId(), cleaned.getTypeId(), cleaned.getDurability(), cleaned.getAmount(), o.getPrice(), ItemDB.formatEnchantData(ItemDB.getEnchantments(cleaned))));
 		mm.ebuySuccess(p, cleaned);
 	}
 	

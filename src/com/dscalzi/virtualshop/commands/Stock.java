@@ -110,7 +110,13 @@ public class Stock implements CommandExecutor, TabCompleter{
 		
 		List<Offer> stock = null;
 		try{
-			stock = fullServerRecord ? dbm.getAllOffers() : dbm.searchBySeller(target.getUniqueId());
+			List<Offer> rstock = fullServerRecord ? dbm.getAllRegularOffers() : dbm.searchRegularBySeller(target.getUniqueId());
+			List<Offer> estock = fullServerRecord ? dbm.getAllEnchantedOffers(false) : dbm.searchEnchantedBySeller(target.getUniqueId(), false);
+			stock = new ArrayList<Offer>();
+			if(rstock != null)
+				stock.addAll(rstock);
+			if(estock != null)
+				stock.addAll(estock);
 		} catch (NullPointerException e){
 			mm.noStock(sender, (target.getName() == null) ? args[0] : target.getName());
 			return;
@@ -138,7 +144,13 @@ public class Stock implements CommandExecutor, TabCompleter{
 		
 		sender.sendMessage(header);
 		for(Offer o : page){
-			sender.sendMessage(mm.formatOffer(o));
+			if(o.isEnchanted()){
+				if(sender instanceof Player)
+					mm.sendRawFormattedMessage((Player)sender, mm.formatEOffer(o));
+				else
+					sender.sendMessage(mm.formatOffer(o, true));
+			} else
+				sender.sendMessage(mm.formatOffer(o));
 		}
 		sender.sendMessage(footer);
 	}

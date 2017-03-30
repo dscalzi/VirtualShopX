@@ -8,8 +8,6 @@ package com.dscalzi.virtualshop.commands;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.bukkit.command.Command;
@@ -27,8 +25,6 @@ import com.dscalzi.virtualshop.objects.Offer;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Reloader;
 import com.dscalzi.vsreloader.PluginUtil;
-
-import javafx.util.Pair;
 
 public class VS implements CommandExecutor, TabCompleter{
 
@@ -103,18 +99,6 @@ public class VS implements CommandExecutor, TabCompleter{
 					this.formatMarket(sender);
 					return true;
 				}
-				if(args[0].equalsIgnoreCase("uuidnamesync")){
-					if(args.length > 1){
-						this.cmdUUIDNameSync(sender, Optional.of(args[1]));
-						return true;
-					}
-					this.cmdUUIDNameSync(sender, Optional.empty());
-					return true;
-				}
-				if(args[0].equalsIgnoreCase("update2uuid")){
-					this.cmdupdateuuid(sender);
-					return true;
-				}
 				if(args[0].equalsIgnoreCase("fullreload")){
 					this.cmdFullReload(sender);
 					return true;
@@ -141,23 +125,6 @@ public class VS implements CommandExecutor, TabCompleter{
 		}
 		
 		return true;
-	}
-	
-	public void cmdupdateuuid(CommandSender sender){
-		
-		if(!sender.hasPermission("virtualshop.*")){
-			mm.noPermissions(sender);
-            return;
-		}
-		
-		try{
-			@SuppressWarnings("deprecation")
-			Pair<Integer, Integer> sfs = dbm.updateDatabase();
-			mm.sendSuccess(sender, "Database updated. " + sfs.getKey() + " successful, " + sfs.getValue() + " failed.");
-		} catch(Exception ex){
-			ex.printStackTrace();
-			mm.sendError(sender, "FAILED");
-		}
 	}
 	
 	public void cmdList(CommandSender sender, int page){
@@ -229,7 +196,7 @@ public class VS implements CommandExecutor, TabCompleter{
 		}
 		
 		int amt = 0;
-		for(Offer o : dbm.getAllOffers()){
+		for(Offer o : dbm.getAllRegularOffers()){
 			if(o.getPrice() > cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData())){
 				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
 				++amt;
@@ -260,7 +227,7 @@ public class VS implements CommandExecutor, TabCompleter{
 			mm.wrongItem(sender, itm);
 			return;
 		}
-		for(Offer o : dbm.getAllOffers()){
+		for(Offer o : dbm.getAllRegularOffers()){
 			boolean isSameItem = idb.reverseLookup(item).equalsIgnoreCase(idb.reverseLookup(o.getItem()));
 			if(o.getPrice() > cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()) && isSameItem){
 				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
@@ -271,34 +238,6 @@ public class VS implements CommandExecutor, TabCompleter{
 			mm.listingsAlreadyFormatted(sender);
 		else
 			mm.listingsFormatted(sender, amt);
-	}
-	
-	public void cmdUUIDNameSync(CommandSender sender, Optional<String> uuid){
-		
-		if(!sender.hasPermission("virtualshop.admin.uuidnamesync")){
-			mm.noPermissions(sender);
-            return;
-		}
-		
-		if(uuid.isPresent()){
-			UUID target;
-			try {
-				target = UUID.fromString(uuid.get());
-			} catch(IllegalArgumentException e){
-				mm.invalidUUIDFormat(sender);
-				return;
-			}
-			Pair<Boolean, Integer> response = dbm.syncNameToUUID(target);
-			if(response.getKey()) mm.accountSynced(sender);
-			else if(response.getValue() == 1) mm.accountAlreadySynced(sender);
-			else if(response.getValue() == 404) mm.accountNotFound(sender);
-			else mm.queryError(sender);
-		} else {
-			int updated = dbm.syncNameToUUID();
-			if(updated > 0) mm.accountsSynced(sender, updated);
-			else mm.accountsAlreadySynced(sender);
-		}
-		
 	}
 	
 	private void redirectCommand(CommandSender sender, String[] args){
@@ -408,8 +347,6 @@ public class VS implements CommandExecutor, TabCompleter{
 				ret.add("formatmarket");
 			if(sender.hasPermission("virtualshop.admin.reload") && "reload".startsWith(args[0].toLowerCase())) 
 				ret.add("reload");
-			if(sender.hasPermission("virtualshop.admin.uuidnamesync") && "uuidnamesync".startsWith(args[0].toLowerCase())) 
-				ret.add("uuidnamesync");
 			if(sender.hasPermission("virtualshop.developer.fullreload") && "fullreload".startsWith(args[0].toLowerCase())) 
 				ret.add("fullreload");
 		}

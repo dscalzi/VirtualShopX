@@ -137,7 +137,13 @@ public class Sales implements CommandExecutor, TabCompleter{
 		
 		sender.sendMessage(header);
 		for(Transaction t : page){
-			sender.sendMessage(mm.formatTransaction(t));
+			if(t.isEnchanted()){
+				if(sender instanceof Player)
+					mm.sendRawFormattedMessage((Player)sender, mm.formatEnchantedTransaction(t));
+				else
+					sender.sendMessage(mm.formatTransaction(t, true));
+			} else
+				sender.sendMessage(mm.formatTransaction(t));
 		}
 		sender.sendMessage(footer);
 	}

@@ -9,6 +9,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.UUIDUtil;
@@ -47,7 +48,7 @@ public class Offer {
         List<Offer> ret = new ArrayList<Offer>();
         try {
             while(result.next()){
-                Offer o = new Offer(UUID.fromString(result.getString("uuid")), result.getInt("item"), (short)result.getInt("damage"),result.getDouble("price"),result.getInt("amount"));
+                Offer o = new Offer(UUID.fromString(result.getString(DatabaseManager.UUIDKEY)), result.getInt(DatabaseManager.ITEM_ID), (short)result.getInt(DatabaseManager.ITEM_DATA),result.getDouble(DatabaseManager.PRICE),result.getInt(DatabaseManager.QUANTITY));
                 o.setId(result.getInt("id"));
                 ret.add(o);
             }
@@ -56,24 +57,26 @@ public class Offer {
         return ret;
     }
     
-    public static List<Offer> listEnchantedOffers(ResultSet result){
+    public static List<Offer> listEnchantedOffers(ResultSet result, boolean withLore){
     	List<Offer> ret = new ArrayList<Offer>();
     	try{
     		while(result.next()){
-    			ItemStack item = new ItemStack(result.getInt("item"), 1, (short)result.getInt("data"));
-    			Map<Enchantment, Integer> enchantments = ItemDB.parseEnchantData(result.getString("edata"));
+    			ItemStack item = new ItemStack(result.getInt(DatabaseManager.ITEM_ID), 1, (short)result.getInt(DatabaseManager.ITEM_DATA));
+    			Map<Enchantment, Integer> enchantments = ItemDB.parseEnchantData(result.getString(DatabaseManager.ITEM_EDATA));
     			ItemDB.addEnchantments(item, enchantments);
     			ItemMeta meta = item.getItemMeta();
-    			Double price = result.getDouble("price");
-    			Offer o = new Offer(UUID.fromString(result.getString("uuid")), item, price);
-    			List<String> desc = new ArrayList<String>();
-    			desc.add("");
-    			desc.add(ChatColor.YELLOW + "Price: " + MessageManager.getInstance().formatPrice(price));
-    			desc.add(ChatColor.RED + "Seller: " + o.getSeller());
-    			meta.setLore(desc);
-    			item.setItemMeta(meta);
+    			Double price = result.getDouble(DatabaseManager.PRICE);
+    			Offer o = new Offer(UUID.fromString(result.getString(DatabaseManager.UUIDKEY)), item, price);
+    			if(withLore){
+	    			List<String> desc = new ArrayList<String>();
+	    			desc.add("");
+	    			desc.add(ChatColor.YELLOW + "Price: " + MessageManager.getInstance().formatPrice(price));
+	    			desc.add(ChatColor.RED + "Seller: " + o.getSeller());
+	    			meta.setLore(desc);
+	    			item.setItemMeta(meta);
+    			}
     			o.setItem(item);
-    			o.setId(result.getInt("id"));
+    			o.setId(result.getInt(DatabaseManager.ID));
     			ret.add(o);
     		}
     	} catch (SQLException e){
@@ -114,6 +117,8 @@ public class Offer {
 	public ItemStack getItem() { return item; }
 
 	public void setItem(ItemStack item) { this.item = item; }
+	
+	public boolean isEnchanted() { return ItemDB.hasEnchantments(item); }
 
 	public double getPrice() { return price; }
 

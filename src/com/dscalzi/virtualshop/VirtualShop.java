@@ -58,13 +58,11 @@ public class VirtualShop extends JavaPlugin {
         if(ConfigManager.getInstance().enableVSR())
         	Reloader.initialize(this);
         this.registerCommands();
-        if(ConfigManager.getInstance().uuidSyncOnEnable()) this.syncNameToUUID();
         this.metrics = new Metrics(this);
     }
     
     public void onDisable(){
     	ConfirmationManager.getInstance().serialize();
-    	if(ConfigManager.getInstance().uuidSyncOnDisable()) this.syncNameToUUID();
     	DatabaseManager.getInstance().terminate();
         System.gc();
     }
@@ -97,13 +95,6 @@ public class VirtualShop extends JavaPlugin {
     	this.getCommand("stock").setExecutor(new Stock(this));
     	this.getCommand("reprice").setExecutor(new Reprice(this));
     	this.getCommand("vs").setExecutor(new VS(this));
-    }
-    
-    private void syncNameToUUID(){
-    	this.getLogger().info("Syncing account data..");
-    	int result = DatabaseManager.getInstance().syncNameToUUID();
-    	if(result > 0) this.getLogger().info("Done! Successfully synced " + result + ((result == 1) ? " account." : " accounts."));
-    	else this.getLogger().info("All accounts are already synced!");
     }
     
     public static boolean hasEnough(Player player, double money){

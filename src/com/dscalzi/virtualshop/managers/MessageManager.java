@@ -163,6 +163,14 @@ public final class MessageManager {
 		p.spigot().sendMessage(fullComponents);
 	}
 	
+	public void sendRawFormattedMessage(Player p, ArrayList<BaseComponent> components){
+		sendRawFormattedMessage(p, components.toArray(new BaseComponent[components.size()]));
+	}
+	
+	public void sendRawFormattedMessage(Player p, BaseComponent... components){
+		p.spigot().sendMessage(components);
+	}
+	
 	//For potentially offline players
 	
 	public boolean sendSuccess(String p, String message){
@@ -177,6 +185,12 @@ public final class MessageManager {
     }
 	
 	public void sendFormattedGlobal(BaseComponent... components){
+		for(Player p : this.plugin.getServer().getOnlinePlayers()){
+			sendFormattedMessage(p, components);
+		}
+	}
+	
+	public void sendFormattedGlobal(ArrayList<BaseComponent> components){
 		for(Player p : this.plugin.getServer().getOnlinePlayers()){
 			sendFormattedMessage(p, components);
 		}
@@ -610,8 +624,6 @@ public final class MessageManager {
 			cmds.add(listPrefix + tColor + "/vs reload" + dColor + " - Reload the plugin's configuration.");
 		if(sender.hasPermission("virtualshop.developer.fullreload"))
 			cmds.add(listPrefix + tColor + "/vs fullreload" + dColor + " - Reload the entire plugin's jar file.");
-		if(sender.hasPermission("virtualshop.admin.uuidnamesync"))
-			cmds.add(listPrefix + tColor + "/vs uuidnamesync [uuid]" + dColor + " - Syncs database names with uuids.");
 		
 		
 		PageList<String> commands = new PageList<String>(6, cmds);
@@ -646,11 +658,15 @@ public final class MessageManager {
 	}
 
 	public String formatItem(String item){
-		return formatItem(item, true);
+		return formatItem(item, true, false);
 	}
 	
 	public String formatItem(String item, boolean forceCase){
-		return getItemColor() + (forceCase ? item.toLowerCase() : item) + getColor();
+		return formatItem(item, forceCase, false);
+	}
+	
+	public String formatItem(String item, boolean forceCase, boolean enchanted){
+		return getItemColor() + (enchanted ? "" + ChatColor.ITALIC : "") + (forceCase ? item.toLowerCase() : item) + getColor();
 	}
 	
 	public String formatPrice(double price){
@@ -662,7 +678,11 @@ public final class MessageManager {
 	}
 	
 	public String formatOffer(Offer o){
-        return formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " " + formatItem(idb.reverseLookup(o.getItem())) + " for " + formatPrice(o.getPrice()) + " each.";
+        return formatOffer(o, false);
+    }
+	
+	public String formatOffer(Offer o, boolean enchanted){
+        return formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " " + formatItem(idb.reverseLookup(o.getItem()), enchanted) + " for " + formatPrice(o.getPrice()) + " each.";
     }
 	
 	public BaseComponent[] formatOffer0(Offer o){
@@ -680,7 +700,29 @@ public final class MessageManager {
 	}
 	
 	public String formatTransaction(Transaction t){
-		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(idb.reverseLookup(t.getItem())) + " for "+ formatPrice(t.getCost());
+		return formatTransaction(t, false);
+	}
+	
+	public String formatTransaction(Transaction t, boolean enchanted){
+		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(idb.reverseLookup(t.getItem()), true, enchanted) + " for "+ formatPrice(t.getCost()) + ".";
+	}
+	
+	public ArrayList<BaseComponent> formatEnchantedTransaction(Transaction t){
+		ComponentBuilder b = new ComponentBuilder(t.getSeller()).color(getSellerColor().asBungee());
+		b.append(" --> ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(t.getBuyer(), FormatRetention.NONE).color(getBuyerColor().asBungee());
+		b.append(": ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(t.getItem().getAmount() + "", FormatRetention.NONE).color(getAmountColor().asBungee());
+		b.append(" ");
+		//ITEM GOES HERE
+		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(t.getCost() + "", FormatRetention.NONE).color(getPriceColor().asBungee());
+		b.append(".", FormatRetention.NONE).color(getColor().asBungee());
+		
+		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(6, formatEnchantedItem(idb.reverseLookup(t.getItem()), t.getItem()));
+		
+    	return a;
 	}
 	
 	public BaseComponent formatEnchantedItem(String item, ItemStack itemStack){
@@ -719,15 +761,17 @@ public final class MessageManager {
         return itemAsJsonObject.toString();
     }
 	
-	public BaseComponent[] formatEOffer(Offer o){
-		BaseComponent[] before = TextComponent.fromLegacyText(formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " ");
+	public ArrayList<BaseComponent> formatEOffer(Offer o){
+		ComponentBuilder b = new ComponentBuilder(o.getSeller()).color(getSellerColor().asBungee());
+		b.append(": an enchanted ", FormatRetention.NONE).color(getColor().asBungee());
+		//b.append(o.getItem().getAmount() + " ", FormatRetention.NONE).color(getAmountColor().asBungee());
+		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
+		b.append(o.getPrice() + "", FormatRetention.NONE).color(getPriceColor().asBungee());
+		b.append(".", FormatRetention.NONE).color(getColor().asBungee());
 		BaseComponent item = formatEnchantedItem(idb.reverseLookup(o.getItem()), o.getItem());
-		BaseComponent[] after = TextComponent.fromLegacyText(getColor() + " for " + formatPrice(o.getPrice()) + " each.");
-		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>();
-		a.addAll(Arrays.asList(before));
-		a.add(item);
-		a.addAll(Arrays.asList(after));
-		return a.toArray(new BaseComponent[a.size()]);
+		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+		a.add(2, item);
+		return a;
 	}
 	
 	public String formatHeaderLength(String header, Class<? extends CommandExecutor> clazz){
