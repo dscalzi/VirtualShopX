@@ -23,6 +23,7 @@ import com.dscalzi.virtualshop.commands.Reprice;
 import com.dscalzi.virtualshop.commands.VS;
 import com.dscalzi.virtualshop.commands.enchanted.EBuy;
 import com.dscalzi.virtualshop.commands.enchanted.ECancel;
+import com.dscalzi.virtualshop.commands.enchanted.EReprice;
 import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.UIManager;
@@ -87,6 +88,7 @@ public class VirtualShop extends JavaPlugin {
     	this.getCommand("ebuy").setExecutor(new EBuy(this));
     	this.getCommand("cancel").setExecutor(new Cancel(this));
     	this.getCommand("ecancel").setExecutor(new ECancel(this));
+    	this.getCommand("ereprice").setExecutor(new EReprice(this));
     	this.getCommand("find").setExecutor(new Find(this));
     	this.getCommand("shop").setExecutor(new VS(this));
     	this.getCommand("sales").setExecutor(new Sales(this));

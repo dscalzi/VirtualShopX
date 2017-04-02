@@ -28,8 +28,8 @@ import com.dscalzi.vsreloader.PluginUtil;
 
 public class VS implements CommandExecutor, TabCompleter{
 
-	private static final Pattern redirects = Pattern.compile("^(?iu)(buy|sell|cancel|find|reprice|stock|sales|ebuy|esell|ecancel)");
-	private static final Pattern confirmables = Pattern.compile("^(?iu)(buy|sell|cancel|reprice|ebuy|esell|ecancel)");
+	private static final Pattern redirects = Pattern.compile("^(?iu)(buy|sell|cancel|find|reprice|stock|sales|ebuy|esell|ecancel|ereprice)");
+	private static final Pattern confirmables = Pattern.compile("^(?iu)(buy|sell|cancel|reprice|ebuy|esell|ecancel|ereprice)");
 	
 	private VirtualShop plugin;
 	private final MessageManager mm;
@@ -323,16 +323,20 @@ public class VS implements CommandExecutor, TabCompleter{
 		if(args.length == 1){
 			if(sender.hasPermission("virtualshop.merchant.regular.buy") && "buy".startsWith(args[0].toLowerCase())) 
 				ret.add("buy");
-			if(sender.hasPermission("virtualshop.merchant.enchanted.buy") && "buy".startsWith(args[0].toLowerCase())) 
+			if(sender.hasPermission("virtualshop.merchant.enchanted.buy") && "ebuy".startsWith(args[0].toLowerCase())) 
 				ret.add("ebuy");
 			if(sender.hasPermission("virtualshop.merchant.regular.sell") && "sell".startsWith(args[0].toLowerCase())) 
 				ret.add("sell");
-			if(sender.hasPermission("virtualshop.merchant.enchanted.sell") && "sell".startsWith(args[0].toLowerCase())) 
-				ret.add("ssell");
+			if(sender.hasPermission("virtualshop.merchant.enchanted.sell") && "esell".startsWith(args[0].toLowerCase())) 
+				ret.add("esell");
 			if(sender.hasPermission("virtualshop.merchant.regular.cancel") && "cancel".startsWith(args[0].toLowerCase())) 
 				ret.add("cancel");
-			if(sender.hasPermission("virtualshop.merchant.enchanted.cancel") && "cancel".startsWith(args[0].toLowerCase())) 
+			if(sender.hasPermission("virtualshop.merchant.enchanted.cancel") && "ecancel".startsWith(args[0].toLowerCase())) 
 				ret.add("ecancel");
+			if(sender.hasPermission("virtualshop.merchant.regular.reprice") && "reprice".startsWith(args[0].toLowerCase())) 
+				ret.add("reprice");
+			if(sender.hasPermission("virtualshop.merchant.enchanted.reprice") && "ereprice".startsWith(args[0].toLowerCase())) 
+				ret.add("ereprice");
 			if(sender.hasPermission("virtualshop.merchant.sales.individual") && "sales".startsWith(args[0].toLowerCase())) 
 				ret.add("sales");
 			if(sender.hasPermission("virtualshop.merchant.stock.individual") && "stock".startsWith(args[0].toLowerCase())) 
@@ -341,8 +345,6 @@ public class VS implements CommandExecutor, TabCompleter{
 				ret.add("find");
 			if(sender.hasPermission("virtualshop.merchant.lookup") && "lookup".startsWith(args[0].toLowerCase())) 
 				ret.add("lookup");
-			if(sender.hasPermission("virtualshop.merchant.reprice") && "reprice".startsWith(args[0].toLowerCase())) 
-				ret.add("reprice");
 			if(sender.hasPermission("virtualshop.admin.formatmarket") && "formatmarket".startsWith(args[0].toLowerCase())) 
 				ret.add("formatmarket");
 			if(sender.hasPermission("virtualshop.admin.reload") && "reload".startsWith(args[0].toLowerCase())) 

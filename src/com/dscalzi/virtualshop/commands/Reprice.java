@@ -54,7 +54,7 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
             mm.denyConsole(sender);
             return true;
         }
-		if(!sender.hasPermission("virtualshop.merchant.reprice")){
+		if(!sender.hasPermission("virtualshop.merchant.regular.reprice")){
 			mm.noPermissions(sender);
 			return true;
 		}

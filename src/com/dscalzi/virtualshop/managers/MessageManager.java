@@ -214,7 +214,17 @@ public final class MessageManager {
 		double oldPrice = data.getOldPrice(), newPrice = data.getPrice(), difference = newPrice-oldPrice;
 		item.setAmount(data.getCurrentListings());
 		Offer o = new Offer(player.getUniqueId(), item, newPrice);
-		sendGlobal(formatOffer(o) + ((difference < 0) ? ChatColor.GREEN + " (▼" + cm.getLocalization().formatPrice(Math.abs(difference)) +  ")" : ChatColor.RED + " (▲" + cm.getLocalization().formatPrice(difference) +  ")"));
+		sendGlobal(formatOffer(o) + ((difference < 0) ? getSuccessColor() + " (▼" + cm.getLocalization().formatPrice(Math.abs(difference)) +  ")" : getErrorColor() + " (▲" + cm.getLocalization().formatPrice(difference) +  ")"));
+	}
+	
+	public void broadcastEnchantedPriceUpdate(Player player, EListingData data){
+		ItemStack item = data.getItem();
+		double oldPrice = data.getOldPrice(), newPrice = data.getPrice(), difference = newPrice-oldPrice;
+		Offer o = new Offer(player.getUniqueId(), item, newPrice);
+		ArrayList<BaseComponent> eO = formatEOffer(o);
+		ComponentBuilder b = (difference < 0) ? new ComponentBuilder(" (▼" + cm.getLocalization().formatPrice(Math.abs(difference)) +  ")").color(getSuccessColor().asBungee()) : new ComponentBuilder(" (▲" + cm.getLocalization().formatPrice(difference) +  ")").color(getErrorColor().asBungee());
+		eO.addAll(Arrays.asList(b.create()));
+		sendFormattedGlobal(eO);
 	}
 	
 	public String getString(String message, Object... args){
@@ -362,26 +372,6 @@ public final class MessageManager {
 		sendError(sender, "Invalid UUID format.");
 	}
 	
-	public void accountSynced(CommandSender sender){
-		sendSuccess(sender, "The account associated with the specified UUID has been synced.");
-	}
-	
-	public void accountsSynced(CommandSender sender, int updated){
-		sendSuccess(sender, getString("Successfully synced {0,choice,1#1 account|1<{0} accounts}.", updated));
-	}
-	
-	public void accountAlreadySynced(CommandSender sender){
-		sendError(sender, "The account associated with the specified UUID is already synced.");
-	}
-	
-	public void accountsAlreadySynced(CommandSender sender){
-		sendSuccess(sender, "All account names and UUIDs are already synced!");
-	}
-	
-	public void accountNotFound(CommandSender sender){
-		sendError(sender, "The account associated with the specified UUID was not found in the database.");
-	}
-	
 	public void queryError(CommandSender sender){
 		sendError(sender, "There was an error while querying the database.");
 	}
@@ -512,6 +502,21 @@ public final class MessageManager {
     	confirmationMsg(player, label, Reprice.class);
     }
     
+    public void eRepriceConfirmation(Player player, String label, EListingData data){
+    	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
+    	ComponentBuilder b = new ComponentBuilder("You are about to update the price of your enchanted ").color(getColor().asBungee());
+    	b.append(" for a " + quantity + " price of ", FormatRetention.NONE).color(getColor().asBungee());
+    	b.append(formatPrice(data.getPrice()), FormatRetention.NONE).color(getPriceColor().asBungee());
+    	b.append(".", FormatRetention.NONE).color(getColor().asBungee());
+    	
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getCleanedItem()));
+    	
+    	sendFormattedMessage(player, a);
+    	
+    	confirmationMsg(player, label, ECancel.class);
+    }
+    
     public void confirmationMsg(Player player, String label, Class<? extends Confirmable> origin){
     	
     	String type = origin == Reprice.class || origin == Cancel.class || origin == ECancel.class ? "request" : "transaction";
@@ -596,6 +601,7 @@ public final class MessageManager {
         cmds.add(listPrefix + tColor + "/ebuy " + iColor + "<item> " + dColor + " - Browse and buy enchanted items.");
         cmds.add(listPrefix + tColor + "/esell " + iColor + "<item> " + dColor + " - Sell enchanted items." );
         cmds.add(listPrefix + tColor + "/ecancel " + "<item> " + dColor + " - Cancel enchanted items.");
+        cmds.add(listPrefix + tColor + "/reprice " + iColor + "<item> " + pColor + "<price>" + dColor + " - Reprice an enchanted listing.");
         cmds.add(listPrefix + tColor + "/<command> " + sColor + "confirm " + ChatColor.DARK_GREEN + "toggle " + dColor + " - Toggle confirmations for <command>.");
         
         PageList<String> commands = new PageList<String>(6, cmds);

@@ -32,6 +32,7 @@ general_settings:
     sell: 15000
     esell: 15000
     reprice: 15000
+    ereprice: 15000
     cancel: 15000
     ecancel: 15000
     

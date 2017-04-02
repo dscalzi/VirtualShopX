@@ -21,6 +21,7 @@ import com.dscalzi.virtualshop.commands.Cancel;
 import com.dscalzi.virtualshop.commands.Sell;
 import com.dscalzi.virtualshop.commands.enchanted.EBuy;
 import com.dscalzi.virtualshop.commands.enchanted.ECancel;
+import com.dscalzi.virtualshop.commands.enchanted.EReprice;
 import com.dscalzi.virtualshop.commands.enchanted.ESell;
 import com.dscalzi.virtualshop.connection.ConnectionWrapper;
 import com.dscalzi.virtualshop.connection.MySQLWrapper;
@@ -56,6 +57,7 @@ public final class DatabaseManager {
 		togglesKey.put(Sell.class, "sellconfirm");
 		togglesKey.put(ESell.class, "esellconfirm");
 		togglesKey.put(Reprice.class, "repriceconfirm");
+		togglesKey.put(EReprice.class, "erepriceconfirm");
 		togglesKey.put(Cancel.class, "cancelconfirm");
 		togglesKey.put(ECancel.class, "ecancelconfirm");
 	}
@@ -168,7 +170,7 @@ public final class DatabaseManager {
 		}
 		if(!ds.checkTable("vshop_toggles")){
 			++desired;
-			String query = "create table vshop_toggles(`" + ID + "` integer primary key" + autoIncrement + ", `buyconfirm` bit not null, `ebuyconfirm` bit not null,`sellconfirm` bit not null, `esellconfirm` bit not null, `cancelconfirm` bit not null, `ecancelconfirm` bit not null, `repriceconfirm` bit not null, `" + UUIDKEY + "` char(36) not null)";
+			String query = "create table vshop_toggles(`" + ID + "` integer primary key" + autoIncrement + ", `buyconfirm` bit not null, `ebuyconfirm` bit not null,`sellconfirm` bit not null, `esellconfirm` bit not null, `cancelconfirm` bit not null, `ecancelconfirm` bit not null, `repriceconfirm` bit not null, `erepriceconfirm` bit not null, `" + UUIDKEY + "` char(36) not null)";
 			if(createTable(query)){
 				cm.logInfo("Successfully created table vshop_toggles.");
 				++checksum;
@@ -216,7 +218,7 @@ public final class DatabaseManager {
     }
     
     public void addPlayerToToggles(UUID vendorUUID){
-    	String sql = "insert into vshop_toggles(buyconfirm,ebuyconfirm,sellconfirm,esellconfirm,cancelconfirm,ecancelconfirm,repriceconfirm," + UUIDKEY + ") values(1,1,1,1,1,1,1,'" + vendorUUID.toString() + "')";
+    	String sql = "insert into vshop_toggles(buyconfirm,ebuyconfirm,sellconfirm,esellconfirm,cancelconfirm,ecancelconfirm,repriceconfirm,erepriceconfirm," + UUIDKEY + ") values(1,1,1,1,1,1,1,1,'" + vendorUUID.toString() + "')";
     	executeUpdate(sql);
     }
     
@@ -380,6 +382,11 @@ public final class DatabaseManager {
     @SuppressWarnings("deprecation")
 	public void updatePrice(UUID vendorUUID, double price, ItemStack item){
     	String sql = "update vshop_stock set " + PRICE + "="+price+" where " + UUIDKEY + "='" + vendorUUID + "' and " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "= " + item.getDurability();
+    	executeUpdate(sql);
+    }
+    
+	public void updatePriceEnchanted(int id, double price){
+    	String sql = "update vshop_estock set " + PRICE + "="+price+" where " + ID + "=" + id;
     	executeUpdate(sql);
     }
     

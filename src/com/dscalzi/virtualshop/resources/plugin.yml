@@ -39,6 +39,9 @@ commands:
   reprice:
     description: Reprices a listing.
     usage: /<command> <item> <price>
+  ereprice:
+    description: Reprices an enchanted listing.
+    usage: /<command> <item> <price>
   vs:
     description: Technical commands under /vs.
     usage: /<command> [param]
@@ -49,17 +52,18 @@ permissions:
         children:
           virtualshop.merchant.lookup: true
           virtualshop.merchant.find: true
-          virtualshop.merchant.reprice: true
           virtualshop.merchant.regular.*:
             children:
               virtualshop.merchant.regular.buy: true
               virtualshop.merchant.regular.cancel: true
               virtualshop.merchant.sell.regular: true
+              virtualshop.merchant.reprice.regular: true
           virtualshop.merchant.enchanted.*:
             children:
               virtualshop.merchant.enchanted.buy: true
               virtualshop.merchant.enchanted.cancel: true
               virtualshop.merchant.enchanted.sell: true
+              virtualshop.merchant.enchanted.reprice: true
           virtualshop.merchant.sales.*:
             children:
               virtualshop.merchant.sales.individual: true
