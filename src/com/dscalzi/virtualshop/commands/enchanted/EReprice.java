@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -141,20 +140,25 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
     		mm.wrongItem(player, args[0]);
     		return;
     	}
-		double newPrice = InputUtil.parsedDouble(args[1]);
+		double newPrice = InputUtil.parseDouble(args[1]);
 		if(newPrice < 0){
-			mm.numberFormat(player);
-			return;
+			if(args[1].startsWith("~")){
+				//We'll process it later.
+			} else {
+				mm.numberFormat(player);
+				return;
+			}
 		}
+		
 		if(newPrice > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
 			mm.priceTooHigh(player, args[0], cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return;
 		}
 		
-		this.goToPage(player, item, newPrice, 1);
+		this.goToPage(player, item, newPrice, args, 1);
 	}
 	
-	private void goToPage(Player player, ItemStack item, double newPrice, int page){	
+	private void goToPage(Player player, ItemStack item, double newPrice, String[] args, int page){	
 		List<Offer> offers = dbm.getEnchantedSellerOffers(player.getUniqueId(), item, true);
 		if(offers.size() == 0){
 			mm.noSpecificStock(player, idb.reverseLookup(item));
@@ -200,7 +204,7 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 			++itemCount;
 		}
 		
-		confirmations.register(this.getClass(), player, new EListingData(item, newPrice, -1, -1, null));
+		confirmations.register(this.getClass(), player, new EListingData(item, newPrice, -1, -1, args));
 		
 		uim.openUI(player, inventory, item, this.getClass(), page);
 	}
@@ -245,18 +249,27 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 				//Next button
 				EListingData d =  (EListingData)confirmations.retrieve(this.getClass(), player);
 				if(event.getCurrentItem().equals(utility[0])){
-					goToPage(player, c.getItem(), d.getPrice(), c.getPage()+1);
+					goToPage(player, c.getItem(), d.getPrice(), d.getArgs(), c.getPage()+1);
 					return;
 				}
 				//Previous button
 				if(event.getCurrentItem().equals(utility[1])){
-					goToPage(player, c.getItem(), d.getPrice(), c.getPage()-1);
+					goToPage(player, c.getItem(), d.getPrice(), d.getArgs(), c.getPage()-1);
 					return;
 				}
 				if(ItemDB.hasEnchantments(event.getCurrentItem())){
 					Offer match = this.validateData(player, event.getCurrentItem());
 					if(match != null){
-						EListingData nd = new EListingData(ItemDB.getCleanedItem(match.getItem()), d.getPrice(), match.getPrice(), System.currentTimeMillis(), new String[]{Integer.toString(match.getId())});
+						ItemStack cleaned = ItemDB.getCleanedItem(match.getItem());
+						double newPrice = d.getPrice();
+						String[] args = d.getArgs();
+						double ret = checkApproxPrice(player, cleaned, args);
+						if(ret < 0) {
+							player.closeInventory();
+							return;
+						}
+						if(ret > 0) newPrice = ret;
+						EListingData nd = new EListingData(cleaned, newPrice, match.getPrice(), System.currentTimeMillis(), new String[]{Integer.toString(match.getId()), args[1]});
 						if(dbm.getToggle(player.getUniqueId(), this.getClass())){
 							confirmations.register(this.getClass(), player, nd);
 							mm.eRepriceConfirmation(player, latestLabel.get(player), nd);
@@ -285,17 +298,54 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 			return;
 		}
 		EListingData d = (EListingData)confirmations.retrieve(this.getClass(), player);
+		double ret = checkApproxPrice(player, d.getCleanedItem(), d.getArgs());
+		if(ret == -1) return;
 		Offer match = validateData(player, d.getItem(), d.getOldPrice());
 		ItemStack cM = ItemDB.getCleanedItem(match.getItem());
 		ItemStack oM = d.getCleanedItem();
 		long timeElapsed = System.currentTimeMillis() - d.getTransactionTime();
 		if(timeElapsed > cm.getConfirmationTimeout(this.getClass()))
 			mm.confirmationExpired(player);
-		else if(match == null || match.getId() != Integer.parseInt(d.getArgs()[0]) || !cM.isSimilar(oM))
+		else if(match == null || match.getId() != Integer.parseInt(d.getArgs()[0]) || !cM.isSimilar(oM) || (ret > 0 && ret != d.getPrice()))
 			mm.invalidConfirmData(player);
 		else
 			finalizeReprice(player, d);
 		confirmations.unregister(this.getClass(), player);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public double checkApproxPrice(Player player, ItemStack cleaned, String[] args){
+		if(args[1].startsWith("~")){
+			try {
+				double newPrice = -1;
+				double amt = Double.parseDouble(args[1].substring(1));
+				List<Offer> offers =  dbm.getOffersWithEnchants(cleaned, false);
+				if(offers.size() == 0){
+	        		mm.specifyDefinitePriceEnchanted(player, cleaned);
+	        		return -1;
+	        	} else if(offers.size() > 0){
+	        		if(offers.get(0).getSellerUUID().equals(player.getUniqueId())){
+		        		mm.alreadyCheapestEnchanted(player, cleaned);
+		        		return -1;
+	        		} else {
+	        			newPrice = offers.get(0).getPrice() + amt;
+	        			if(newPrice < 0){
+	        				mm.priceTooLow(player);
+	        				return -1;
+	        			}
+	        		}
+	        	}
+				if(newPrice > cm.getMaxPrice(cleaned.getData().getItemTypeId(), cleaned.getData().getData())){
+					mm.priceTooHigh(player, args[0], cm.getMaxPrice(cleaned.getData().getItemTypeId(), cleaned.getData().getData()));
+					return -1;
+				}
+				return newPrice;
+			} catch (NumberFormatException e){
+				mm.numberFormat(player);
+				return -1;
+			}
+		}
+		return 0;
 	}
 	
 	private void toggleConfirmations(Player player, String label, String[] args){

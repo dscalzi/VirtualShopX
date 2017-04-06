@@ -7,6 +7,7 @@ package com.dscalzi.virtualshop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -101,11 +102,22 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
 	private boolean validateData(Player player, String[] args){
 		final int amt = 0;
 		ItemStack item = idb.get(args[0], amt);
-		double newPrice = InputUtil.parsedDouble(args[1]);
+		double newPrice = InputUtil.parseDouble(args[1]);
+		Optional<Double> bpDiff = Optional.empty();
 		PlayerInventory im = player.getInventory();
 		if(newPrice < 0){
-			mm.numberFormat(player);
-			return false;
+			if(args[1].startsWith("~")){
+				try {
+					double tAmt = Double.parseDouble(args[1].substring(1));
+					bpDiff = Optional.of(tAmt);
+				} catch (NumberFormatException e){
+					mm.numberFormat(player);
+					return false;
+				}
+			} else{
+				mm.numberFormat(player);
+				return false;
+			}
 		}
 		if(args[0].matches("^(?iu)(hand|mainhand|offhand)")){
 			item = new ItemStack(args[0].equalsIgnoreCase("offhand") ? im.getItemInOffHand() : im.getItemInMainHand());
@@ -120,6 +132,26 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
 			mm.wrongItem(player, args[0]);
 			return false;
 		}
+		
+		if(bpDiff.isPresent()){
+        	List<Offer> offers = dbm.getItemOffers(item);
+        	if(offers.size() == 0){
+        		mm.specifyDefinitePrice(player, args[0], false);
+        		return false;
+        	} else if(offers.size() > 0){
+        		if(offers.get(0).getSellerUUID().equals(player.getUniqueId())){
+	        		mm.alreadyCheapest(player, args[0], false);
+	        		return false;
+        		} else {
+        			newPrice = offers.get(0).getPrice() + bpDiff.get();
+        			if(newPrice < 0){
+        				mm.priceTooLow(player);
+        				return false;
+        			}
+        		}
+        	}
+        }
+		
 		if(newPrice > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
 			mm.priceTooHigh(player, args[0], cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return false;
@@ -130,10 +162,12 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
         	currentlyListed += o.getItem().getAmount();
         	oldPrice = o.getPrice();
         }
+        
         if(currentlyListed == 0){
         	mm.noSpecificStock(player, args[0]);
         	return false;
         }
+        
         if(newPrice == oldPrice){
         	mm.sendError(player, "Your current price for this item is the same as the requested new price.");
         	return false;

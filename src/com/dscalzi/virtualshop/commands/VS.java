@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.MessageManager;
@@ -182,6 +183,12 @@ public class VS implements CommandExecutor, TabCompleter{
 		if(target.getTypeId() == 440){
 			mm.lookupUnsuported(sender);
 			return;
+		}
+		
+		if(target.getItemMeta() instanceof PotionMeta){
+			PotionMeta m = (PotionMeta)target.getItemMeta();
+			//m.getBasePotionData().getType().
+			mm.sendMessage(sender, m.getBasePotionData().getType().getEffectType().getId() + "");
 		}
 		
 		mm.formatLookupResults(sender, target, idb.getAliases(target));

@@ -328,6 +328,18 @@ public final class MessageManager {
 		sendError(sender, "You cannot buy your own item!");
 	}
 	
+	public void specifyDefinitePrice(CommandSender sender, String item, boolean enchanted){
+		sendError(sender, "No one is currently selling any " + formatItem(item, true, enchanted) + getErrorColor() + ", please specify a definite price.");
+	}
+	
+	public void alreadyCheapest(CommandSender sender, String item, boolean enchanted){
+		sendError(sender, "You already have the lowest price for " + formatItem(item, true, enchanted) + getErrorColor() + ", please specify a definite price.");
+	}
+	
+	public void priceTooLow(CommandSender sender){
+		sendError(sender, "Your price must be greater than zero.");
+	}
+	
 	public void lookupFailedNull(CommandSender sender){
 		sendError(sender, "Lookup failed. You are not holding an item nor did you specify one.");
 	}
@@ -422,6 +434,36 @@ public final class MessageManager {
 	
 	public void noListings(CommandSender sender, String itemName){
 		sendError(sender, getString("No one is selling {0}.", formatItem(itemName) + getErrorColor()));
+	}
+	
+	public void notSellingEnchanted(Player player, ItemStack item){
+		ComponentBuilder b = new ComponentBuilder("You are not selling any ").color(getErrorColor().asBungee());
+    	b.append(" and must specify a price.", FormatRetention.FORMATTING);
+    	
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), ItemDB.getCleanedItem(item)));
+    	
+    	sendFormattedMessage(player, a);
+	}
+	
+	public void specifyDefinitePriceEnchanted(Player player, ItemStack item){
+		ComponentBuilder b = new ComponentBuilder("No one is currently selling any ").color(getErrorColor().asBungee());
+    	b.append(", please specify a definite price.", FormatRetention.FORMATTING);
+    	
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), ItemDB.getCleanedItem(item)));
+    	
+    	sendFormattedMessage(player, a);
+	}
+	
+	public void alreadyCheapestEnchanted(Player player, ItemStack item){
+		ComponentBuilder b = new ComponentBuilder("You already have the lowest price for ").color(getErrorColor().asBungee());
+    	b.append(", please specify a definite price.", FormatRetention.FORMATTING);
+    	
+    	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
+    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), ItemDB.getCleanedItem(item)));
+
+    	sendFormattedMessage(player, a);
 	}
 	
 	public void sellConfirmation(Player player, String label, ListingData data){

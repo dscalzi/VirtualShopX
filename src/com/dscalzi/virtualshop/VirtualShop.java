@@ -65,6 +65,7 @@ public class VirtualShop extends JavaPlugin {
     public void onDisable(){
     	ConfirmationManager.getInstance().serialize();
     	DatabaseManager.getInstance().terminate();
+    	UIManager.prepareShutdown();
         System.gc();
     }
     

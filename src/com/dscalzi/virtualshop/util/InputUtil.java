@@ -20,7 +20,7 @@ public class InputUtil {
 		return -1;
 	}
 	
-	public static double parsedDouble(String s){
+	public static double parseDouble(String s){
 		try{
 			double i = Double.parseDouble(s);
 			if(i > 0) return i;

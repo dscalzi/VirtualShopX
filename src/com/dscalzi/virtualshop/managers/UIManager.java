@@ -39,6 +39,13 @@ public class UIManager implements Listener{
 		}
 	}
 	
+	public static void prepareShutdown(){
+		if(!initialized) return;
+		for(Player p : getInstance().cache.keySet()){
+			p.closeInventory();
+		}
+	}
+	
 	public static boolean refresh(){
 		if(!initialized) return false;
 		getInstance().assignVars();

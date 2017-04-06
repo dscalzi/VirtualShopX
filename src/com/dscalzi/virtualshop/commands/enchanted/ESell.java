@@ -7,6 +7,7 @@ package com.dscalzi.virtualshop.commands.enchanted;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -125,7 +126,9 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 		//Set Data
 		PlayerInventory im = player.getInventory();
 		ItemStack item = new ItemStack(im.getItemInMainHand());
-		double price = InputUtil.parsedDouble(args[0]);
+		double price = InputUtil.parseDouble(args[0]);
+		Optional<Double> bpDiff = Optional.empty();
+		boolean samePrice = false;
 		InventoryManager invM = new InventoryManager(player);
 		//Validate Data
 		
@@ -139,19 +142,60 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 			return false;
 		}
 		
+		String iName = ItemDB.getInstance().reverseLookup(item);
+		
 		if(price < 0){
-			mm.numberFormat(player);
-			return false;
+			if(args[0].equals("-"))
+				samePrice = true;
+			else if(args[0].startsWith("~")){
+				try {
+					double amt = Double.parseDouble(args[0].substring(1));
+					bpDiff = Optional.of(amt);
+				} catch (NumberFormatException e){
+					mm.numberFormat(player);
+					return false;
+				}
+			} else {
+				mm.numberFormat(player);
+				return false;
+			}
 		}
 		
 		if(!(invM.contains(item))){
 			if(item.getAmount() == 0)
-				mm.sendError(player, "You do not have any " + mm.formatItem(args[1], true) + mm.getErrorColor() + ".");
+				mm.sendError(player, "You do not have any " + mm.formatItem(iName, true) + mm.getErrorColor() + ".");
 			else
-				mm.sendError(player, "You do not have " + mm.formatAmount(item.getAmount()) + " " + mm.formatItem(args[1], true) + mm.getErrorColor() + ".");
+				mm.sendError(player, "You do not have " + mm.formatAmount(item.getAmount()) + " " + mm.formatItem(iName, true) + mm.getErrorColor() + ".");
 			return false;
 		}
         
+		if(samePrice){
+			List<Offer> offers = dbm.getOffersWithEnchants(player.getUniqueId(), item, false);
+        	if(offers.size() == 0){
+        		mm.notSellingEnchanted(player, item);
+        		return false;
+        	}
+        	price = offers.get(0).getPrice();
+        	args[0] = Double.toString(price);
+        } else if(bpDiff.isPresent()){
+			List<Offer> offers =  dbm.getOffersWithEnchants(item, false);
+			if(offers.size() == 0){
+        		mm.specifyDefinitePriceEnchanted(player, item);
+        		return false;
+        	} else if(offers.size() > 0){
+        		if(offers.get(0).getSellerUUID().equals(player.getUniqueId())){
+	        		mm.alreadyCheapestEnchanted(player, item);
+	        		return false;
+        		} else {
+        			price = offers.get(0).getPrice() + bpDiff.get();
+        			if(price < 0){
+        				mm.priceTooLow(player);
+        				return false;
+        			}
+        		}
+        	}
+		}
+		
         if(price > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
 			mm.priceTooHigh(player, args[1], cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
 			return false;

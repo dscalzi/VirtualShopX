@@ -316,6 +316,32 @@ public final class DatabaseManager {
     }
     
     @SuppressWarnings("deprecation")
+	public List<Offer> getOffersWithEnchants(ItemStack item, boolean withLore){
+    	String sql = "select * from vshop_estock where " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability() + " and " + ITEM_EDATA + "='" + ItemDB.formatEnchantData(ItemDB.getEnchantments(item)) + "' order by " + PRICE + " asc";
+    	try(Connection connection = ds.getDataSource().getConnection();
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listEnchantedOffers(result, withLore);
+    	} catch (SQLException e){
+    		cm.logError(e.getMessage(), true);
+    		return null;
+    	}
+    }
+    
+    @SuppressWarnings("deprecation")
+	public List<Offer> getOffersWithEnchants(UUID vendorUUID, ItemStack item, boolean withLore){
+    	String sql = "select * from vshop_estock where " + UUIDKEY + "= '" + vendorUUID.toString() + "' and " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability() + " and " + ITEM_EDATA + "='" + ItemDB.formatEnchantData(ItemDB.getEnchantments(item)) + "' order by " + PRICE + " asc";
+    	try(Connection connection = ds.getDataSource().getConnection();
+        	PreparedStatement stmt = connection.prepareStatement(sql);
+        	ResultSet result = stmt.executeQuery()){
+    		return Offer.listEnchantedOffers(result, withLore);
+    	} catch (SQLException e){
+    		cm.logError(e.getMessage(), true);
+    		return null;
+    	}
+    }
+    
+    @SuppressWarnings("deprecation")
 	public List<Offer> getSpecificEnchantedOffer(ItemStack item, String edata, double price, boolean withLore){
     	String sql = "select * from vshop_estock where " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability() + " and " + ITEM_EDATA + "='" + edata + "' and " + PRICE + "=" + price;
     	try(Connection connection = ds.getDataSource().getConnection();

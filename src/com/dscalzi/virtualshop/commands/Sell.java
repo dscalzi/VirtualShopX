@@ -7,6 +7,7 @@ package com.dscalzi.virtualshop.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -130,8 +131,9 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
 		//Set Data
 		int amount = InputUtil.parseInt(args[0]);
 		ItemStack item = idb.get(args[1], amount);
-		double price = InputUtil.parsedDouble(args[2]);
+		double price = InputUtil.parseDouble(args[2]);
 		boolean samePrice = false;
+		Optional<Double> bpDiff = Optional.empty();
 		PlayerInventory im = player.getInventory();
 		InventoryManager invM = new InventoryManager(player);
 		//Validate Data
@@ -142,7 +144,15 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
 		if(price < 0){
 			if(args[2].equals("-"))
 				samePrice = true;
-			else{
+			else if(args[2].startsWith("~")){
+				try {
+					double amt = Double.parseDouble(args[2].substring(1));
+					bpDiff = Optional.of(amt);
+				} catch (NumberFormatException e){
+					mm.numberFormat(player);
+					return false;
+				}
+			} else{
 				mm.numberFormat(player);
 				return false;
 			}
@@ -203,6 +213,23 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
         	}
         	price = oldPrice;
         	args[2] = Double.toString(oldPrice);
+        } else if(bpDiff.isPresent()){
+        	List<Offer> offers = dbm.getItemOffers(item);
+        	if(offers.size() == 0){
+        		mm.specifyDefinitePrice(player, args[1], false);
+        		return false;
+        	} else if(offers.size() > 0){
+        		if(offers.get(0).getSellerUUID().equals(player.getUniqueId())){
+	        		mm.alreadyCheapest(player, args[1], false);
+	        		return false;
+        		} else {
+        			price = offers.get(0).getPrice() + bpDiff.get();
+        			if(price < 0){
+        				mm.priceTooLow(player);
+        				return false;
+        			}
+        		}
+        	}
         }
         
         if(price > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){

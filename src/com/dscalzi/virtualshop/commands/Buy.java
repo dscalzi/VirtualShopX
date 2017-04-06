@@ -136,7 +136,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 			return false;
 		}
         if(args.length > 2){
-        	maxprice = InputUtil.parsedDouble(args[2]);
+        	maxprice = InputUtil.parseDouble(args[2]);
         	if(maxprice < 0){
         		mm.numberFormat(player);
         		return false;
