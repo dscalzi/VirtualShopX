@@ -1,8 +1,0 @@
-eclipse.preferences.version=1
-encoding//src/com/dscalzi/virtualshop/commands/Find.java=UTF-8
-encoding//src/com/dscalzi/virtualshop/commands/Sales.java=UTF-8
-encoding//src/com/dscalzi/virtualshop/commands/Stock.java=UTF-8
-encoding//src/com/dscalzi/virtualshop/commands/enchanted/EBuy.java=UTF-8
-encoding//src/com/dscalzi/virtualshop/commands/enchanted/ECancel.java=UTF-8
-encoding//src/com/dscalzi/virtualshop/commands/enchanted/EReprice.java=UTF-8
-encoding//src/com/dscalzi/virtualshop/managers/MessageManager.java=UTF-8
