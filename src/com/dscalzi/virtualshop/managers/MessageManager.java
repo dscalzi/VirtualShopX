@@ -101,7 +101,7 @@ public final class MessageManager {
 		this.pColor = cm.getPriceColor();
 		this.buColor = cm.getBuyerColor();
 		this.seColor = cm.getSellerColor();
-		f = new SimpleDateFormat("EEE, F MMMM yyyy \n"+getBaseColor()+"'  at' hh:mm:ssa zzz");
+		f = new SimpleDateFormat("EEE, d MMMM yyyy \n"+getBaseColor()+"'  at' hh:mm:ssa zzz");
 	}
 	
 	public static void initialize(VirtualShop plugin){
