@@ -31,11 +31,10 @@
   <build>
     <defaultGoal>package</defaultGoal>
     <finalName>VirtualShop</finalName>
-    <sourceDirectory>src</sourceDirectory>
     <resources>
         <resource>
-            <targetPath>.</targetPath>
-            <directory>${basedir}/src/com/dscalzi/virtualshop/resources/</directory>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
         </resource>
         <resource>
             <targetPath>./depend/</targetPath>

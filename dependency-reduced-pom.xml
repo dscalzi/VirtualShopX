@@ -4,7 +4,7 @@
   <groupId>com.dscalzi</groupId>
   <artifactId>VirtualShop</artifactId>
   <name>VirtualShop</name>
-  <version>AvSoft 1.11-R0.1-SNAPSHOT</version>
+  <version>0.152.0</version>
   <description>VirtualShop Minecraft Plugin</description>
   <developers>
     <developer>
@@ -23,12 +23,11 @@
     </contributor>
   </contributors>
   <build>
-    <sourceDirectory>src</sourceDirectory>
     <defaultGoal>package</defaultGoal>
     <resources>
       <resource>
-        <targetPath>.</targetPath>
-        <directory>${basedir}/src/com/dscalzi/virtualshop/resources/</directory>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
       </resource>
       <resource>
         <targetPath>./depend/</targetPath>
