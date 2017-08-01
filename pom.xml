@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dscalzi</groupId>
   <artifactId>VirtualShop</artifactId>
-  <version>AvSoft 1.11-R0.1-SNAPSHOT</version>
+  <version>0.152.0</version>
   <name>VirtualShop</name>
   <description>VirtualShop Minecraft Plugin</description>
   
