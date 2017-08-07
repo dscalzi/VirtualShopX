@@ -17,12 +17,12 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-
 import com.dscalzi.virtualshop.VirtualShop;
 import com.dscalzi.virtualshop.managers.MessageManager;
 import com.dscalzi.virtualshop.managers.ConfigManager;
 import com.dscalzi.virtualshop.managers.DatabaseManager;
 import com.dscalzi.virtualshop.objects.Offer;
+import com.dscalzi.virtualshop.util.ConversionUtil;
 import com.dscalzi.virtualshop.util.ItemDB;
 import com.dscalzi.virtualshop.util.Reloader;
 import com.dscalzi.vsreloader.PluginUtil;
@@ -102,6 +102,11 @@ public class VS implements CommandExecutor, TabCompleter{
 				}
 				if(args[0].equalsIgnoreCase("fullreload")){
 					this.cmdFullReload(sender);
+					return true;
+				}
+				if(args[0].equalsIgnoreCase("debug")) {
+					//ConversionUtil.generateEveryPotion();
+					ConversionUtil.main(null);
 					return true;
 				}
 				if(args[0].equalsIgnoreCase("reload")){
