@@ -21,10 +21,6 @@
         <filtering>true</filtering>
         <directory>src/main/resources</directory>
       </resource>
-      <resource>
-        <targetPath>./depend/</targetPath>
-        <directory>${basedir}/depend/</directory>
-      </resource>
     </resources>
     <finalName>VirtualShopX</finalName>
     <plugins>
@@ -46,6 +42,13 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <transformers>
+                <transformer>
+                  <manifestEntries>
+                    <Implementation-Version>${project.version}</Implementation-Version>
+                  </manifestEntries>
+                </transformer>
+              </transformers>
               <finalName>VirtualShopX</finalName>
               <filters />
               <relocations>
