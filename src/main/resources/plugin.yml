@@ -1,6 +1,6 @@
 author: Daniel Scalzi
 description: Enables users to buy and sell items on a virtual shop.
-main: com.dscalzi.virtualshop.VirtualShopX
+main: com.dscalzi.virtualshopx.VirtualShopX
 name: VirtualShopX
 version: 0.152.0
 depend: [Vault]

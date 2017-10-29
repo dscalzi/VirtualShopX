@@ -121,6 +121,7 @@
 		<groupId>com.dscalzi</groupId>
 		<artifactId>VSXReloader</artifactId>
 		<version>LATEST</version>
+		<scope>provided</scope>
 	</dependency>
 	<dependency>
   		<groupId>org.bstats</groupId>
