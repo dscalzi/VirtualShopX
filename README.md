@@ -1,10 +1,5 @@
-# Virtual Shop #
+![#VirtualShopX](https://i.imgur.com/Ega2vT4.png)
 
-This is a revamp of the [plugin originally created by SwearWords](http://dev.bukkit.org/bukkit-plugins/virtualshop/). No update has been deployed since October 29th, 2011. 
+[![](http://ci.aventiumsoftworks.com/jenkins/job/VirtualShopX/badge/icon)](http://ci.aventiumsoftworks.com/jenkins/job/VirtualShopx/) [![](https://img.shields.io/badge/license-AGPL-blue.svg)](https://bitbucket.org/AventiumSoftworks/virtualshopx/src/master/src/main/resources/LICENSE.txt) ![](https://img.shields.io/badge/Spigot-1.12.x-orange.svg) ![](https://img.shields.io/badge/Java-8+-ec2025.svg) [![](https://discordapp.com/api/guilds/211524927831015424/widget.png)](https://discordapp.com/invite/MkmRnhd)
 
-### Plugin Details ###
-
-* This revamp of VirtualShop has updated much of the plugin adding badly needed features.
-* Version *AvSoft 1.11-R0.1-SNAPSHOT*
-
-### More Details Coming Soon ###
+#### More Details Coming Soon

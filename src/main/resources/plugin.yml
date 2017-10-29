@@ -1,28 +1,28 @@
 author: Daniel Scalzi
-description: Allows players to buy and sell goods on a VirtualShop.
-main: com.dscalzi.virtualshop.VirtualShop
-name: VirtualShop
+description: Enables users to buy and sell items on a virtual shop.
+main: com.dscalzi.virtualshop.VirtualShopX
+name: VirtualShopX
 version: 0.152.0
 depend: [Vault]
 loadbefore: [VSReloader]
 commands:
   buy:
-    description: Buy goods for sale on the VirtualShop.
+    description: Buy goods for sale on the virtual shop.
     usage: /<command> <amount> <item> [maxprice]
   ebuy:
-    description: Browse and purchase enchanted goods on the VirtualShop.
+    description: Browse and purchase enchanted goods on the virtual shop.
     usage: /<command> <item>
   sell:
-    description: Put goods up for sale on the VirtualShop.
+    description: Put goods up for sale on the virtual shop.
     usage: /<command> <amount> <item> <price> | /<command> <amount> <hand/mainhand/offhand> <price>
   esell:
-    description: Put enchanted goods up for sale on the VirtualShop.
+    description: Put enchanted goods up for sale on the virtual shop.
     usage: /<command> <item> <price>
   cancel:
-    description: Removes items from VirtualShop.
+    description: Removes items from virtual shop.
     usage: /<command> <item>
   ecancel:
-    description: Remove enchanted items from the VirtualShop.
+    description: Remove enchanted items from the virtual shop.
     usage: /<command> <item>
   find:
     description: Find offers for an item.
@@ -46,33 +46,33 @@ commands:
     description: Technical commands under /vs.
     usage: /<command> [param]
 permissions:
-  virtualshop.*:
+  virtualshopx.*:
     children:
-      virtualshop.merchant.*:
+      virtualshopx.merchant.*:
         children:
-          virtualshop.merchant.lookup: true
-          virtualshop.merchant.find: true
-          virtualshop.merchant.regular.*:
+          virtualshopx.merchant.lookup: true
+          virtualshopx.merchant.find: true
+          virtualshopx.merchant.regular.*:
             children:
-              virtualshop.merchant.regular.buy: true
-              virtualshop.merchant.regular.cancel: true
-              virtualshop.merchant.sell.regular: true
-              virtualshop.merchant.reprice.regular: true
-          virtualshop.merchant.enchanted.*:
+              virtualshopx.merchant.regular.buy: true
+              virtualshopx.merchant.regular.cancel: true
+              virtualshopx.merchant.sell.regular: true
+              virtualshopx.merchant.reprice.regular: true
+          virtualshopx.merchant.enchanted.*:
             children:
-              virtualshop.merchant.enchanted.buy: true
-              virtualshop.merchant.enchanted.cancel: true
-              virtualshop.merchant.enchanted.sell: true
-              virtualshop.merchant.enchanted.reprice: true
-          virtualshop.merchant.sales.*:
+              virtualshopx.merchant.enchanted.buy: true
+              virtualshopx.merchant.enchanted.cancel: true
+              virtualshopx.merchant.enchanted.sell: true
+              virtualshopx.merchant.enchanted.reprice: true
+          virtualshopx.merchant.sales.*:
             children:
-              virtualshop.merchant.sales.individual: true
-          virtualshop.merchant.stock.*:
+              virtualshopx.merchant.sales.individual: true
+          virtualshopx.merchant.stock.*:
             children:
-              virtualshop.merchant.stock.individual: true
-      virtualshop.admin.*:
+              virtualshopx.merchant.stock.individual: true
+      virtualshopx.admin.*:
         children:
-          virtualshop.admin.formatmarket: true
-          virtualshop.admin.reload: true
-          virtualshop.admin.reprice.others: true
-      virtualshop.developer.fullreload: true
+          virtualshopx.admin.formatmarket: true
+          virtualshopx.admin.reload: true
+          virtualshopx.admin.reprice.others: true
+      virtualshopx.developer.fullreload: true

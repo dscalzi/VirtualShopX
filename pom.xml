@@ -3,8 +3,8 @@
   <groupId>com.dscalzi</groupId>
   <artifactId>VirtualShop</artifactId>
   <version>0.152.0</version>
-  <name>VirtualShop</name>
-  <description>VirtualShop Minecraft Plugin</description>
+  <name>VirtualShopX</name>
+  <description>Enables users to buy and sell items on a virtual shop.</description>
   
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,18 +19,9 @@
     </developer>
   </developers>
   
-  <contributors>
-    <contributor>
-      <name>SwearWords</name>
-      <roles>
-        <role>Original Idea</role>
-      </roles>
-    </contributor>
-  </contributors>
-  
   <build>
     <defaultGoal>package</defaultGoal>
-    <finalName>VirtualShop</finalName>
+    <finalName>VirtualShopX</finalName>
     <resources>
         <resource>
             <directory>src/main/resources</directory>
@@ -136,7 +127,7 @@
 	<dependency>
   		<groupId>org.bstats</groupId>
  		<artifactId>bstats-bukkit</artifactId>
-  		<version>1.1</version>
+  		<version>1.2</version>
 	</dependency>
   </dependencies>
   
