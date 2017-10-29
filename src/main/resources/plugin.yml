@@ -56,8 +56,8 @@ permissions:
             children:
               virtualshopx.merchant.regular.buy: true
               virtualshopx.merchant.regular.cancel: true
-              virtualshopx.merchant.sell.regular: true
-              virtualshopx.merchant.reprice.regular: true
+              virtualshopx.merchant.regular.sell: true
+              virtualshopx.merchant.regular.reprice: true
           virtualshopx.merchant.enchanted.*:
             children:
               virtualshopx.merchant.enchanted.buy: true

@@ -643,8 +643,8 @@ public final class MessageManager {
         cmds.add(listPrefix + tColor + "/sales " + seColor + "[player] " + ChatColor.GRAY + "[page]" + dColor + " - View transaction log.");
         cmds.add(listPrefix + tColor + "/ebuy " + iColor + "<item> " + dColor + " - Browse and buy enchanted items.");
         cmds.add(listPrefix + tColor + "/esell " + iColor + "<item> " + dColor + " - Sell enchanted items." );
-        cmds.add(listPrefix + tColor + "/ecancel " + "<item> " + dColor + " - Cancel enchanted items.");
-        cmds.add(listPrefix + tColor + "/reprice " + iColor + "<item> " + pColor + "<price>" + dColor + " - Reprice an enchanted listing.");
+        cmds.add(listPrefix + tColor + "/ecancel " + iColor + "<item> " + dColor + " - Cancel enchanted items.");
+        cmds.add(listPrefix + tColor + "/ereprice " + iColor + "<item> " + pColor + "<price>" + dColor + " - Reprice an enchanted listing.");
         cmds.add(listPrefix + tColor + "/<command> " + sColor + "confirm " + ChatColor.DARK_GREEN + "toggle " + dColor + " - Toggle confirmations for <command>.");
         
         PageList<String> commands = new PageList<String>(6, cmds);
