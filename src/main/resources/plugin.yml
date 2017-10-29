@@ -4,7 +4,7 @@ main: com.dscalzi.virtualshop.VirtualShopX
 name: VirtualShopX
 version: 0.152.0
 depend: [Vault]
-loadbefore: [VSReloader]
+loadbefore: [VSXReloader]
 commands:
   buy:
     description: Buy goods for sale on the virtual shop.

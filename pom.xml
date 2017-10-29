@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dscalzi</groupId>
-  <artifactId>VirtualShop</artifactId>
+  <artifactId>VirtualShopX</artifactId>
   <version>0.152.0</version>
   <name>VirtualShopX</name>
   <description>Enables users to buy and sell items on a virtual shop.</description>
@@ -54,7 +54,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <finalName>VirtualShop</finalName>
+              <finalName>VirtualShopX</finalName>
               <filters>
               </filters>
               <relocations>
@@ -119,10 +119,8 @@
     </dependency>
 	<dependency>
 		<groupId>com.dscalzi</groupId>
-		<artifactId>VSReloader</artifactId>
+		<artifactId>VSXReloader</artifactId>
 		<version>LATEST</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/depend/VSReloader.jar</systemPath>
 	</dependency>
 	<dependency>
   		<groupId>org.bstats</groupId>

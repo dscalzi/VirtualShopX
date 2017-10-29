@@ -622,9 +622,9 @@ public final class MessageManager {
     }
     
     public void versionMessage(CommandSender sender){
-		sendMessage(sender, "VirtualShop Version " + plugin.getDescription().getVersion() + 
-				"\n" + bColor + "| " + sColor + "Metrics" + bColor+ " | " + color + "https://bstats.org/plugin/bukkit/VirtualShop" + 
-				"\n" + bColor + "| " + sColor + "Source" + bColor + " | " + color + "https://bitbucket.org/AventiumSoftworks/virtualshop");
+		sendMessage(sender, this.plugin.getName() + " Version " + plugin.getDescription().getVersion() + 
+				"\n" + bColor + "| " + sColor + "Metrics" + bColor+ " | " + color + "https://bstats.org/plugin/bukkit/VirtualShopX" + 
+				"\n" + bColor + "| " + sColor + "Source" + bColor + " | " + color + "https://bitbucket.org/AventiumSoftworks/virtualshopx");
 	}
     
     /* Command Lists */
@@ -633,7 +633,7 @@ public final class MessageManager {
     	final String listPrefix = ChatColor.RED.toString() + b + " ";
     	
     	List<String> cmds = new ArrayList<String>();
-        cmds.add(listPrefix + tColor + "/vs" + dColor + " - Virtual Shop's technical commands.");
+        cmds.add(listPrefix + tColor + "/vs" + dColor + " - VirtualShopX's technical commands.");
         cmds.add(listPrefix + tColor + "/buy " + aColor + "<amount> " + iColor + "<item> " + pColor + "[maxprice]" + dColor + " - Buy items.");
         cmds.add(listPrefix + tColor + "/sell " + aColor + "<amount> " + iColor + "<item> " + pColor + "<price>" + dColor + " - Sell items.");
         cmds.add(listPrefix + tColor + "/reprice " + iColor + "<item> " + pColor + "<price>" + dColor + " - Reprice a listing.");
@@ -673,14 +673,14 @@ public final class MessageManager {
 		
 		List<String> cmds = new ArrayList<String>();
 		cmds.add(listPrefix + tColor + "/shop " + ChatColor.GRAY + "[page]" + dColor + " - View merchant commands.");
-		cmds.add(listPrefix + tColor + "/vs help " + ChatColor.GRAY + "[page]" + dColor + " - VirtualShop's technical commands.");
+		cmds.add(listPrefix + tColor + "/vs help " + ChatColor.GRAY + "[page]" + dColor + " - VirtualShopX's technical commands.");
 		cmds.add(listPrefix + tColor + "/vs lookup " + iColor + "[item]" + dColor + " - Browse item name information.");
 		cmds.add(listPrefix + tColor + "/vs version" + dColor + " - View plugin's version.");
-		if(sender.hasPermission("virtualshop.admin.formatmarket"))
+		if(sender.hasPermission("virtualshopx.admin.formatmarket"))
 			cmds.add(listPrefix + tColor + "/vs formatmarket " + iColor + "[item]" + dColor + " - Reprice all items who's market price exceeds the set limit.");
-		if(sender.hasPermission("virtualshop.admin.reload"))
+		if(sender.hasPermission("virtualshopx.admin.reload"))
 			cmds.add(listPrefix + tColor + "/vs reload" + dColor + " - Reload the plugin's configuration.");
-		if(sender.hasPermission("virtualshop.developer.fullreload"))
+		if(sender.hasPermission("virtualshopx.developer.fullreload"))
 			cmds.add(listPrefix + tColor + "/vs fullreload" + dColor + " - Reload the entire plugin's jar file.");
 		
 		

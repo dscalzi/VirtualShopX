@@ -26,7 +26,7 @@ import com.dscalzi.virtualshopx.objects.Offer;
 import com.dscalzi.virtualshopx.util.ConversionUtil;
 import com.dscalzi.virtualshopx.util.ItemDB;
 import com.dscalzi.virtualshopx.util.Reloader;
-import com.dscalzi.vsreloader.PluginUtil;
+import com.dscalzi.vsxreloader.PluginUtil;
 
 public class VS implements CommandExecutor, TabCompleter{
 
@@ -274,17 +274,17 @@ public class VS implements CommandExecutor, TabCompleter{
 			mm.noPermissions(sender);
             return;
 		}
-		if(plugin.getServer().getPluginManager().getPlugin("VSReloader") == null){
+		if(plugin.getServer().getPluginManager().getPlugin("VSXReloader") == null){
 			if(sender.hasPermission("virtualshopx.admin.reload")){
-				mm.sendError(sender, "VS Reloader not found, reloading config instead.");
+				mm.sendError(sender, "VSXReloader not found, reloading config instead.");
 				cmdReload(sender);
 			} else {
-				mm.sendError(sender, "VS Reloader not found, could not reload the plugin.");
+				mm.sendError(sender, "VSXReloader not found, could not reload the plugin.");
 			}
 			return;
 		}
 		DatabaseManager.getInstance().terminate();
-		mm.sendMessage(sender, "Begining reload of VirtualShop, this may lag the server for a few seconds..");
+		mm.sendMessage(sender, "Begining reload of VirtualShopX, this may lag the server for a few seconds..");
 		/* TODO Test async relaod.
 		 * 
 		 * Thread th = new Thread(() -> {

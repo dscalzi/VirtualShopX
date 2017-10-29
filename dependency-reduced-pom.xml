@@ -26,7 +26,7 @@
         <directory>${basedir}/depend/</directory>
       </resource>
     </resources>
-    <finalName>VirtualShop</finalName>
+    <finalName>VirtualShopX</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -46,7 +46,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <finalName>VirtualShop</finalName>
+              <finalName>VirtualShopX</finalName>
               <filters />
               <relocations>
                 <relocation>
