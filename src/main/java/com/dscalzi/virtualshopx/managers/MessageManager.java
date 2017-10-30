@@ -773,7 +773,7 @@ public final class MessageManager {
 		b.append(t.getItem().getAmount() + " ", FormatRetention.NONE).color(getAmountColor().asBungee());
 		b.append(formatItem(idb.reverseLookup(t.getItem()))).color(getItemColor().asBungee());
 		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
-		b.append(t.getCost() + "", FormatRetention.NONE).color(getPriceColor().asBungee());
+		b.append(formatPrice(t.getCost()) + "", FormatRetention.NONE).color(getPriceColor().asBungee());
 		b.append(". ", FormatRetention.NONE).color(getColor().asBungee());
 		b.append("(?)", FormatRetention.FORMATTING);
 		b.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(getBaseColor() + "- " + getTrimColor() + "Transaction Time" + getBaseColor() + " -\n  " + getBaseColor() + formatTemporal(t.getTimestamp()))));
@@ -792,7 +792,7 @@ public final class MessageManager {
 		b.append(" ");
 		//ITEM GOES HERE
 		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
-		b.append(t.getCost() + "", FormatRetention.NONE).color(getPriceColor().asBungee());
+		b.append(formatPrice(t.getCost()) + "", FormatRetention.NONE).color(getPriceColor().asBungee());
 		b.append(". ", FormatRetention.NONE).color(getColor().asBungee());
 		b.append("(?)", FormatRetention.FORMATTING);
 		b.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(getBaseColor() + "- " + getTrimColor() + "Transaction Time" + getBaseColor() + " -\n  " + getBaseColor() + formatTemporal(t.getTimestamp()))));
