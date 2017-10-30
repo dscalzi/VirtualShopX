@@ -45,7 +45,7 @@ public class Find implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
-		if(!sender.hasPermission("virtualshopx.merchant.find")){
+		if(!sender.hasPermission("virtualshopx.merchant.regular.find")){
             mm.noPermissions(sender);
             return true;
         }

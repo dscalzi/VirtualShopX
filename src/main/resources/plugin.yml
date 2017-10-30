@@ -51,18 +51,18 @@ permissions:
       virtualshopx.merchant.*:
         children:
           virtualshopx.merchant.lookup: true
-          virtualshopx.merchant.find: true
           virtualshopx.merchant.regular.*:
             children:
               virtualshopx.merchant.regular.buy: true
-              virtualshopx.merchant.regular.cancel: true
               virtualshopx.merchant.regular.sell: true
+              virtualshopx.merchant.regular.cancel: true
               virtualshopx.merchant.regular.reprice: true
+              virtualshopx.merchant.regular.find: true
           virtualshopx.merchant.enchanted.*:
             children:
               virtualshopx.merchant.enchanted.buy: true
-              virtualshopx.merchant.enchanted.cancel: true
               virtualshopx.merchant.enchanted.sell: true
+              virtualshopx.merchant.enchanted.cancel: true
               virtualshopx.merchant.enchanted.reprice: true
           virtualshopx.merchant.sales.*:
             children:
@@ -74,5 +74,6 @@ permissions:
         children:
           virtualshopx.admin.formatmarket: true
           virtualshopx.admin.reload: true
-          virtualshopx.admin.reprice.others: true
-      virtualshopx.developer.fullreload: true
+      virtualshopx.developer.*:
+        children:
+          virtualshopx.developer.fullreload: true
