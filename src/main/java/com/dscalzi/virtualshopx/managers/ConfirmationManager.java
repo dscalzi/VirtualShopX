@@ -26,7 +26,7 @@ import com.dscalzi.virtualshopx.VirtualShopX;
 import com.dscalzi.virtualshopx.objects.Confirmable;
 import com.dscalzi.virtualshopx.objects.VsDataCache;
 
-import javafx.util.Pair;
+import com.dscalzi.virtualshopx.util.Pair;
 
 public class ConfirmationManager implements Serializable{
 

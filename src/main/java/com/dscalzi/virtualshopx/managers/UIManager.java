@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import com.dscalzi.virtualshopx.VirtualShopX;
 import com.dscalzi.virtualshopx.objects.InventoryCache;
 
-import javafx.util.Pair;
+import com.dscalzi.virtualshopx.util.Pair;
 
 public class UIManager implements Listener{
 
