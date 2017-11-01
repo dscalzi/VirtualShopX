@@ -60,7 +60,7 @@ public class Stock implements CommandExecutor, TabCompleter{
 		final ChatColor trimColor = cm.getTrimColor();
 		
 		boolean fullServerRecord = false;
-		final String serverConstant = "@s";
+		final String serverConstant = "-s";
 		
 		OfflinePlayer target = null;
 		int requestedPage = 1;
@@ -162,8 +162,8 @@ public class Stock implements CommandExecutor, TabCompleter{
 		if(args.length == 1){
 			if(sender.hasPermission("virtualshopx.merchant.stock.*")){
 				plugin.getServer().getOnlinePlayers().forEach(player -> {if(player.getName().toLowerCase().startsWith(args[0].toLowerCase())) ret.add(player.getName());});
-				if("@s".startsWith(args[0].toLowerCase()))
-					ret.add("@s");
+				if("-s".startsWith(args[0].toLowerCase()))
+					ret.add("-s");
 			}
 		}
 		
