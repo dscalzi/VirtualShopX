@@ -5,6 +5,7 @@
  */
 package com.dscalzi.virtualshopx.managers;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -69,7 +70,6 @@ public final class DatabaseManager {
 	
 	private ConnectionType type;
 	
-	@SuppressWarnings("unused")
 	private VirtualShopX plugin;
 	private ConnectionWrapper ds;
 	private ConfigManager configM;
@@ -95,10 +95,7 @@ public final class DatabaseManager {
 	}
 	
 	private boolean loadSQLite() {
-		final String name = "VirtualShop";
-		final String location = "plugins/VirtualShop/";
-		
-        this.ds = new SQLiteWrapper(name, location);
+        this.ds = new SQLiteWrapper(new File(plugin.getDataFolder(), plugin.getName() + ".db"));
         return this.ds.initialize();
     }
 

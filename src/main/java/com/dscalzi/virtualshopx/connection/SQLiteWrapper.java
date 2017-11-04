@@ -17,15 +17,13 @@ import com.zaxxer.hikari.pool.HikariPool.PoolInitializationException;
 
 public class SQLiteWrapper extends ConnectionWrapper{
 
-	private final String name;
-	private final String location;
+	private final File sqlFile;
 	
 	private boolean initialized;
 	
-	public SQLiteWrapper(String name, String location){
+	public SQLiteWrapper(File sqlFile){
 		super();
-		this.name = name;
-		this.location  =  location;
+		this.sqlFile = sqlFile;
 		this.initialized = false;
 	}
 	
@@ -41,11 +39,6 @@ public class SQLiteWrapper extends ConnectionWrapper{
 			MessageManager.getInstance().logError("SQLite Driver not found. Shutting down!", true);
 			return false;
 		}
-		
-		File folder = new File(location);
-		if(!folder.exists()) folder.mkdir();
-		
-		File sqlFile = new File(folder.getAbsolutePath() + File.separator + name + ".db");
 		
 		config.setJdbcUrl("jdbc:sqlite:" + sqlFile.toPath().toString());
 		config.setMaximumPoolSize(1);
