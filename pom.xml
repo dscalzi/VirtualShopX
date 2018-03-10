@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dscalzi</groupId>
   <artifactId>VirtualShopX</artifactId>
-  <version>0.152.0</version>
+  <version>0.153.0</version>
   <name>VirtualShopX</name>
   <description>Enables users to buy and sell items on a virtual shop.</description>
   

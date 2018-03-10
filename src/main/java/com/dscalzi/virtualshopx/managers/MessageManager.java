@@ -624,7 +624,7 @@ public final class MessageManager {
     public void versionMessage(CommandSender sender){
 		sendMessage(sender, this.plugin.getName() + " Version " + plugin.getDescription().getVersion() + 
 				"\n" + bColor + "| " + sColor + "Metrics" + bColor+ " | " + color + "https://bstats.org/plugin/bukkit/VirtualShopX" + 
-				"\n" + bColor + "| " + sColor + "Source" + bColor + " | " + color + "https://bitbucket.org/AventiumSoftworks/virtualshopx");
+				"\n" + bColor + "| " + sColor + "Source" + bColor + " | " + color + "https://github.com/dscalzi/VirtualShopX");
 	}
     
     /* Command Lists */
