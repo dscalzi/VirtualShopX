@@ -5,6 +5,7 @@
   <version>0.153.0</version>
   <name>VirtualShopX</name>
   <description>Enables users to buy and sell items on a virtual shop.</description>
+  <url>https://github.com/dscalzi/VirtualShopX</url>
   
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

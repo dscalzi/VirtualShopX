@@ -1,7 +1,7 @@
 /*
  * VirtualShopX
- * Copyright (C) 2015-2017 Daniel D. Scalzi
- * See LICENSE.txt for license information.
+ * Copyright (C) 2015-2018 Daniel D. Scalzi
+ * See LICENSE for license information.
  */
 package com.dscalzi.virtualshopx;
 
@@ -41,7 +41,8 @@ public class VirtualShopX extends JavaPlugin {
 	private Metrics metrics;
 
     public void onEnable(){
-        if (!this.setupEconomy()){
+    	// Set up Vault.
+        if(!this.setupEconomy()){
             this.getLogger().severe("Vault not found. Shutting down!");
             this.getPluginLoader().disablePlugin(this);
         }
@@ -70,9 +71,13 @@ public class VirtualShopX extends JavaPlugin {
     }
     
     private boolean setupEconomy(){
-        if (getServer().getPluginManager().getPlugin("Vault") == null) return false;
+        if(getServer().getPluginManager().getPlugin("Vault") == null) {
+        	return false;
+        }
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) return false;
+        if(rsp == null) {
+        	return false;
+        }
         econ = rsp.getProvider();
         return econ != null;
     }

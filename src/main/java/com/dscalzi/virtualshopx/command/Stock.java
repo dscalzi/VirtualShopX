@@ -1,7 +1,7 @@
 /*
  * VirtualShopX
- * Copyright (C) 2015-2017 Daniel D. Scalzi
- * See LICENSE.txt for license information.
+ * Copyright (C) 2015-2018 Daniel D. Scalzi
+ * See LICENSE for license information.
  */
 package com.dscalzi.virtualshopx.command;
 
