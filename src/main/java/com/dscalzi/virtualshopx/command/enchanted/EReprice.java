@@ -305,7 +305,7 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 		long timeElapsed = System.currentTimeMillis() - d.getTransactionTime();
 		if(timeElapsed > cm.getConfirmationTimeout(this.getClass()))
 			mm.confirmationExpired(player);
-		else if(match == null || match.getId() != Integer.parseInt(d.getArgs()[0]) || !cM.isSimilar(oM) || (ret > 0 && ret != d.getPrice()))
+		else if(match == null || match.getId() != Integer.parseInt(d.getArgs()[0]) || !ItemDB.similarEnchanted(cM, oM) || (ret > 0 && ret != d.getPrice()))
 			mm.invalidConfirmData(player);
 		else
 			finalizeReprice(player, d);

@@ -23,6 +23,7 @@ import com.dscalzi.itemcodexlib.ItemCodex;
 import com.dscalzi.itemcodexlib.component.ItemEntry;
 import com.dscalzi.virtualshopx.VirtualShopX;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public final class ItemDB {
@@ -127,7 +128,7 @@ public final class ItemDB {
 	public static String serializeEnchantmentData(ItemStack item) {
 	    Map<Enchantment, Integer> enchants = getEnchantments(item);
 	    if(enchants.size() > 0) {
-	        Gson g = new Gson();
+	        Gson g = new GsonBuilder().registerTypeAdapter(new TypeToken<Map<Enchantment, Integer>>() {}.getType(), new EnchantmentTypeAdapter()).create();
 	        return g.toJson(enchants, new TypeToken<Map<Enchantment, Integer>>() {}.getType());
 	    } else {
 	        return null;
@@ -138,7 +139,7 @@ public final class ItemDB {
 	    if(s == null) {
             return null;
         }
-        Gson g = new Gson();
+        Gson g = new GsonBuilder().registerTypeAdapter(new TypeToken<Enchantment>() {}.getType(), new EnchantmentTypeAdapter()).create();
         return g.fromJson(s, new TypeToken<Map<Enchantment, Integer>>() {}.getType());
 	}
 	
@@ -172,6 +173,15 @@ public final class ItemDB {
         	i.setItemMeta(meta);
         }
 		return i;
+	}
+	
+	public static boolean similarEnchanted(ItemStack first, ItemStack second) {
+	    if(first.getType().equals(second.getType())) {
+	        if(ItemDB.getEnchantments(first).equals(ItemDB.getEnchantments(second))){
+	            return true;
+	        }
+	    }
+	    return false;
 	}
 	
 }
