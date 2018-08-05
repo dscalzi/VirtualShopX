@@ -33,7 +33,7 @@ public class Offer {
     private int id;
 
 	public Offer(UUID sellerUUID, Material m, double price, int amount){
-        this.item = new ItemStack(m);
+        this.item = new ItemStack(m, amount);
         this.sellerUUID = sellerUUID;
         this.price = price;
     }

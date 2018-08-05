@@ -273,7 +273,7 @@ public final class DatabaseManager {
     }*/
     
     public List<Offer> getAllRegularOffers(){
-    	String sql = "select * from vsx_stock where " + KEY_ENCHANTMENT_DATA + " IS NULL order by " + KEY_PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_ENCHANTMENT_DATA + "='null' order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -285,7 +285,7 @@ public final class DatabaseManager {
     }
     
     public List<Offer> getAllEnchantedOffers(boolean withLore){
-    	String sql = "select * from vsx_stock where" + KEY_ENCHANTMENT_DATA + " IS NOT NULL order by " + KEY_PRICE + " asc";
+    	String sql = "select * from vsx_stock where NOT " + KEY_ENCHANTMENT_DATA + "='null' order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -299,7 +299,7 @@ public final class DatabaseManager {
   //TODO next
     
 	public List<Offer> getItemOffers(ItemStack item){
-    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NOT NULL order by " + KEY_PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and NOT " + KEY_ENCHANTMENT_DATA + "='null' order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -311,7 +311,7 @@ public final class DatabaseManager {
     }
     
 	public List<Offer> getEnchantedOffers(ItemStack item, boolean withLore){
-    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NULL order by " + KEY_PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + "='null' order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -359,7 +359,7 @@ public final class DatabaseManager {
     }
 
 	public List<Offer> getSellerOffers(UUID vendorUUID, ItemStack item){
-    	String sql = "select * from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NULL";
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + "='null'";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -371,7 +371,7 @@ public final class DatabaseManager {
     }
     
 	public List<Offer> getEnchantedSellerOffers(UUID vendorUUID, ItemStack item, boolean withLore){
-    	String sql = "select * from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NOT NULL order by " + KEY_PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and NOT " + KEY_ENCHANTMENT_DATA + "='null' order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -383,7 +383,7 @@ public final class DatabaseManager {
     }
 
 	public void removeSellerOffers(UUID vendorUUID, ItemStack item){
-    	String sql = "delete from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NULL";
+    	String sql = "delete from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + "='null'";
     	executeUpdate(sql);
     }
 
@@ -408,7 +408,7 @@ public final class DatabaseManager {
     }
 
 	public void updatePrice(UUID vendorUUID, double price, ItemStack item){
-    	String sql = "update vsx_stock set " + KEY_PRICE + "=" + price + " where " + KEY_UUID + "='" + vendorUUID + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NULL";
+    	String sql = "update vsx_stock set " + KEY_PRICE + "=" + price + " where " + KEY_UUID + "='" + vendorUUID + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + "='null'";
     	executeUpdate(sql);
     }
     
@@ -435,7 +435,7 @@ public final class DatabaseManager {
     }
 
     public List<Offer> searchRegularBySeller(UUID vendorUUID){
-    	String sql = "select * from vsx_stock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' where " + KEY_ENCHANTMENT_DATA + " IS NULL";
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' where " + KEY_ENCHANTMENT_DATA + "='null'";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -447,7 +447,7 @@ public final class DatabaseManager {
     }
     
     public List<Offer> searchEnchantedBySeller(UUID vendorUUID, boolean withLore){
-    	String sql = "select * from vsx_estock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' where " + KEY_ENCHANTMENT_DATA + " IS NOT NULL";
+    	String sql = "select * from vsx_estock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' where NOT " + KEY_ENCHANTMENT_DATA + "='null'";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -483,7 +483,7 @@ public final class DatabaseManager {
 	}
 
 	public List<Offer> getPrices(ItemStack item){
-    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' AND " + KEY_POTION_DATA + "=" + ItemDB.serializePotionData(item) + " order by " + KEY_PRICE + " asc limit 0,10";
+    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' AND " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' order by " + KEY_PRICE + " asc limit 0,10";
     	try(Connection connection = ds.getDataSource().getConnection();
     		PreparedStatement stmt = connection.prepareStatement(sql);
     		ResultSet result = stmt.executeQuery()){

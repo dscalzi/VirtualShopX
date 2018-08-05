@@ -125,7 +125,7 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
 				return false;
 			}
 			item.setAmount(amt);
-			args[0] = idb.reverseLookup(item);
+			args[0] = idb.getItemAlias(item);
 		}
 		if(item==null){
 			mm.wrongItem(player, args[0]);

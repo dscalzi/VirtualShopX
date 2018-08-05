@@ -128,7 +128,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 				mm.holdingNothing(player);
 				return false;
 			}
-			args[1] = idb.reverseLookup(item);
+			args[1] = idb.getItemAlias(item);
 		}
 		if(item==null){
 			mm.wrongItem(player, args[1]);

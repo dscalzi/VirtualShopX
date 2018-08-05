@@ -72,7 +72,7 @@ public class Find implements CommandExecutor{
     				mm.holdingNothing(sender);
     				return;
     			}
-    			args[0] = idb.reverseLookup(item);
+    			args[0] = idb.getItemAlias(item);
     		}
     	}
     	if(item == null){

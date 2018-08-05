@@ -441,7 +441,7 @@ public final class MessageManager {
     	b.append(" and must specify a price.", FormatRetention.FORMATTING);
     	
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), ItemDB.getCleanedItem(item)));
+    	a.add(1, formatEnchantedItem(idb.getItemAlias(item), ItemDB.getCleanedItem(item)));
     	
     	sendFormattedMessage(player, a);
 	}
@@ -451,7 +451,7 @@ public final class MessageManager {
     	b.append(", please specify a definite price.", FormatRetention.FORMATTING);
     	
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), ItemDB.getCleanedItem(item)));
+    	a.add(1, formatEnchantedItem(idb.getItemAlias(item), ItemDB.getCleanedItem(item)));
     	
     	sendFormattedMessage(player, a);
 	}
@@ -461,7 +461,7 @@ public final class MessageManager {
     	b.append(", please specify a definite price.", FormatRetention.FORMATTING);
     	
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), ItemDB.getCleanedItem(item)));
+    	a.add(1, formatEnchantedItem(idb.getItemAlias(item), ItemDB.getCleanedItem(item)));
 
     	sendFormattedMessage(player, a);
 	}
@@ -469,9 +469,9 @@ public final class MessageManager {
 	public void sellConfirmation(Player player, String label, ListingData data){
 		
     	if(data.getCurrentListings() < 1)
-    		sendMessage(player, getString("You are about to create a listing for {0} {1} for {2} each.", formatAmount(data.getAmount()), formatItem(idb.reverseLookup(data.getItem())), formatPrice(data.getPrice())));
+    		sendMessage(player, getString("You are about to create a listing for {0} {1} for {2} each.", formatAmount(data.getAmount()), formatItem(idb.getItemAlias(data.getItem())), formatPrice(data.getPrice())));
     	else{
-    		String common = getString("You are about to add {0} {1} to your current listing", formatAmount(data.getAmount()), formatItem(idb.reverseLookup(data.getItem())));
+    		String common = getString("You are about to add {0} {1} to your current listing", formatAmount(data.getAmount()), formatItem(idb.getItemAlias(data.getItem())));
     		if(data.getOldPrice() == data.getPrice())
     			sendMessage(player, common + ".");
     		else if(data.getOldPrice() > data.getPrice())
@@ -490,7 +490,7 @@ public final class MessageManager {
 		b.append(" each.", FormatRetention.NONE).color(getColor().asBungee());
 		
 		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-		a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getCleanedItem()));
+		a.add(1, formatEnchantedItem(idb.getItemAlias(data.getCleanedItem()), data.getCleanedItem()));
 		
     	sendFormattedMessage(player, a);
     	confirmationMsg(player, label, ESell.class);
@@ -498,7 +498,7 @@ public final class MessageManager {
 	
     public void buyConfirmation(Player player, String label, TransactionData data){
     	sendMessage(player, getString("You are about to buy {0} {1} for a total price of {2}.",
-    			formatAmount(data.getAmount()), formatItem(idb.reverseLookup(data.getItem())), formatPrice(data.getPrice())));
+    			formatAmount(data.getAmount()), formatItem(idb.getItemAlias(data.getItem())), formatPrice(data.getPrice())));
     	confirmationMsg(player, label, Buy.class);
     }
     
@@ -509,14 +509,14 @@ public final class MessageManager {
     	b.append(".", FormatRetention.NONE).color(getColor().asBungee());
     	
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getCleanedItem()));
+    	a.add(1, formatEnchantedItem(idb.getItemAlias(data.getCleanedItem()), data.getCleanedItem()));
     	
     	sendFormattedMessage(player, a);
     	confirmationMsg(player, label, EBuy.class);
     }
     
     public void cancelConfirmation(Player player, String label, CancelData data){
-    	sendMessage(player, getString("You are about to cancel {0} {1}.", formatAmount(data.getAmount()), formatItem(idb.reverseLookup(data.getItem()))));
+    	sendMessage(player, getString("You are about to cancel {0} {1}.", formatAmount(data.getAmount()), formatItem(idb.getItemAlias(data.getItem()))));
     	if(data.getAmount() > data.getInventorySpace())
     			sendError(player, getString("Currently, you have space for {0}. Excess will be dropped around you.", (data.getInventorySpace() == 0 ? "none" : "only " + formatAmount(data.getInventorySpace()) + getErrorColor())));
     	
@@ -528,7 +528,7 @@ public final class MessageManager {
     	b.append(".", FormatRetention.NONE).color(getColor().asBungee());
     	
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getCleanedItem()));
+    	a.add(1, formatEnchantedItem(idb.getItemAlias(data.getCleanedItem()), data.getCleanedItem()));
     	
     	sendFormattedMessage(player, a);
     	
@@ -539,7 +539,7 @@ public final class MessageManager {
     
     public void repriceConfirmation(Player player, String label, ListingData data){
     	String quantity = (data.getOldPrice() > data.getPrice()) ? "lower" : "higher";
-    	sendMessage(player, getString("You are about to update the price of your {0} for a {1} price of {2} each.", formatItem(idb.reverseLookup(data.getItem())), quantity, formatPrice(data.getPrice())));
+    	sendMessage(player, getString("You are about to update the price of your {0} for a {1} price of {2} each.", formatItem(idb.getItemAlias(data.getItem())), quantity, formatPrice(data.getPrice())));
     	
     	confirmationMsg(player, label, Reprice.class);
     }
@@ -552,7 +552,7 @@ public final class MessageManager {
     	b.append(".", FormatRetention.NONE).color(getColor().asBungee());
     	
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(1, formatEnchantedItem(idb.reverseLookup(data.getCleanedItem()), data.getCleanedItem()));
+    	a.add(1, formatEnchantedItem(idb.getItemAlias(data.getCleanedItem()), data.getCleanedItem()));
     	
     	sendFormattedMessage(player, a);
     	
@@ -591,7 +591,7 @@ public final class MessageManager {
     	ComponentBuilder b = new ComponentBuilder("Managed to buy an enchanted ").color(getSuccessColor().asBungee());
     	b.append(".");
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), item));
+    	a.add(1, formatEnchantedItem(idb.getItemAlias(item), item));
     	
     	sendFormattedMessage(player, a);
     }
@@ -606,7 +606,7 @@ public final class MessageManager {
     	b.append(".", FormatRetention.NONE).color(getSuccessColor().asBungee());
     	
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(2, formatEnchantedItem(idb.reverseLookup(item), item));
+    	a.add(2, formatEnchantedItem(idb.getItemAlias(item), item));
     	
     	sendFormattedMessage(p, a);
     }
@@ -615,7 +615,7 @@ public final class MessageManager {
     	ComponentBuilder b = new ComponentBuilder("Removed an enchanted ").color(getSuccessColor().asBungee());
     	b.append(".");
     	ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(1, formatEnchantedItem(idb.reverseLookup(item), item));
+    	a.add(1, formatEnchantedItem(idb.getItemAlias(item), item));
     	
     	sendFormattedMessage(player, a);
     }
@@ -739,14 +739,14 @@ public final class MessageManager {
     }
 	
 	public String formatOffer(Offer o, boolean enchanted){
-        return formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " " + formatItem(idb.reverseLookup(o.getItem()), enchanted) + " for " + formatPrice(o.getPrice()) + " each.";
+        return formatSeller(o.getSeller()) + ": " + formatAmount(o.getItem().getAmount()) + " " + formatItem(idb.getItemAlias(o.getItem()), enchanted) + " for " + formatPrice(o.getPrice()) + " each.";
     }
 	
 	public BaseComponent[] formatOffer0(Offer o){
 		ComponentBuilder b = new ComponentBuilder(o.getSeller()).color(getSellerColor().asBungee());
 		b.append(": ", FormatRetention.NONE).color(getColor().asBungee());
 		b.append(formatAmount(o.getItem().getAmount()) + " ", FormatRetention.NONE).color(getAmountColor().asBungee());
-		String item = idb.reverseLookup(o.getItem());
+		String item = idb.getItemAlias(o.getItem());
 		b.append(item, FormatRetention.NONE).color(getItemColor().asBungee());
 		b.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/vs find " + item));
     	b.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(getItemColor() + "Click to view other\n" + getItemColor() + "listings for this item.")));
@@ -761,7 +761,7 @@ public final class MessageManager {
 	}
 	
 	public String formatTransactionConsole(Transaction t, boolean enchanted){
-		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(idb.reverseLookup(t.getItem()), true, enchanted) + " for "+ formatPrice(t.getCost()) + ".";
+		return formatSeller(t.getSeller())+ " --> " + formatBuyer(t.getBuyer()) + ": " + formatAmount(t.getItem().getAmount())+" " + formatItem(idb.getItemAlias(t.getItem()), true, enchanted) + " for "+ formatPrice(t.getCost()) + ".";
 	}
 	
 	public ArrayList<BaseComponent> formatTransaction(Transaction t){
@@ -770,7 +770,7 @@ public final class MessageManager {
 		b.append(t.getBuyer(), FormatRetention.NONE).color(getBuyerColor().asBungee());
 		b.append(": ", FormatRetention.NONE).color(getColor().asBungee());
 		b.append(t.getItem().getAmount() + " ", FormatRetention.NONE).color(getAmountColor().asBungee());
-		b.append(formatItem(idb.reverseLookup(t.getItem()))).color(getItemColor().asBungee());
+		b.append(formatItem(idb.getItemAlias(t.getItem()))).color(getItemColor().asBungee());
 		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
 		b.append(formatPrice(t.getCost()) + "", FormatRetention.NONE).color(getPriceColor().asBungee());
 		b.append(". ", FormatRetention.NONE).color(getColor().asBungee());
@@ -797,7 +797,7 @@ public final class MessageManager {
 		b.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(getBaseColor() + "- " + getTrimColor() + "Transaction Time" + getBaseColor() + " -\n  " + getBaseColor() + formatTemporal(t.getTimestamp()))));
 		
 		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
-    	a.add(6, formatEnchantedItem(idb.reverseLookup(t.getItem()), t.getItem()));
+    	a.add(6, formatEnchantedItem(idb.getItemAlias(t.getItem()), t.getItem()));
 		
     	return a;
 	}
@@ -845,7 +845,7 @@ public final class MessageManager {
 		b.append(" for ", FormatRetention.NONE).color(getColor().asBungee());
 		b.append(formatPrice(o.getPrice()) + "", FormatRetention.NONE).color(getPriceColor().asBungee());
 		b.append(".", FormatRetention.NONE).color(getColor().asBungee());
-		BaseComponent item = formatEnchantedItem(idb.reverseLookup(o.getItem()), o.getItem());
+		BaseComponent item = formatEnchantedItem(idb.getItemAlias(o.getItem()), o.getItem());
 		ArrayList<BaseComponent> a = new ArrayList<BaseComponent>(Arrays.asList(b.create()));
 		a.add(2, item);
 		return a;

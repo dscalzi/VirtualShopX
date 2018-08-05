@@ -114,14 +114,14 @@ public class Cancel implements CommandExecutor, Confirmable, TabCompleter{
 				mm.holdingNothing(player);
 				return false;
 			}
-			args[1] = idb.reverseLookup(item);
+			args[1] = idb.getItemAlias(item);
 		} else if(args[1].equalsIgnoreCase("offhand")){
 			item = new ItemStack(im.getItemInOffHand());
 			if(item.getType() == Material.AIR){
 				mm.holdingNothing(player);
 				return false;
 			}
-			args[1] = idb.reverseLookup(item);
+			args[1] = idb.getItemAlias(item);
 		}
         
 		if(item==null){

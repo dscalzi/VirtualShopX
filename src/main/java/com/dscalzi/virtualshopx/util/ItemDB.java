@@ -6,8 +6,6 @@
 package com.dscalzi.virtualshopx.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -81,12 +79,13 @@ public final class ItemDB {
 	    return codex.getItemByItemStack(item);
 	}
 	
-	public String reverseLookup(ItemStack item)	{
-		Optional<ItemEntry> ieOpt = codex.getItem(item.getType().name());
-		if(ieOpt.isPresent()) {
-		    return ieOpt.get().getAliases().get(0);
-		}
-		return item.getType().name().toLowerCase();
+	public String getItemAlias(ItemStack item) {
+	    Optional<ItemEntry> isOpt = codex.getItemByItemStack(item);
+	    if(isOpt.isPresent()) {
+	        return isOpt.get().getAliases().get(0);
+	    } else {
+	        return item.getType().name().toLowerCase();
+	    }
 	}
 	
 	/**

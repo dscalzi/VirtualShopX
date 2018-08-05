@@ -221,14 +221,14 @@ public class VS implements CommandExecutor, TabCompleter{
 			Player player = (Player)sender;
 			PlayerInventory piv = player.getInventory();
 			item = new ItemStack(piv.getItemInMainHand().getType());
-			itm = idb.reverseLookup(item);
+			itm = idb.getItemAlias(item);
 		}
 		if(item == null){
 			mm.wrongItem(sender, itm);
 			return;
 		}
 		for(Offer o : dbm.getAllRegularOffers()){
-			boolean isSameItem = idb.reverseLookup(item).equalsIgnoreCase(idb.reverseLookup(o.getItem()));
+			boolean isSameItem = idb.getItemAlias(item).equalsIgnoreCase(idb.getItemAlias(o.getItem()));
 			if(o.getPrice() > cm.getMaxPrice(o.getItem().getType()) && isSameItem){
 				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getType()));
 				++amt;

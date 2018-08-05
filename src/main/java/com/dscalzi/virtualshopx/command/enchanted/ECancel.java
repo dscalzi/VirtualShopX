@@ -131,7 +131,7 @@ public class ECancel implements CommandExecutor, Listener, Confirmable, TabCompl
 				mm.holdingNothing(player);
 				return;
 			}
-			args[0] = idb.reverseLookup(item);
+			args[0] = idb.getItemAlias(item);
 		} else item = idb.get(args[0], 0);
 		
 		if(item == null){
@@ -145,13 +145,13 @@ public class ECancel implements CommandExecutor, Listener, Confirmable, TabCompl
 	private void goToPage(Player player, ItemStack item, int page){	
 		List<Offer> offers = dbm.getEnchantedSellerOffers(player.getUniqueId(), item, true);
 		if(offers.size() == 0){
-			mm.noSpecificStock(player, idb.reverseLookup(item));
+			mm.noSpecificStock(player, idb.getItemAlias(item));
 			return;
 		}
 		
 		final ChatColor baseColor = mm.getBaseColor();
 		final ChatColor trimColor = mm.getTrimColor();
-		String name = idb.reverseLookup(item);
+		String name = idb.getItemAlias(item);
 		
 		double div = 14.0;
 		

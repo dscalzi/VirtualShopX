@@ -142,7 +142,7 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 			return false;
 		}
 		
-		String iName = ItemDB.getInstance().reverseLookup(item);
+		String iName = ItemDB.getInstance().getItemAlias(item);
 		
 		if(price < 0){
 			if(args[0].equals("-"))

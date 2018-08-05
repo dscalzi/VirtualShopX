@@ -132,7 +132,7 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 				mm.holdingNothing(player);
 				return;
 			}
-			args[0] = idb.reverseLookup(item);
+			args[0] = idb.getItemAlias(item);
 		} else item = idb.get(args[0], 0);
 		
 		if(item == null){
@@ -160,13 +160,13 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 	private void goToPage(Player player, ItemStack item, double newPrice, String[] args, int page){	
 		List<Offer> offers = dbm.getEnchantedSellerOffers(player.getUniqueId(), item, true);
 		if(offers.size() == 0){
-			mm.noSpecificStock(player, idb.reverseLookup(item));
+			mm.noSpecificStock(player, idb.getItemAlias(item));
 			return;
 		}
 		
 		final ChatColor baseColor = mm.getBaseColor();
 		final ChatColor trimColor = mm.getTrimColor();
-		String name = idb.reverseLookup(item);
+		String name = idb.getItemAlias(item);
 		
 		double div = 14.0;
 		
