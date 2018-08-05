@@ -435,7 +435,7 @@ public final class DatabaseManager {
     }
 
     public List<Offer> searchRegularBySeller(UUID vendorUUID){
-    	String sql = "select * from vsx_stock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' where " + KEY_ENCHANTMENT_DATA + "='null'";
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' and " + KEY_ENCHANTMENT_DATA + "='null'";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -447,7 +447,7 @@ public final class DatabaseManager {
     }
     
     public List<Offer> searchEnchantedBySeller(UUID vendorUUID, boolean withLore){
-    	String sql = "select * from vsx_estock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' where NOT " + KEY_ENCHANTMENT_DATA + "='null'";
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' and NOT " + KEY_ENCHANTMENT_DATA + "='null'";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
