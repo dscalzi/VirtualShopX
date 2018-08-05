@@ -11,11 +11,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.material.MaterialData;
 
 /**
  * New Inventory manager to comply with 1.9 inventories.
- * 
  * 
  * @author Daniel Scalzi
  *
@@ -30,24 +28,6 @@ public class InventoryManager {
 		this._p = p;
 		this._inv = p.getInventory();
 	}
-	
-	@SuppressWarnings("deprecation")
-	public static byte handleData(MaterialData data) {
-    	try {
-    		if(data!=null) return data.getData(); 
-    		else return ((byte)(0));
-    	} catch(Exception ex) {
-    		return ((byte)(0));
-    	}
-    }
-	
-	public static byte handleData(short data) {
-    	try { 
-    		return ((byte)(data));
-    	} catch(Exception ex) {
-    		return ((byte)(0));
-    	}
-    }
 	
 	public boolean contains(ItemStack item){
 		

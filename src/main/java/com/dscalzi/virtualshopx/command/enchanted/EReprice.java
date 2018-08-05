@@ -123,7 +123,6 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void execute(Player player, String[] args){
 		ItemStack item;
 		if(args[0].matches("^(?iu)(hand|mainhand|offhand)")){
@@ -150,8 +149,8 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 			}
 		}
 		
-		if(newPrice > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			mm.priceTooHigh(player, args[0], cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+		if(newPrice > cm.getMaxPrice(item.getType())){
+			mm.priceTooHigh(player, args[0], cm.getMaxPrice(item.getType()));
 			return;
 		}
 		
@@ -230,7 +229,7 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 	private Offer validateData(Player player, ItemStack item, Double price){
 		if(price == null) return null;
 		ItemStack i = ItemDB.getCleanedItem(item);
-		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price, true);
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.serializeEnchantmentData(i), price, true);
 		for(Offer o : matches)
 			if(o.getSellerUUID().equals(player.getUniqueId()))
 				return o;
@@ -287,7 +286,7 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 	}
 	
 	private void finalizeReprice(Player player, EListingData d){
-		dbm.updatePriceEnchanted(Integer.parseInt(d.getArgs()[0]), d.getPrice());
+		dbm.updatePrice(Integer.parseInt(d.getArgs()[0]), d.getPrice());
 		if(cm.broadcastOffers())
         	mm.broadcastEnchantedPriceUpdate(player, d);
     }
@@ -313,7 +312,6 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 		confirmations.unregister(this.getClass(), player);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public double checkApproxPrice(Player player, ItemStack cleaned, String[] args){
 		if(args[1].startsWith("~")){
 			try {
@@ -335,8 +333,8 @@ public class EReprice implements CommandExecutor, Listener, Confirmable, TabComp
 	        			}
 	        		}
 	        	}
-				if(newPrice > cm.getMaxPrice(cleaned.getData().getItemTypeId(), cleaned.getData().getData())){
-					mm.priceTooHigh(player, args[0], cm.getMaxPrice(cleaned.getData().getItemTypeId(), cleaned.getData().getData()));
+				if(newPrice > cm.getMaxPrice(cleaned.getType())){
+					mm.priceTooHigh(player, args[0], cm.getMaxPrice(cleaned.getType()));
 					return -1;
 				}
 				return newPrice;

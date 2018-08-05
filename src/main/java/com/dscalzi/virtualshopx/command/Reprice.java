@@ -98,7 +98,6 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
 			mm.repriceConfirmation(player, label, (ListingData) confirmations.retrieve(this.getClass(), player));
 	}
 	
-	@SuppressWarnings("deprecation")
 	private boolean validateData(Player player, String[] args){
 		final int amt = 0;
 		ItemStack item = idb.get(args[0], amt);
@@ -152,8 +151,8 @@ public class Reprice implements CommandExecutor, Confirmable, TabCompleter{
         	}
         }
 		
-		if(newPrice > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			mm.priceTooHigh(player, args[0], cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+		if(newPrice > cm.getMaxPrice(item.getType())){
+			mm.priceTooHigh(player, args[0], cm.getMaxPrice(item.getType()));
 			return false;
 		}
 		int currentlyListed = 0;

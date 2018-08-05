@@ -5,6 +5,7 @@
  */
 package com.dscalzi.virtualshopx.objects;
 
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,7 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-@SuppressWarnings("deprecation")
 public class Offer {
 	
 	private UUID sellerUUID;
@@ -32,8 +32,8 @@ public class Offer {
     private double price;
     private int id;
 
-	public Offer(UUID sellerUUID, int id, short damage, double price, int amount){
-        this.item = new ItemStack(id,amount,damage);
+	public Offer(UUID sellerUUID, Material m, double price, int amount){
+        this.item = new ItemStack(m);
         this.sellerUUID = sellerUUID;
         this.price = price;
     }
@@ -48,7 +48,7 @@ public class Offer {
         List<Offer> ret = new ArrayList<Offer>();
         try {
             while(result.next()){
-                Offer o = new Offer(UUID.fromString(result.getString(DatabaseManager.UUIDKEY)), result.getInt(DatabaseManager.ITEM_ID), (short)result.getInt(DatabaseManager.ITEM_DATA),result.getDouble(DatabaseManager.PRICE),result.getInt(DatabaseManager.QUANTITY));
+                Offer o = new Offer(UUID.fromString(result.getString(DatabaseManager.KEY_UUID)), Material.valueOf(result.getString(DatabaseManager.KEY_MATERIAL)), result.getDouble(DatabaseManager.KEY_PRICE), result.getInt(DatabaseManager.KEY_QUANTITY));
                 o.setId(result.getInt("id"));
                 ret.add(o);
             }
@@ -61,12 +61,12 @@ public class Offer {
     	List<Offer> ret = new ArrayList<Offer>();
     	try{
     		while(result.next()){
-    			ItemStack item = new ItemStack(result.getInt(DatabaseManager.ITEM_ID), 1, (short)result.getInt(DatabaseManager.ITEM_DATA));
-    			Map<Enchantment, Integer> enchantments = ItemDB.parseEnchantData(result.getString(DatabaseManager.ITEM_EDATA));
+    			ItemStack item = new ItemStack(Material.valueOf(result.getString(DatabaseManager.KEY_MATERIAL)));
+    			Map<Enchantment, Integer> enchantments = ItemDB.deserializeEnchantmentData(result.getString(DatabaseManager.KEY_ENCHANTMENT_DATA));
     			ItemDB.addEnchantments(item, enchantments);
     			ItemMeta meta = item.getItemMeta();
-    			Double price = result.getDouble(DatabaseManager.PRICE);
-    			Offer o = new Offer(UUID.fromString(result.getString(DatabaseManager.UUIDKEY)), item, price);
+    			Double price = result.getDouble(DatabaseManager.KEY_PRICE);
+    			Offer o = new Offer(UUID.fromString(result.getString(DatabaseManager.KEY_UUID)), item, price);
     			if(withLore){
 	    			List<String> desc = new ArrayList<String>();
 	    			desc.add("");
@@ -76,7 +76,7 @@ public class Offer {
 	    			item.setItemMeta(meta);
     			}
     			o.setItem(item);
-    			o.setId(result.getInt(DatabaseManager.ID));
+    			o.setId(result.getInt(DatabaseManager.KEY_ID));
     			ret.add(o);
     		}
     	} catch (SQLException e){

@@ -357,7 +357,6 @@ public final class MessageManager {
 		sendError(sender, "The VS does not yet support this item. Try again soon!");
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void formatLookupResults(CommandSender sender, ItemStack target, List<String> aliases){
 		String formattedAliasList;
 		if(aliases.size() < 1){
@@ -368,7 +367,7 @@ public final class MessageManager {
 			formattedAliasList = formattedAliasList.replaceAll("\\]", tColor + "\\]" + bColor);
 		}
 		
-		String topLine = getPrefix() + " " + formatItem(target.getType().toString(), true).toUpperCase() + tColor + " - " + formatItem(target.getTypeId() + ":" + target.getData().getData(), true);
+		String topLine = getPrefix() + " " + formatItem(target.getType().toString(), true).toUpperCase() + tColor + " - " + formatItem(target.getType().name(), true);
 		sendRawMessage(sender, topLine);
 		sendRawMessage(sender, bColor + formattedAliasList);
 	}

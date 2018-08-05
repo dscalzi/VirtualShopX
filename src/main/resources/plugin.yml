@@ -3,6 +3,7 @@ description: Enables users to buy and sell items on a virtual shop.
 main: com.dscalzi.virtualshopx.VirtualShopX
 name: VirtualShopX
 version: 0.154.0
+api-version: 1.13
 depend: [Vault]
 loadbefore: [VSXReloader]
 commands:

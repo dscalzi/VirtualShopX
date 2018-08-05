@@ -66,7 +66,7 @@ public final class Reloader {
 	/* Reflect */
 	
 	private boolean loadVSXR(final File dest){
-        try(InputStream in = this.getClass().getResourceAsStream("/depend/VSXReloader.jar")){
+        try(InputStream in = this.getClass().getResourceAsStream("/depend/VSXReloader.notajar")){
         	plugin.getLogger().info("Saving VSXReloader.jar");
 			Files.copy(in, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException | NullPointerException e) {

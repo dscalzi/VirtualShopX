@@ -8,6 +8,7 @@ package com.dscalzi.virtualshopx.command;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.bukkit.command.Command;
@@ -16,14 +17,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
-
+import org.bukkit.inventory.PlayerInventory;
+import com.dscalzi.itemcodexlib.component.ItemEntry;
 import com.dscalzi.virtualshopx.VirtualShopX;
 import com.dscalzi.virtualshopx.managers.ConfigManager;
 import com.dscalzi.virtualshopx.managers.DatabaseManager;
 import com.dscalzi.virtualshopx.managers.MessageManager;
 import com.dscalzi.virtualshopx.objects.Offer;
-import com.dscalzi.virtualshopx.util.ConversionUtil;
 import com.dscalzi.virtualshopx.util.ItemDB;
 import com.dscalzi.virtualshopx.util.Reloader;
 import com.dscalzi.vsxreloader.PluginUtil;
@@ -105,11 +105,6 @@ public class VS implements CommandExecutor, TabCompleter{
 					this.cmdFullReload(sender);
 					return true;
 				}
-				if(args[0].equalsIgnoreCase("debug")) {
-					//ConversionUtil.generateEveryPotion();
-					ConversionUtil.main(null);
-					return true;
-				}
 				if(args[0].equalsIgnoreCase("reload")){
 					this.cmdReload(sender);
 					return true;
@@ -142,7 +137,6 @@ public class VS implements CommandExecutor, TabCompleter{
 		mm.vsList(sender, page);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void cmdLookup(CommandSender sender, String[] args){
 		
 		if(!sender.hasPermission("virtualshopx.merchant.lookup")){
@@ -150,7 +144,8 @@ public class VS implements CommandExecutor, TabCompleter{
 			return;
 		}
     	
-		ItemStack target = null;
+		Optional<ItemEntry> target = null;
+		ItemStack searchItem = null;
 		
 		//Hand
 		if(args.length == 1 || (args.length > 1 && (args[1].equalsIgnoreCase("hand") || args[1].equalsIgnoreCase("mainhand") || args[1].equalsIgnoreCase("offhand")))){
@@ -159,48 +154,40 @@ public class VS implements CommandExecutor, TabCompleter{
 				return;
 			}
 			Player p = (Player)sender;
-			if(args.length > 1 && args[1].equalsIgnoreCase("offhand")) target = p.getInventory().getItemInOffHand();
-			else target = p.getInventory().getItemInMainHand();
+			if(args.length > 1 && args[1].equalsIgnoreCase("offhand")) searchItem = p.getInventory().getItemInOffHand();
+			else searchItem = p.getInventory().getItemInMainHand();
 			
-			if(target == null){
+			if(searchItem == null){
 				mm.lookupFailedNull(sender);
 				return;
+			} else {
+			    target = ItemDB.getInstance().getByItemStack(searchItem);
 			}
 		}
 		
-		if(args.length > 1 && target == null){
-			target = idb.get(args[1], 0);
-			if(target == null){
-				target = idb.unsafeLookup(args[1]);
-				if(target == null){
-					mm.lookupFailedNotFound(sender, args[1]);
-					return;
-				}
-			}
+		if(target == null && args.length > 1) {
+		    target = ItemDB.getInstance().get(args[1]);
+		    
+		    if(!target.isPresent()) {
+		        searchItem = idb.unsafeLookup(args[1]);
+                if(searchItem == null){
+                    mm.lookupFailedNotFound(sender, args[1]);
+                    return;
+                }
+		    } else {
+		        searchItem = target.get().getItemStack();
+		    }
 		}
 		
 		//Final check for security.
-		if(target == null){
+		if(searchItem == null){
 			mm.lookupFailedUnknown(sender);
 			return;
 		}
 		
-		//Blocked items.
-		if(target.getTypeId() == 440){
-			mm.lookupUnsuported(sender);
-			return;
-		}
-		
-		if(target.getItemMeta() instanceof PotionMeta){
-			PotionMeta m = (PotionMeta)target.getItemMeta();
-			//m.getBasePotionData().getType().
-			mm.sendMessage(sender, m.getBasePotionData().getType().getEffectType().getId() + "");
-		}
-		
-		mm.formatLookupResults(sender, target, idb.getAliases(target));
+		mm.formatLookupResults(sender, searchItem, target.isPresent() ? target.get().getAliases() : new ArrayList<String>());
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void formatMarket(CommandSender sender){
 		
 		if(!sender.hasPermission("virtualshopx.admin.formatmarket")){
@@ -210,8 +197,8 @@ public class VS implements CommandExecutor, TabCompleter{
 		
 		int amt = 0;
 		for(Offer o : dbm.getAllRegularOffers()){
-			if(o.getPrice() > cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData())){
-				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
+			if(o.getPrice() > cm.getMaxPrice(o.getItem().getType())){
+				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getType()));
 				++amt;
 			}
 		}
@@ -221,8 +208,7 @@ public class VS implements CommandExecutor, TabCompleter{
 			mm.listingsFormatted(sender, amt);
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void formatMarket(CommandSender sender, String itm){
+    public void formatMarket(CommandSender sender, String itm){
 		
 		if(!sender.hasPermission("virtualshopx.admin.formatmarket")){
 			mm.noPermissions(sender);
@@ -233,7 +219,8 @@ public class VS implements CommandExecutor, TabCompleter{
 		ItemStack item = idb.get(itm, 0);
 		if(itm.equalsIgnoreCase("hand") && sender instanceof Player){
 			Player player = (Player)sender;
-			item = new ItemStack(player.getItemInHand().getType(), 0, player.getItemInHand().getDurability());
+			PlayerInventory piv = player.getInventory();
+			item = new ItemStack(piv.getItemInMainHand().getType());
 			itm = idb.reverseLookup(item);
 		}
 		if(item == null){
@@ -242,8 +229,8 @@ public class VS implements CommandExecutor, TabCompleter{
 		}
 		for(Offer o : dbm.getAllRegularOffers()){
 			boolean isSameItem = idb.reverseLookup(item).equalsIgnoreCase(idb.reverseLookup(o.getItem()));
-			if(o.getPrice() > cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()) && isSameItem){
-				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getData().getItemTypeId(), o.getItem().getData().getData()));
+			if(o.getPrice() > cm.getMaxPrice(o.getItem().getType()) && isSameItem){
+				dbm.updatePrice(o.getId(), cm.getMaxPrice(o.getItem().getType()));
 				++amt;
 			}
 		}

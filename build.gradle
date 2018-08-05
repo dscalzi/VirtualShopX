@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'maven'
+	id'com.github.johnrengelman.shadow' version '2.0.4'
+}
+
+group = 'com.dscalzi'
+version = '0.154.0'
+
+description = """VirtualShopX"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url "http://nexus.hc.to/content/repositories/pub_releases" }
+    maven { url "http://repo.bstats.org/content/repositories/releases/" }
+}
+dependencies {
+    compile group: 'com.zaxxer', name: 'HikariCP', version:'2.6.1'
+    compile group: 'com.dscalzi', name: 'ItemCodexLib', version:'1.0.0'
+    compile group: 'com.google.code.gson', name: 'gson', version:'2.8.5'
+    compile group: 'org.bstats', name: 'bstats-bukkit', version:'1.2'
+    compileOnly group: 'org.spigotmc', name: 'spigot-api', version:'1.13-R0.1-SNAPSHOT'
+    compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version:'1.6'
+    compileOnly group: 'com.dscalzi', name: 'VSXReloader', version:'0.6.0'
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+jar {
+    baseName = project.name
+    manifest {
+        attributes 'Implementation-Version': version, 'Specification-Version': version
+    }
+}
+
+shadowJar {
+    classifier 'dist'
+    relocate 'org.bstats', 'lib.org.bstats'
+    relocate 'com.zaxxer', 'lib.com.zaxxer'
+    relocate 'org.slf4j', 'lib.org.slf4j'
+    relocate 'com.google', 'lib.com.google'
+    relocate 'com.dscalzi.itemcodexlib', 'lib.com.dscalzi.itemcodexlib'
+}
+
+build {
+    dependsOn clean
+    dependsOn jar
+    dependsOn shadowJar
+
+    jar.mustRunAfter clean
+}

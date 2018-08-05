@@ -37,17 +37,29 @@ import com.dscalzi.virtualshopx.util.ItemDB;
 public final class DatabaseManager {
 
 	/* Constants */
-	public static final String ID = "id";
-	public static final String UUIDKEY = "uuid";
-	public static final String VENDOR_UUID = "vendor_uuid";
-	public static final String BUYER_UUID = "buyer_uuid";
-	public static final String ITEM_ID = "item";
-	public static final String ITEM_DATA = "damage";
-	public static final String ITEM_EDATA = "edata";
-	public static final String QUANTITY = "quantity";
-	public static final String PRICE = "price";
-	public static final String COST = "cost";
-	public static final String TIMESTAMP = "timestamp";
+    
+    // @NotNull integer
+	public static final String KEY_ID = "ID";
+	public static final String KEY_QUANTITY = "QUANTITY";
+	
+	// @NotNull double
+	public static final String KEY_PRICE = "PRICE";
+	public static final String KEY_COST = "COST";
+	
+	// @NotNull varchar(256)
+	public static final String KEY_MATERIAL = "MATERIAL";
+	
+	// @Nullable varchar(256)
+	public static final String KEY_POTION_DATA = "POTION_DATA";
+	public static final String KEY_ENCHANTMENT_DATA = "ENCHANTMENT_DATA";
+	
+	// @NotNull char(36)
+	public static final String KEY_UUID = "UUID";
+    public static final String KEY_SELLER_UUID = "SELLER_UUID";
+	public static final String KEY_BUYER_UUID = "BUYER_UUID";
+	
+	// @NotNull bigint
+	public static final String KEY_TIMESTAMP = "TIMESTAMP";
 	
 	private static final Map<Class<? extends Confirmable>, String> togglesKey;
 	private static boolean initialized;
@@ -139,41 +151,41 @@ public final class DatabaseManager {
     private boolean checkTables(ConnectionType type){
     	int checksum = 0, desired = 0;
     	String autoIncrement = type == ConnectionType.SQLite ? "" : " auto_increment"; 
-		if(!ds.checkTable("vshop_stock")){
+		if(!ds.checkTable("vsx_stock")){
 			++desired;
-			String query = "create table vshop_stock(`" + ID + "` integer primary key" + autoIncrement + ", `" + ITEM_ID + "` integer not null, `" + ITEM_DATA + "` smallint, `" + QUANTITY + "` integer not null, `" + PRICE + "` double not null, `" + UUIDKEY + "` char(36) not null)";
+			String query = "create table vsx_stock(`" + KEY_ID + "` integer primary key" + autoIncrement + ", `" + KEY_MATERIAL + "` varchar(256) not null, `" + KEY_POTION_DATA + "` varchar(256), `" + KEY_ENCHANTMENT_DATA + "` varchar(256) not null, `" + KEY_QUANTITY + "` integer not null, `" + KEY_PRICE + "` double not null, `" + KEY_UUID + "` char(36) not null)";
 			if(createTable(query)){
-				cm.logInfo("Successfully created table vshop_stock.");
+				cm.logInfo("Successfully created table vsx_stock.");
 				++checksum;
 			} else
-				cm.logError("Unable to create table vshop_stock.", true);
+				cm.logError("Unable to create table vsx_stock.", true);
 		}
-		if(!ds.checkTable("vshop_estock")){
+		/*if(!ds.checkTable("vsx_estock")){
 			++desired;
-			String query = "create table vshop_estock(`" + ID + "` integer primary key" + autoIncrement + ", `" + ITEM_ID + "` integer not null, `" + ITEM_DATA + "` smallint not null, `" + PRICE + "` double not null, `" + ITEM_EDATA + "` varchar(255) not null, `" + UUIDKEY + "` char(36) not null)";
+			String query = "create table vsx_estock(`" + KEY_ID + "` integer primary key" + autoIncrement + ", `" + KEY_MATERIAL + "` varchar(256) not null, `" + KEY_PRICE + "` double not null, `" + KEY_ITEM_ENCHANTMENT_DATA + "` varchar(255) not null, `" + KEY_UUID + "` char(36) not null)";
 			if(createTable(query)){
-				cm.logInfo("Successfully created table vshop_estock.");
+				cm.logInfo("Successfully created table vsx_estock.");
 				++checksum;
 			} else
-				cm.logError("Unable to create table vshop_stock.", true);
+				cm.logError("Unable to create table vsx_estock.", true);
+		}*/
+		if(!ds.checkTable("vsx_transactions")){
+			++desired;
+			String query = "create table vsx_transactions(`" + KEY_ID + "` integer primary key" + autoIncrement + ", `" + KEY_MATERIAL + "` varchar(256) not null, `" + KEY_POTION_DATA + "` varchar(256), `" + KEY_ENCHANTMENT_DATA + "` varchar(256), `" + KEY_QUANTITY + "` integer not null, `" + KEY_COST + "` double not null, `" + KEY_TIMESTAMP + "` bigint, `" + KEY_BUYER_UUID + "` char(36) not null, `" + KEY_SELLER_UUID + "` char(36) not null)";
+			if(createTable(query)){
+				cm.logInfo("Successfully created table vsx_transaction.");
+				++checksum;
+			} else
+				cm.logError("Unable to create table vsx_transaction.", true);
 		}
-		if(!ds.checkTable("vshop_transactions")){
+		if(!ds.checkTable("vsx_toggles")){
 			++desired;
-			String query = "create table vshop_transactions(`" + ID + "` integer primary key" + autoIncrement + ", `" + ITEM_ID + "` integer not null, `" + ITEM_DATA + "` smallint not null, `" + ITEM_EDATA + "` varchar(255), `" + QUANTITY + "` integer not null, `" + COST + "` double not null, `" + TIMESTAMP + "` bigint, `" + BUYER_UUID + "` char(36) not null, `" + VENDOR_UUID + "` char(36) not null)";
+			String query = "create table vsx_toggles(`" + KEY_ID + "` integer primary key" + autoIncrement + ", `buyconfirm` bit not null, `ebuyconfirm` bit not null,`sellconfirm` bit not null, `esellconfirm` bit not null, `cancelconfirm` bit not null, `ecancelconfirm` bit not null, `repriceconfirm` bit not null, `erepriceconfirm` bit not null, `" + KEY_UUID + "` char(36) not null)";
 			if(createTable(query)){
-				cm.logInfo("Successfully created table vshop_transaction.");
+				cm.logInfo("Successfully created table vsx_toggles.");
 				++checksum;
 			} else
-				cm.logError("Unable to create table vshop_transaction.", true);
-		}
-		if(!ds.checkTable("vshop_toggles")){
-			++desired;
-			String query = "create table vshop_toggles(`" + ID + "` integer primary key" + autoIncrement + ", `buyconfirm` bit not null, `ebuyconfirm` bit not null,`sellconfirm` bit not null, `esellconfirm` bit not null, `cancelconfirm` bit not null, `ecancelconfirm` bit not null, `repriceconfirm` bit not null, `erepriceconfirm` bit not null, `" + UUIDKEY + "` char(36) not null)";
-			if(createTable(query)){
-				cm.logInfo("Successfully created table vshop_toggles.");
-				++checksum;
-			} else
-				cm.logError("Unable to create table vshop_toggles.", true);
+				cm.logError("Unable to create table vsx_toggles.", true);
 		}
 		
 		if(checksum != desired){
@@ -197,7 +209,7 @@ public final class DatabaseManager {
     /* Buy & Sell Confirmation Accessors */
     
     public boolean isPlayerInToggles(UUID vendorUUID){
-    	String sql = "select * from vshop_toggles where " + UUIDKEY + "='" + vendorUUID.toString() + "'";
+    	String sql = "select * from vsx_toggles where " + KEY_UUID + "='" + vendorUUID.toString() + "'";
     	try(Connection connection = ds.getDataSource().getConnection();
     		PreparedStatement stmt = connection.prepareStatement(sql))
     	{
@@ -205,7 +217,7 @@ public final class DatabaseManager {
 		    	if(!result.next())
 		    		return false;
 		    	else
-		    		if(result.getString(UUIDKEY).equalsIgnoreCase(vendorUUID.toString()))
+		    		if(result.getString(KEY_UUID).equalsIgnoreCase(vendorUUID.toString()))
 		    			return true;
 		    	return false;
 	    	}
@@ -216,7 +228,7 @@ public final class DatabaseManager {
     }
     
     public void addPlayerToToggles(UUID vendorUUID){
-    	String sql = "insert into vshop_toggles(buyconfirm,ebuyconfirm,sellconfirm,esellconfirm,cancelconfirm,ecancelconfirm,repriceconfirm,erepriceconfirm," + UUIDKEY + ") values(1,1,1,1,1,1,1,1,'" + vendorUUID.toString() + "')";
+    	String sql = "insert into vsx_toggles(buyconfirm,ebuyconfirm,sellconfirm,esellconfirm,cancelconfirm,ecancelconfirm,repriceconfirm,erepriceconfirm," + KEY_UUID + ") values(1,1,1,1,1,1,1,1,'" + vendorUUID.toString() + "')";
     	executeUpdate(sql);
     }
     
@@ -227,7 +239,7 @@ public final class DatabaseManager {
     		addPlayerToToggles(vendorUUID);
     	
     	int dataval = value ? 1 : 0;
-    	String sql = "update vshop_toggles set " + togglesKey.get(clazz) + "=" + dataval + " where " + UUIDKEY + "='" + vendorUUID.toString() + "'";
+    	String sql = "update vsx_toggles set " + togglesKey.get(clazz) + "=" + dataval + " where " + KEY_UUID + "='" + vendorUUID.toString() + "'";
     	executeUpdate(sql);
     }
     
@@ -237,7 +249,7 @@ public final class DatabaseManager {
     	if(!isPlayerInToggles(vendorUUID))
     		addPlayerToToggles(vendorUUID);
     	
-    	String sql = "select * from vshop_toggles where " + UUIDKEY + "='" + vendorUUID.toString() + "'";
+    	String sql = "select * from vsx_toggles where " + KEY_UUID + "='" + vendorUUID.toString() + "'";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -249,20 +261,19 @@ public final class DatabaseManager {
     	}
     }
     
-    @SuppressWarnings("deprecation")
 	public void addOffer(Offer offer){
-    	String sql = "insert into vshop_stock(" + ITEM_ID + "," + ITEM_DATA + "," + QUANTITY + "," + PRICE + "," + UUIDKEY + ") values(" + offer.getItem().getType().getId() + ","+offer.getItem().getDurability() +","+offer.getItem().getAmount()+"," + offer.getPrice()+",'"+offer.getSellerUUID().toString()+"')";
+    	String sql = "insert into vsx_stock(" + KEY_MATERIAL + "," + KEY_POTION_DATA + "," + KEY_ENCHANTMENT_DATA + "," + KEY_QUANTITY + "," + KEY_PRICE + "," + KEY_UUID + ") values('" + offer.getItem().getType().name() + "','" + ItemDB.serializePotionData(offer.getItem()) + "','" + ItemDB.serializeEnchantmentData(offer.getItem()) + "'," + offer.getItem().getAmount() + "," + offer.getPrice() + ",'" + offer.getSellerUUID().toString() + "')";
     	executeUpdate(sql);
     }
     
-    @SuppressWarnings("deprecation")
+	/*
     public void addEOffer(Offer offer, String edata){
-		String sql = "insert into vshop_estock(" + ITEM_ID + "," + ITEM_DATA + "," + PRICE + "," + ITEM_EDATA + "," + UUIDKEY + ") values(" + offer.getItem().getType().getId() + ","+offer.getItem().getDurability() +","+offer.getPrice()+",'" + edata +"','"+offer.getSellerUUID().toString()+"')";
+		String sql = "insert into vsx_estock(" + KEY_MATERIAL + "," + KEY_PRICE + "," + KEY_ENCHANTMENT_DATA + "," + KEY_UUID + ") values(" + offer.getItem().getType().getId() + ","+offer.getItem().getDurability() +","+offer.getPrice()+",'" + edata +"','"+offer.getSellerUUID().toString()+"')";
     	executeUpdate(sql);
-    }
+    }*/
     
     public List<Offer> getAllRegularOffers(){
-    	String sql = "select * from vshop_stock order by " + PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_ENCHANTMENT_DATA + " IS NULL order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -274,7 +285,7 @@ public final class DatabaseManager {
     }
     
     public List<Offer> getAllEnchantedOffers(boolean withLore){
-    	String sql = "select * from vshop_estock order by " + PRICE + " asc";
+    	String sql = "select * from vsx_stock where" + KEY_ENCHANTMENT_DATA + " IS NOT NULL order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -287,9 +298,8 @@ public final class DatabaseManager {
 
   //TODO next
     
-    @SuppressWarnings("deprecation")
 	public List<Offer> getItemOffers(ItemStack item){
-    	String sql = "select * from vshop_stock where " + ITEM_ID + "=" + item.getTypeId()+ " and " + ITEM_DATA + "=" + item.getDurability() + " order by " + PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NOT NULL order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -300,9 +310,8 @@ public final class DatabaseManager {
     	}
     }
     
-    @SuppressWarnings("deprecation")
 	public List<Offer> getEnchantedOffers(ItemStack item, boolean withLore){
-    	String sql = "select * from vshop_estock where " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability() + " order by " + PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NULL order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -313,9 +322,8 @@ public final class DatabaseManager {
     	}
     }
     
-    @SuppressWarnings("deprecation")
 	public List<Offer> getOffersWithEnchants(ItemStack item, boolean withLore){
-    	String sql = "select * from vshop_estock where " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability() + " and " + ITEM_EDATA + "='" + ItemDB.formatEnchantData(ItemDB.getEnchantments(item)) + "' order by " + PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + "='" + ItemDB.serializeEnchantmentData(item) + "' order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -326,9 +334,8 @@ public final class DatabaseManager {
     	}
     }
     
-    @SuppressWarnings("deprecation")
 	public List<Offer> getOffersWithEnchants(UUID vendorUUID, ItemStack item, boolean withLore){
-    	String sql = "select * from vshop_estock where " + UUIDKEY + "= '" + vendorUUID.toString() + "' and " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability() + " and " + ITEM_EDATA + "='" + ItemDB.formatEnchantData(ItemDB.getEnchantments(item)) + "' order by " + PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + "='" + ItemDB.serializeEnchantmentData(item) + "' order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -339,9 +346,8 @@ public final class DatabaseManager {
     	}
     }
     
-    @SuppressWarnings("deprecation")
 	public List<Offer> getSpecificEnchantedOffer(ItemStack item, String edata, double price, boolean withLore){
-    	String sql = "select * from vshop_estock where " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability() + " and " + ITEM_EDATA + "='" + edata + "' and " + PRICE + "=" + price;
+    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + "='" + edata + "' and " + KEY_PRICE + "=" + price;
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -352,9 +358,8 @@ public final class DatabaseManager {
     	}
     }
 
-    @SuppressWarnings("deprecation")
 	public List<Offer> getSellerOffers(UUID vendorUUID, ItemStack item){
-    	String sql = "select * from vshop_stock where " + UUIDKEY + "= '" + vendorUUID.toString() + "' and " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability();
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NULL";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -365,9 +370,8 @@ public final class DatabaseManager {
     	}
     }
     
-    @SuppressWarnings("deprecation")
 	public List<Offer> getEnchantedSellerOffers(UUID vendorUUID, ItemStack item, boolean withLore){
-    	String sql = "select * from vshop_estock where " + UUIDKEY + "= '" + vendorUUID.toString() + "' and " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "=" + item.getDurability() + " order by " + PRICE + " asc";
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NOT NULL order by " + KEY_PRICE + " asc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -378,54 +382,48 @@ public final class DatabaseManager {
     	}
     }
 
-    @SuppressWarnings("deprecation")
 	public void removeSellerOffers(UUID vendorUUID, ItemStack item){
-    	String sql = "delete from vshop_stock where " + UUIDKEY + "= '" + vendorUUID.toString() + "' and " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "= " + item.getDurability();
+    	String sql = "delete from vsx_stock where " + KEY_UUID + "= '" + vendorUUID.toString() + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NULL";
     	executeUpdate(sql);
     }
 
     public void deleteItem(int id){
-    	String sql = "delete from vshop_stock where " + ID + "="+id;
+    	String sql = "delete from vsx_stock where " + KEY_ID + "=" + id;
     	executeUpdate(sql);
 	}
     
-    public void deleteEnchantedItem(int id){
-    	String sql = "delete from vshop_estock where " + ID + "="+id;
+    /*public void deleteEnchantedItem(int id){
+    	String sql = "delete from vsx_estock where " + KEY_ID + "=" + id;
     	executeUpdate(sql);
-    }
+    }*/
 
     public void updateQuantity(int id, int quantity){
-    	String sql = "update vshop_stock set " + QUANTITY + "="+quantity+" where " + ID + "=" + id;
+    	String sql = "update vsx_stock set " + KEY_QUANTITY + "=" + quantity + " where " + KEY_ID + "=" + id;
     	executeUpdate(sql);
 	}
 
     public void updatePrice(int id, double price){
-    	String sql = "update vshop_stock set " + PRICE + "="+price+" where " + ID + "=" + id;
+    	String sql = "update vsx_stock set " + KEY_PRICE + "="+price+" where " + KEY_ID + "=" + id;
     	executeUpdate(sql);
     }
-    @SuppressWarnings("deprecation")
+
 	public void updatePrice(UUID vendorUUID, double price, ItemStack item){
-    	String sql = "update vshop_stock set " + PRICE + "="+price+" where " + UUIDKEY + "='" + vendorUUID + "' and " + ITEM_ID + "=" + item.getTypeId() + " and " + ITEM_DATA + "= " + item.getDurability();
+    	String sql = "update vsx_stock set " + KEY_PRICE + "=" + price + " where " + KEY_UUID + "='" + vendorUUID + "' and " + KEY_MATERIAL + "='" + item.getType().name() + "' and " + KEY_POTION_DATA + "='" + ItemDB.serializePotionData(item) + "' and " + KEY_ENCHANTMENT_DATA + " IS NULL";
     	executeUpdate(sql);
     }
     
-	public void updatePriceEnchanted(int id, double price){
-    	String sql = "update vshop_estock set " + PRICE + "="+price+" where " + ID + "=" + id;
+	/*public void updatePriceEnchanted(int id, double price){
+    	String sql = "update vsx_estock set " + KEY_PRICE + "="+price+" where " + KEY_ID + "=" + id;
     	executeUpdate(sql);
-    }
+    }*/
     
-    
-    //TODO HI
-    @SuppressWarnings("deprecation")
 	public void logTransaction(Transaction t){
-    	String edata = null;
-    	if(ItemDB.hasEnchantments(t.getItem())) edata = ItemDB.formatEnchantData(ItemDB.getEnchantments(t.getItem()));
-    	String sql = "insert into vshop_transactions(" + ITEM_ID + "," + ITEM_DATA + "," + ITEM_EDATA + "," + QUANTITY + "," + COST + "," + TIMESTAMP + "," + BUYER_UUID + "," + VENDOR_UUID + ") values(" + t.getItem().getTypeId() + ","+ t.getItem().getDurability() +",'"+edata+"',"+t.getItem().getAmount()+","+t.getCost()+"," + t.getTimestamp() + ",'"+t.getBuyerUUID().toString()+"','"+t.getSellerUUID().toString()+"')";
+    	String sql = "insert into vsx_transactions(" + KEY_MATERIAL + "," + KEY_POTION_DATA + "," + KEY_ENCHANTMENT_DATA + "," + KEY_QUANTITY + "," + KEY_COST + "," + KEY_TIMESTAMP + "," + KEY_BUYER_UUID + "," + KEY_SELLER_UUID + ") values('" + t.getItem().getType().name() + "'," + ItemDB.serializePotionData(t.getItem()) + ",'" + ItemDB.serializeEnchantmentData(t.getItem()) + "'," + t.getItem().getAmount() + "," + t.getCost() + "," + t.getTimestamp() + ",'" + t.getBuyerUUID().toString() + "','" + t.getSellerUUID().toString() + "')";
     	executeUpdate(sql);
     }
 
     public List<Offer> getBestPrices(){
-    	String sql = "select f.* from (select " + ITEM_ID + ",min(" + PRICE + ") as min" + PRICE + " from vshop_stock group by " + ITEM_ID + ") as x inner join vshop_stock as f on f." + ITEM_ID + " = x." + ITEM_ID + " and f." + PRICE + " = x.min" + PRICE + "";
+    	String sql = "select f.* from (select " + KEY_MATERIAL + ",min(" + KEY_PRICE + ") as min" + KEY_PRICE + " from vsx_stock group by " + KEY_MATERIAL + ") as x inner join vsx_stock as f on f." + KEY_MATERIAL + " = x." + KEY_MATERIAL + " and f." + KEY_PRICE + " = x.min" + KEY_PRICE + "";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -437,7 +435,7 @@ public final class DatabaseManager {
     }
 
     public List<Offer> searchRegularBySeller(UUID vendorUUID){
-    	String sql = "select * from vshop_stock where " + UUIDKEY + "='" + vendorUUID.toString() +  "'";
+    	String sql = "select * from vsx_stock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' where " + KEY_ENCHANTMENT_DATA + " IS NULL";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -449,7 +447,7 @@ public final class DatabaseManager {
     }
     
     public List<Offer> searchEnchantedBySeller(UUID vendorUUID, boolean withLore){
-    	String sql = "select * from vshop_estock where " + UUIDKEY + "='" + vendorUUID.toString() +  "'";
+    	String sql = "select * from vsx_estock where " + KEY_UUID + "='" + vendorUUID.toString() +  "' where " + KEY_ENCHANTMENT_DATA + " IS NOT NULL";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -461,7 +459,7 @@ public final class DatabaseManager {
     }
 
     public List<Transaction> getTransactions(){
-    	String sql = "select * from vshop_transactions order by " + ID + " desc";
+    	String sql = "select * from vsx_transactions order by " + KEY_ID + " desc";
     	try(Connection connection = ds.getDataSource().getConnection();
         	PreparedStatement stmt = connection.prepareStatement(sql);
         	ResultSet result = stmt.executeQuery()){
@@ -473,7 +471,7 @@ public final class DatabaseManager {
     }
 
 	public List<Transaction> getTransactions(UUID targetUUID){
-		String sql = "select * from vshop_transactions where " + VENDOR_UUID + "='" + targetUUID.toString() +"' OR " + BUYER_UUID + "='" + targetUUID.toString() +"' order by " + ID + "";
+		String sql = "select * from vsx_transactions where " + KEY_SELLER_UUID + "='" + targetUUID.toString() +"' OR " + KEY_BUYER_UUID + "='" + targetUUID.toString() +"' order by " + KEY_ID + "";
 		try(Connection connection = ds.getDataSource().getConnection();
 	    	PreparedStatement stmt = connection.prepareStatement(sql);
 	    	ResultSet result = stmt.executeQuery()){
@@ -484,9 +482,8 @@ public final class DatabaseManager {
 		}
 	}
 
-    @SuppressWarnings("deprecation")
 	public List<Offer> getPrices(ItemStack item){
-    	String sql = "select * from vshop_stock where " + ITEM_ID + "=" + item.getTypeId() + " AND " + ITEM_DATA + "=" + item.getDurability() + " order by " + PRICE + " asc limit 0,10";
+    	String sql = "select * from vsx_stock where " + KEY_MATERIAL + "='" + item.getType().name() + "' AND " + KEY_POTION_DATA + "=" + ItemDB.serializePotionData(item) + " order by " + KEY_PRICE + " asc limit 0,10";
     	try(Connection connection = ds.getDataSource().getConnection();
     		PreparedStatement stmt = connection.prepareStatement(sql);
     		ResultSet result = stmt.executeQuery()){

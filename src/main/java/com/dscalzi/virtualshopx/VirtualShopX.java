@@ -43,8 +43,8 @@ public class VirtualShopX extends JavaPlugin {
     public void onEnable(){
     	// Set up Vault.
         if(!this.setupEconomy()){
-            this.getLogger().severe("Vault not found. Shutting down!");
             this.getPluginLoader().disablePlugin(this);
+            return;
         }
         try {
 			ItemDB.initialize(this);
@@ -64,18 +64,26 @@ public class VirtualShopX extends JavaPlugin {
     }
     
     public void onDisable(){
-    	ConfirmationManager.getInstance().serialize();
-    	DatabaseManager.getInstance().terminate();
-    	UIManager.prepareShutdown();
+        if(ConfirmationManager.getInstance() != null) {
+            ConfirmationManager.getInstance().serialize();
+        }
+        if(DatabaseManager.getInstance() != null) {
+            DatabaseManager.getInstance().terminate();
+        }
+        if(UIManager.getInstance() != null) {
+            UIManager.prepareShutdown();
+        }
         System.gc();
     }
     
     private boolean setupEconomy(){
         if(getServer().getPluginManager().getPlugin("Vault") == null) {
+            this.getLogger().severe("Vault not found! Shutting down..");
         	return false;
         }
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if(rsp == null) {
+            this.getLogger().severe("Economy plugin not found! Shutting down..");
         	return false;
         }
         econ = rsp.getProvider();

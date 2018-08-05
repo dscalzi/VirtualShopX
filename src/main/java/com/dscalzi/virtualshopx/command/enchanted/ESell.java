@@ -122,7 +122,6 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 	 * @return True if all of the parameters the player supplies are valid to initiate the creation of a listing.
 	 *  	   If any data is not valid, returns false.
 	 */
-	@SuppressWarnings("deprecation")
 	private boolean validateData(Player player, String[] args){
 		//Set Data
 		PlayerInventory im = player.getInventory();
@@ -197,8 +196,8 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
         	}
 		}
 		
-        if(price > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			mm.priceTooHigh(player, args[1], cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+        if(price > cm.getMaxPrice(item.getType())){
+			mm.priceTooHigh(player, args[1], cm.getMaxPrice(item.getType()));
 			return false;
 		}
         
@@ -221,8 +220,7 @@ public class ESell implements CommandExecutor, Confirmable, TabCompleter{
 		InventoryManager im = new InventoryManager(player);
 		im.removeItem(item);
         Offer o = new Offer(player.getUniqueId(), cleanedItem, price);
-        String edata = ItemDB.formatEnchantData(ItemDB.getEnchantments(cleanedItem));
-		dbm.addEOffer(o, edata);
+		dbm.addOffer(o);
 		confirmations.unregister(this.getClass(), player);
         if(cm.broadcastOffers())
         {

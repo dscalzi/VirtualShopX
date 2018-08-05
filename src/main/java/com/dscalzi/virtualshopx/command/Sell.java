@@ -126,7 +126,6 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
 	 * @return True if all of the parameters the player supplies are valid to initiate the creation of a listing.
 	 *  	   If any data is not valid, returns false.
 	 */
-	@SuppressWarnings("deprecation")
 	private boolean validateData(Player player, String[] args){
 		//Set Data
 		int amount = InputUtil.parseInt(args[0]);
@@ -232,8 +231,8 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
         	}
         }
         
-        if(price > cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData())){
-			mm.priceTooHigh(player, args[1], cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData()));
+        if(price > cm.getMaxPrice(item.getType())){
+			mm.priceTooHigh(player, args[1], cm.getMaxPrice(item.getType()));
 			return false;
 		}
         

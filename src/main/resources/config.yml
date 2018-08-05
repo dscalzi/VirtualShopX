@@ -158,13 +158,11 @@ item_settings:
   #  
   # Example below: (// is a comment)
   #
-  #     itemid-datavalue:    //If there is no specific data value put 0
-  #       name: ItemName     //Not required but helpful for the user
-  #       max-price:         //Maximum price the user can sell this item at
+  #     MATERIAL_NAME:       // https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  #       max-price:         // Maximum price the user can sell this item at
   price_limits:
     default_limit: 100000.0
     items:
-      399-0: 
-        name: NetherStar
+      NETHER_STAR: 
         max-price: 1000000.0
       

@@ -107,7 +107,6 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 			mm.buyConfirmation(player, label, (TransactionData) confirmations.retrieve(this.getClass(), player));
 	}
 	
-	@SuppressWarnings("deprecation")
 	private boolean validateData(Player player, String[] args){
 		//Set data
 		int amount = InputUtil.parseInt(args[0]);
@@ -142,7 +141,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
         		return false;
         	}
         } else {
-        	maxprice = cm.getMaxPrice(item.getData().getItemTypeId(), item.getData().getData());
+        	maxprice = cm.getMaxPrice(item.getType());
         }
 		//Check for listings
 		List<Offer> offers = dbm.getItemOffers(item);
@@ -169,8 +168,6 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
 		confirmations.unregister(this.getClass(), player);
 	}
 	
-	
-	@SuppressWarnings("deprecation")
 	private TransactionData parseListings(Player player, TransactionData data, boolean finalize){
 		boolean canContinue = true;
 		int amount = data.getAmount();
@@ -226,7 +223,7 @@ public class Buy implements CommandExecutor, Confirmable, TabCompleter{
             		dbm.deleteItem(o.getId());
             	else 
             		dbm.updateQuantity(o.getId(), left);
-            	Transaction t = new Transaction(o.getSellerUUID(), player.getUniqueId(), o.getItem().getTypeId(), o.getItem().getDurability(), canbuy, cost, System.currentTimeMillis());
+            	Transaction t = new Transaction(o.getSellerUUID(), player.getUniqueId(), o.getItem().getType(), canbuy, cost, System.currentTimeMillis());
             	dbm.logTransaction(t);
             }
             if(bought >= amount) 

@@ -211,7 +211,7 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 	private Offer validateData(Player player, ItemStack item, Double price){
 		if(price == null) return null;
 		ItemStack i = ItemDB.getCleanedItem(item);
-		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price, true);
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.serializeEnchantmentData(i), price, true);
 		for(Offer o : matches)
 			if(!o.getSellerUUID().equals(player.getUniqueId()))
 				return o;
@@ -219,16 +219,15 @@ public class EBuy implements CommandExecutor, Listener, Confirmable, TabComplete
 		return matches.size() > 0 ? matches.get(0) : null;
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void finalizeTransaction(Player p, Offer o){
 		ItemStack cleaned = ItemDB.getCleanedItem(o.getItem());
 		VirtualShopX.getEconomy().withdrawPlayer(p, o.getPrice());
 		VirtualShopX.getEconomy().depositPlayer(Bukkit.getOfflinePlayer(o.getSellerUUID()), o.getPrice());
 		mm.ebuySuccessVendor(p, o.getSellerUUID(), cleaned, o.getPrice());
-		DatabaseManager.getInstance().deleteEnchantedItem(o.getId());
+		DatabaseManager.getInstance().deleteItem(o.getId());
 		InventoryManager im = new InventoryManager(p);
 		im.addItem(cleaned);
-		dbm.logTransaction(new Transaction(o.getSellerUUID(), p.getUniqueId(), cleaned.getTypeId(), cleaned.getDurability(), cleaned.getAmount(), o.getPrice(), System.currentTimeMillis(), ItemDB.formatEnchantData(ItemDB.getEnchantments(cleaned))));
+		dbm.logTransaction(new Transaction(o.getSellerUUID(), p.getUniqueId(), cleaned.getType(), cleaned.getAmount(), o.getPrice(), System.currentTimeMillis(), ItemDB.serializeEnchantmentData(cleaned)));
 		mm.ebuySuccess(p, cleaned);
 	}
 	

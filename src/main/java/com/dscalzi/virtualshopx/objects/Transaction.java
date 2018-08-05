@@ -5,6 +5,7 @@
  */
 package com.dscalzi.virtualshopx.objects;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import com.dscalzi.virtualshopx.managers.DatabaseManager;
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@SuppressWarnings("deprecation")
 public class Transaction {
 	
     private UUID sellerUUID;
@@ -27,15 +27,15 @@ public class Transaction {
     private double cost;
     private long timestamp;
 
-    public Transaction(UUID sellerUUID, UUID buyerUUID, int id, short damage, int amount, double cost, long timestamp){
-        this(sellerUUID, buyerUUID, id, damage, amount, cost, timestamp, null);
+    public Transaction(UUID sellerUUID, UUID buyerUUID, Material m, int amount, double cost, long timestamp){
+        this(sellerUUID, buyerUUID, m, amount, cost, timestamp, null);
     }
     
-    public Transaction(UUID sellerUUID, UUID buyerUUID, int id, short damage, int amount, double cost, long timestamp, String edata){
+    public Transaction(UUID sellerUUID, UUID buyerUUID, Material m, int amount, double cost, long timestamp, String edata){
     	this.sellerUUID = sellerUUID;
         this.buyerUUID = buyerUUID;
-        this.item = new ItemStack(id,amount, damage);
-        if(edata != null) ItemDB.addEnchantments(item, ItemDB.parseEnchantData(edata));
+        this.item = new ItemStack(m, amount);
+        if(edata != null) ItemDB.addEnchantments(item, ItemDB.deserializeEnchantmentData(edata));
         this.cost = cost;
         this.timestamp = timestamp;
     }
@@ -44,7 +44,7 @@ public class Transaction {
         List<Transaction> ret = new ArrayList<Transaction>();
         try {
             while(result.next()){
-                Transaction t = new Transaction(UUID.fromString(result.getString(DatabaseManager.VENDOR_UUID)), UUID.fromString(result.getString(DatabaseManager.BUYER_UUID)), result.getInt(DatabaseManager.ITEM_ID), result.getShort(DatabaseManager.ITEM_DATA), result.getInt(DatabaseManager.QUANTITY), result.getDouble(DatabaseManager.COST), result.getLong(DatabaseManager.TIMESTAMP), result.getString(DatabaseManager.ITEM_EDATA));
+                Transaction t = new Transaction(UUID.fromString(result.getString(DatabaseManager.KEY_SELLER_UUID)), UUID.fromString(result.getString(DatabaseManager.KEY_BUYER_UUID)), Material.valueOf(result.getString(DatabaseManager.KEY_MATERIAL)), result.getInt(DatabaseManager.KEY_QUANTITY), result.getDouble(DatabaseManager.KEY_COST), result.getLong(DatabaseManager.KEY_TIMESTAMP), result.getString(DatabaseManager.KEY_ENCHANTMENT_DATA));
                 ret.add(t);
             }
         } catch (SQLException e) {

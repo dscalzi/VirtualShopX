@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -161,21 +162,17 @@ public final class ConfigManager {
 		return this.config.getDouble("item_settings.price_limits.default_limit");
 	}
 	
-	public double getMaxPrice(int itemID){
-		return getMaxPrice(itemID, 0);
-	}
-	
 	public int getConfirmationTimeout(Class<? extends Confirmable> clazz){
 		int time = this.config.getInt("general_settings.confirmation_timeouts." + (clazz.getSimpleName().toLowerCase()), 15000);
 		return (time > 0) ? time : 15000;
 	}
 	
-	public double getMaxPrice(int itemID, int dataValue){
-		if(!this.config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue)))
+	public double getMaxPrice(Material m){
+		if(!this.config.contains("item_settings.price_limits.items." + m.name()))
 			return getMaxPrice();
-		if(!this.config.contains("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price"))
+		if(!this.config.contains("item_settings.price_limits.items." + m.name() + ".max-price"))
 			return getMaxPrice();
-		return this.config.getLong("item_settings.price_limits.items." + Integer.toString(itemID) + "-" + Integer.toString(dataValue) + ".max-price");
+		return this.config.getLong("item_settings.price_limits.items." + m.name() + ".max-price");
 	}
 	
 	public List<String> getAllowedWorlds(){

@@ -211,7 +211,7 @@ public class ECancel implements CommandExecutor, Listener, Confirmable, TabCompl
 	private Offer validateData(Player player, ItemStack item, Double price){
 		if(price == null) return null;
 		ItemStack i = ItemDB.getCleanedItem(item);
-		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.formatEnchantData(ItemDB.getEnchantments(i)), price, true);
+		List<Offer> matches = DatabaseManager.getInstance().getSpecificEnchantedOffer(i, ItemDB.serializeEnchantmentData(i), price, true);
 		for(Offer o : matches)
 			if(o.getSellerUUID().equals(player.getUniqueId()))
 				return o;
@@ -261,7 +261,7 @@ public class ECancel implements CommandExecutor, Listener, Confirmable, TabCompl
 	private void finalizeCancel(Player player, Offer o){
     	ItemStack item = ItemDB.getCleanedItem(o.getItem());
     	new InventoryManager(player).addItem(item);
-        dbm.deleteEnchantedItem(o.getId());
+        dbm.deleteItem(o.getId());
         mm.ecancelSuccess(player, ItemDB.getCleanedItem(item));
     }
 	
