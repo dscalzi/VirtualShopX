@@ -185,7 +185,11 @@ public class VS implements CommandExecutor, TabCompleter{
 			return;
 		}
 		
-		mm.formatLookupResults(sender, searchItem, target.isPresent() ? target.get().getAliases() : new ArrayList<String>());
+		if(target.isPresent()) {
+		    mm.formatLookupResults(sender, searchItem, target.get().hasLegacy() ? target.get().getLegacy().toString() : null, target.get().getAliases());
+		} else {
+		    mm.formatLookupResults(sender, searchItem, null, new ArrayList<String>());
+		}
 	}
 	
 	public void formatMarket(CommandSender sender){

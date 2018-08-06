@@ -22,6 +22,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 
 import com.dscalzi.virtualshopx.VirtualShopX;
 import com.dscalzi.virtualshopx.command.Buy;
@@ -357,7 +358,7 @@ public final class MessageManager {
 		sendError(sender, "The VS does not yet support this item. Try again soon!");
 	}
 	
-	public void formatLookupResults(CommandSender sender, ItemStack target, List<String> aliases){
+	public void formatLookupResults(CommandSender sender, ItemStack target, String legacyString, List<String> aliases){
 		String formattedAliasList;
 		if(aliases.size() < 1){
 			formattedAliasList = cm.getErrorColor() + "Could not find this item in the database. It's either damaged, not included in the VS, or from a recent update!";
@@ -367,7 +368,13 @@ public final class MessageManager {
 			formattedAliasList = formattedAliasList.replaceAll("\\]", tColor + "\\]" + bColor);
 		}
 		
-		String topLine = getPrefix() + " " + formatItem(target.getType().toString(), true).toUpperCase() + tColor + " - " + formatItem(target.getType().name(), true);
+		String potionLine = "";
+		
+		if(target.hasItemMeta() && target.getItemMeta() instanceof PotionMeta) {
+		    potionLine = tColor + " of " + formatItem(((PotionMeta)target.getItemMeta()).getBasePotionData().getType().name(), false);
+		}
+		
+		String topLine = getPrefix() + " " + formatItem(target.getType().name(), false) + potionLine + (legacyString != null ? tColor + " - " + ChatColor.GRAY + legacyString : "");
 		sendRawMessage(sender, topLine);
 		sendRawMessage(sender, bColor + formattedAliasList);
 	}
