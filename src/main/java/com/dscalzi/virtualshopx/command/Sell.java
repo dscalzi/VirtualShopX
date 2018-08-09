@@ -179,11 +179,11 @@ public class Sell implements CommandExecutor, Confirmable, TabCompleter{
         	for(int i=0; i<inv.length-5; ++i){
         		if(inv[i] == null)
         			continue;
-        		else if(inv[i].isSimilar(item)){
+        		else if(ItemDB.similar(item, inv[i], true)){
         			total += inv[i].getAmount();
         		}
         	}
-        	if(im.getItemInOffHand().isSimilar(item)){
+        	if(ItemDB.similar(item, im.getItemInOffHand(), true)){
         		total += im.getItemInOffHand().getAmount();
         	}
         	amount = total;

@@ -175,13 +175,27 @@ public final class ItemDB {
 		return i;
 	}
 	
-	public static boolean similarEnchanted(ItemStack first, ItemStack second) {
+	public static boolean hasLore(ItemStack item) {
+	    return item.hasItemMeta() && item.getItemMeta().hasLore();
+	}
+	
+	public static boolean similar(ItemStack first, ItemStack second) {
+	    return similar(first, second, false);
+	}
+	
+	public static boolean similar(ItemStack first, ItemStack second, boolean checkLore) {
 	    if(first.getType().equals(second.getType())) {
-	        if(ItemDB.getEnchantments(first).equals(ItemDB.getEnchantments(second))){
-	            return true;
+	        if(checkLore) {
+	            boolean hlF = hasLore(first), hlS = hasLore(second);
+	            if(hlF && !hlS || !hlF && hlS) {
+	                return false;
+	            }
 	        }
-	    }
-	    return false;
+            if(ItemDB.getEnchantments(first).equals(ItemDB.getEnchantments(second))){
+                return true;
+            }
+        }
+        return false;
 	}
 	
 }

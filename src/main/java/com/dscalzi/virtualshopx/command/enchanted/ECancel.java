@@ -281,7 +281,7 @@ public class ECancel implements CommandExecutor, Listener, Confirmable, TabCompl
 		long timeElapsed = System.currentTimeMillis() - d.getTransactionTime();
 		if(timeElapsed > cm.getConfirmationTimeout(this.getClass()))
 			mm.confirmationExpired(player);
-		else if(ItemDB.similarEnchanted(cM, oM) && match.getPrice() == d.getPrice())
+		else if(ItemDB.similar(cM, oM) && match.getPrice() == d.getPrice())
 			finalizeCancel(player, match);
 		else
 			mm.invalidConfirmData(player);

@@ -38,10 +38,10 @@ public class InventoryManager {
 		
 		for(Map.Entry<Integer, ? extends ItemStack> entry : _inv.all(item.getType()).entrySet()){
 			ItemStack i = entry.getValue();
-			if(i.isSimilar(item)) itemAmount += i.getAmount();
+			if(ItemDB.similar(i, item)) itemAmount += i.getAmount();
 				
 		}
-		if(_inv.getItemInOffHand().isSimilar(item)) itemAmount += _inv.getItemInOffHand().getAmount();
+		if(ItemDB.similar(_inv.getItemInOffHand(), item, true)) itemAmount += _inv.getItemInOffHand().getAmount();
 		
 		if(item.getAmount() <= itemAmount) return true;
 		
@@ -62,7 +62,7 @@ public class InventoryManager {
 		
 		if(dropAmount == 0) return;
 		
-		if(_inv.getItemInOffHand().isSimilar(item)){
+		if(ItemDB.similar(_inv.getItemInOffHand(), item, true)){
 			if(_inv.getItemInOffHand().getAmount() < 64){
 				ItemStack offhand = _inv.getItemInOffHand();
 				int newAmt = (dropAmount + offhand.getAmount()) > 64 ? 64 : dropAmount + offhand.getAmount();
@@ -98,7 +98,7 @@ public class InventoryManager {
     		if(inv[i] == null){
     			openNum += 64;
     			continue;
-    		} else if(inv[i].isSimilar(item)){
+    		} else if(ItemDB.similar(inv[i], item, true)){
     			int m = inv[i].getMaxStackSize();
     			if(m < 0) m = 64;
     			int guess = m-inv[i].getAmount();
@@ -106,7 +106,7 @@ public class InventoryManager {
     			openNum += guess;
     		}
     	}
-        if(_inv.getItemInOffHand().isSimilar(item)){
+        if(ItemDB.similar(_inv.getItemInOffHand(), item, true)){
         	int m = _inv.getItemInOffHand().getMaxStackSize();
 			if(m < 0) m = 64;
 			int guess = m-_inv.getItemInOffHand().getAmount();
@@ -123,7 +123,7 @@ public class InventoryManager {
     	    	
     	for(Map.Entry<Integer,? extends ItemStack> entry : _inv.all(item.getType()).entrySet()) {
     		ItemStack i = entry.getValue();
-    		if(item.isSimilar(i)){
+    		if(ItemDB.similar(item, i, true)){
     			if(requestedDeletion>=i.getAmount()) {
     				requestedDeletion -= i.getAmount();
     				
@@ -142,7 +142,7 @@ public class InventoryManager {
     		}
     	}
     	if(requestedDeletion > 0){
-    		if(_inv.getItemInOffHand().isSimilar(item)){
+    		if(ItemDB.similar(_inv.getItemInOffHand(), item, true)){
     			ItemStack reduced = _inv.getItemInOffHand();
     			int reducedNumber = reduced.getAmount()-requestedDeletion <= 0 ? 0 : reduced.getAmount()-requestedDeletion;
     			requestedDeletion -= item.getAmount() <= 0 ? 0 : item.getAmount();
